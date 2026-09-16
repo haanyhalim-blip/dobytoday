@@ -1,0 +1,715 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="color-scheme" content="light">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Do by Today – a to-do list for today only, sorted by when</title>
+<meta name="description" content="A to-do list for today only: morning, afternoon, evening, if there's time. Start from a ready-made day, tap things off as you go, and tomorrow it starts clean. Free, no account.">
+<meta name="theme-color" content="#b0611c">
+<link rel="canonical" href="https://dobytoday.com/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="Do by Today">
+<meta property="og:title" content="Do by Today – today's list, sorted by when">
+<meta property="og:description" content="Morning, afternoon, evening, if there's time. Tap things off as you go; tomorrow starts clean. Free, no account.">
+<meta property="og:url" content="https://dobytoday.com/">
+<meta name="twitter:card" content="summary">
+<script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Do by Today","url":"https://dobytoday.com/","applicationCategory":"LifestyleApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"GBP"},"description":"A to-do list for today only, sorted by when: morning, afternoon, evening, if there's time. Start from a ready-made day, tap things off, share it with the house. Tomorrow it starts clean. Free, no account needed."}</script>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23b0611c'/%3E%3Ccircle cx='32' cy='32' r='17' fill='none' stroke='%23fff' stroke-width='5'/%3E%3Cpath d='M32 20v12l8 6' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="DobyToday">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --bg:#f6f1ea; --card:#fffcf8; --line:#e0d5c6; --ink:#2b2218; --muted:#6f6357; --faint:#a89a8a;
+  --main:#b0611c; --main-deep:#864713; --wash:#f6e6d3; --accent:#b5532a; --accent-wash:#f6e4db; --second:#2b3a67; --second-deep:#1e2a4d; --second-wash:#e3e7f2;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.5}
+.wrap{max-width:760px;margin:0 auto;padding:0 16px 90px}
+header{padding:26px 0 14px;margin-bottom:6px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
+.keep{margin:0 0 10px;padding:12px 14px;background:var(--wash);border:1.5px solid var(--main);border-radius:10px;font-size:.92rem;color:var(--ink)}
+.keep[hidden]{display:none}
+.keep b{color:var(--main-deep)}
+.tagline{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:1.15rem;color:var(--ink);margin:0;flex:1 1 auto}
+@media (max-width:560px){.tagline{flex-basis:100%;order:3}.keepb{order:4}}
+.brand{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:1.55rem;letter-spacing:-.01em;color:var(--main);margin:0;text-decoration:none}
+.brand span{color:var(--ink)}
+.brand.mini{font-size:1.05rem}
+body.searching h2.sec:has(#howBtn),body.searching #howBox,body.searching h2.sec:has(#tripBtn),body.searching #tripBox,body.searching h2.sec:has(#shopBtn){display:none}
+.sticky{position:sticky;top:0;z-index:10;background:var(--bg);padding:6px 0 10px;border-bottom:1px solid var(--line);margin:0 0 4px}
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.sticky .qwrap{flex:1 1 160px;position:relative;display:flex}
+.sticky #q{flex:1 1 auto;width:100%;padding-right:40px}
+#qClear{position:absolute;right:6px;top:50%;transform:translateY(-50%);width:30px;height:30px;border:0;border-radius:50%;background:var(--line);color:var(--ink);font:700 20px/1 system-ui,sans-serif;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#qClear[hidden]{display:none}
+@media (max-width:480px){.sticky .qwrap{flex-basis:100%}}
+#q{flex:1;min-width:0;padding:13px 15px;border:1.5px solid var(--line);border-radius:10px;background:var(--card);color:var(--ink);font:inherit;font-size:17px}
+#q:focus{outline:2px solid var(--main);outline-offset:-1px;border-color:transparent}
+#q::placeholder{color:var(--faint)}
+.btn{font:inherit;font-size:.92rem;cursor:pointer;border:1.5px solid var(--line);background:var(--card);color:var(--ink);padding:11px 14px;border-radius:10px;white-space:nowrap;font-weight:700}
+.btn:hover{border-color:var(--main)}
+.btn:focus-visible,.it:focus-visible,.link:focus-visible{outline:2px solid var(--main);outline-offset:2px}
+.btn.primary{background:var(--main);border-color:var(--main);color:#fff}
+.btn.primary:hover{background:var(--main-deep);border-color:var(--main-deep)}
+.btn:disabled{opacity:.4;cursor:default}
+.sec{font-size:1.2rem;font-weight:700;color:var(--main-deep);margin:22px 0 10px;padding:9px 12px;background:var(--wash);border-left:4px solid var(--main);border-radius:8px}
+.sect{font:inherit;font-size:1.2rem;font-weight:700;color:var(--main-deep);width:100%;background:none;border:0;padding:0;cursor:pointer;display:inline-flex;align-items:center;gap:10px}
+.sect .c{width:10px;height:10px;border-right:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:rotate(-45deg);transition:transform .15s}
+.sect[aria-expanded="true"] .c{transform:rotate(45deg)}
+.sect:hover{opacity:.85}
+.howwrap{margin:0 0 4px;padding:14px 16px;background:var(--card);border:1.5px solid var(--main);border-radius:10px;display:grid;gap:14px;grid-template-columns:1fr;align-items:center}
+.step{opacity:1;transform:none;pointer-events:auto;grid-area:auto}
+.step.ov{display:none}
+.howwrap[hidden]{display:none}
+.steps{display:grid;align-items:center}
+.step{grid-area:1/1;display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;font-size:.95rem;line-height:1.4;opacity:0;transform:translateY(6px);transition:opacity .35s,transform .35s;pointer-events:none}
+.step.on{opacity:1;transform:none}
+.step.ov{grid-template-columns:1fr;gap:8px;align-content:center}
+.ovrow{display:flex;align-items:center;gap:10px;opacity:.35;transition:opacity .3s}
+.ovrow.hl{opacity:1}
+.ovrow b{font-size:1.05rem}
+.step .k{width:28px;height:28px;border-radius:50%;background:var(--main);color:#fff;font-weight:700;font-size:.85rem;display:flex;align-items:center;justify-content:center}
+.step b{color:var(--ink);font-size:1.05rem}
+.gtk{display:block;margin-top:4px;font-size:.82rem;color:var(--muted)}
+.demo{position:relative;width:260px;border-radius:12px;overflow:hidden;border:1.5px solid var(--main);background:var(--bg);line-height:0}
+.demo video{width:100%;height:auto;display:block;cursor:pointer}
+.pp{font:inherit;font-size:.8rem;font-weight:700;line-height:1;width:100%;border:0;border-top:1.5px solid var(--main);background:var(--card);color:var(--main-deep);padding:8px 6px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px}
+.pp:hover{background:var(--wash)}
+.bigpp{position:absolute;left:50%;bottom:46px;transform:translateX(-50%);width:52px;height:52px;border-radius:50%;border:2px solid #fff;background:rgba(0,0,0,.45);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;box-shadow:0 2px 8px rgba(0,0,0,.35)}
+.bigpp:hover{background:rgba(0,0,0,.65)}
+.bigpp .iy{display:none} .bigpp.paused .iy{display:block} .bigpp.paused .ip{display:none}
+.bigpp.paused{background:var(--main);border-color:#fff}
+@media (max-width:480px){.bigpp{width:44px;height:44px;bottom:40px}.bigpp svg{width:22px;height:22px}}
+@media (max-width:560px){.howwrap{grid-template-columns:1fr;justify-items:center}.steps{width:100%}.demo{width:min(100%,340px)}}
+/* starter trips */
+#tripBox[hidden]{display:none}
+.trips{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px}
+.trip{font:inherit;text-align:left;cursor:pointer;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:12px 13px;display:flex;flex-direction:column;gap:4px}
+.trip:hover{border-color:var(--main)}
+.trip b{font-size:1rem;color:var(--main-deep)}
+.trip small{font-size:.82rem;color:var(--muted);line-height:1.35}
+.trip .n{font-size:.76rem;color:var(--main);font-weight:700;margin-top:4px}
+.tripnote{margin:10px 0 0;font-size:.85rem;color:var(--muted)}
+.tripnote .link{font-size:.85rem}
+#shareBox[hidden]{display:none}
+.paper{font:inherit;font-size:.9rem;line-height:1.5;white-space:pre-wrap;background:#fff;color:#111;border:1px solid var(--line);border-radius:6px;padding:14px 16px;margin:0 0 12px;box-shadow:0 1px 3px rgba(0,0,0,.08);max-height:40vh;overflow:auto}
+.drawer .sharebox{margin:18px 0 0;border-color:var(--second);scroll-margin-top:64px}
+#shopBox{padding:6px 12px 12px;background:var(--card);border:1.5px solid var(--main);border-radius:10px}
+#shopBox[hidden]{display:none}
+#mineBox[hidden]{display:none}
+.mineb{background:var(--second);border-color:var(--second);color:#fff}
+.mineb:hover{background:var(--second-deep);border-color:var(--second-deep)}
+.mineb .tn{background:#fff;color:var(--second-deep);border-radius:99px;padding:1px 7px;font-size:.8rem;margin-left:2px}
+.mineb .tn:empty{display:none}
+.drawer{position:fixed;inset:0;z-index:40;background:var(--bg);overflow:auto;-webkit-overflow-scrolling:touch;overscroll-behavior:contain}
+.dwrap{max-width:720px;margin:0 auto;padding:10px 16px 40px}
+.dhead{position:sticky;top:0;z-index:2;background:var(--bg);display:flex;align-items:center;gap:10px;padding:8px 0 10px;border-bottom:1.5px solid var(--second)}
+.dtitle{flex:1;margin:0;font-size:1.2rem;font-weight:700;color:var(--second-deep);text-align:center;white-space:nowrap}
+.dhead #clear{font-size:.78rem;color:var(--accent);font-weight:700;text-align:right;line-height:1.15}
+.dhead #clear[hidden]{visibility:hidden;display:inline}
+.btn.back{padding:9px 10px;font-size:.88rem}
+.dfoot{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px;padding-top:14px;border-top:1px solid var(--line)}
+.dfoot .btn{flex:1 1 auto;text-align:center}
+body.dopen{overflow:hidden}
+#mine .aisle .ah{color:var(--second-deep);font-size:.82rem;letter-spacing:.08em;text-transform:uppercase;padding:14px 4px 5px;border-bottom:2px solid var(--second-wash);cursor:default}
+#mine .aisle .ah .c{display:none}
+#mine .aisle .ah .sub{font-size:.72rem;letter-spacing:0;text-transform:none;font-weight:400;color:var(--muted);margin-left:2px}
+#mine .grid{display:block;margin:0 0 4px}
+#mine .it{border:0;border-bottom:1px dashed var(--line);border-radius:0;background:transparent;padding:9px 4px;font-size:1rem;width:100%}
+#mine .it:hover{background:var(--second-wash)}
+#mine .it[aria-pressed="true"] .box{background:var(--second);border-color:var(--second)}
+#mine .it .box{width:17px;height:17px}
+#mine .it.rm{opacity:.55}
+#mine h2.aisle.rm .ah{border-bottom-color:var(--line);color:var(--muted)}
+#mine .rmfoot{padding:6px 4px}
+.count{font-size:.82rem;color:var(--muted);margin:10px 0 0}
+.count b{color:var(--main-deep)}
+.actions{display:flex;gap:8px;flex-wrap:wrap;margin:14px 0 4px}
+.actions .btn{flex:1 1 auto;text-align:center}
+.btn.share{border-color:var(--main);color:var(--main-deep);white-space:normal;line-height:1.15;padding-top:8px;padding-bottom:8px}
+.btn.share small{display:block;font-size:.72rem;font-weight:400;color:var(--muted);margin-top:2px}
+.btn.share[data-on="1"]{background:var(--wash)}
+.shared{display:flex;gap:12px;align-items:center;flex-wrap:wrap;margin:6px 0 2px;padding:9px 12px;border-radius:9px;background:var(--wash);color:var(--main-deep);font-size:.86rem}
+.shared[hidden]{display:none}
+.shared span{flex:1 1 200px}
+.shared .link{font-size:.86rem}
+#shareUrl{flex:1 1 100%;font:inherit;font-size:.84rem;padding:6px 9px;border:1px solid var(--line);border-radius:7px;background:var(--card);color:var(--ink);min-width:0}
+.link{font:inherit;font-weight:700;color:var(--main-deep);background:none;border:0;padding:0;cursor:pointer;text-decoration:underline;text-underline-offset:3px}
+.link.quiet{color:var(--muted);font-weight:400;font-size:.85rem}
+.paste{margin:10px 0 4px;padding:14px 16px;background:var(--card);border:1.5px solid var(--main);border-radius:10px}
+.paste[hidden]{display:none}
+.paste p{margin:0 0 8px;font-size:.9rem;color:var(--muted)}
+.sortbox{border-color:var(--second);background:var(--second-wash)}
+.sortbox p{color:var(--ink)}
+.srow{display:flex;align-items:center;gap:10px;padding:6px 0;flex-wrap:wrap}
+.srow b{flex:1 1 120px}
+.srow select{font:inherit;font-size:.92rem;padding:8px 10px;border:1.5px solid var(--line);border-radius:9px;background:var(--card);color:var(--ink);max-width:100%}
+.it .mv{color:var(--second-deep);text-decoration:underline;text-underline-offset:2px;cursor:pointer}
+#mine .it small .mv.bag{display:inline;background:none;padding:0;margin:0;border-radius:0;font-size:.74rem;font-weight:400;color:var(--muted)}
+#mine .it small .mv.bag:hover{color:var(--second-deep);background:none}
+#mine .it small{display:inline;margin-left:8px;font-size:.74rem}
+h2.aisle{margin:0}
+.ah{font:inherit;width:100%;cursor:pointer;background:none;border:0;border-bottom:1px solid var(--line);color:var(--ink);text-align:left;padding:14px 4px 12px;display:flex;align-items:center;gap:10px;font-size:1rem;font-weight:700}
+.ah .n{margin-left:auto;font-size:.8rem;color:var(--main-deep);font-weight:700}
+.golist{display:inline-block;padding:3px 9px;border-radius:99px;background:var(--second);color:#fff;cursor:pointer}
+.golist:hover{background:var(--second-deep)}
+.golist u{text-decoration:underline;text-underline-offset:2px}
+.ah .c{width:10px;height:10px;border-right:2px solid var(--faint);border-bottom:2px solid var(--faint);transform:rotate(-45deg);transition:transform .15s;flex:0 0 auto}
+.ah[aria-expanded="true"] .c{transform:rotate(45deg)}
+.ah:hover{color:var(--main-deep)}
+.grid{margin:10px 0 18px;display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:7px}
+.grid[hidden]{display:none}
+.it{font:inherit;cursor:pointer;border:1.5px solid var(--line);background:var(--card);color:var(--ink);text-align:left;padding:11px 12px;border-radius:9px;line-height:1.3;display:flex;gap:10px;align-items:flex-start;font-size:.95rem}
+#out .it:hover{border-color:var(--main)}
+.it .box{flex:0 0 auto;width:18px;height:18px;border:2px solid var(--faint);border-radius:5px;margin-top:1px;position:relative}
+.addrow{grid-column:1/-1;display:flex;gap:6px;align-items:center;border:1.5px dashed var(--main);border-radius:9px;padding:4px 6px 4px 10px;background:var(--card)}
+.addrow:focus-within{border-style:solid}
+.it[hidden]{display:none}
+.addrow input{flex:1 1 auto;min-width:0;font:inherit;font-size:.95rem;border:0;background:none;color:var(--ink);padding:4px}
+.addrow input:focus{outline:none}
+.addrow .btn{padding:7px 12px;font-size:.85rem}
+#out .it[aria-pressed="true"]{background:var(--wash);border-color:var(--main)}
+#out .it[aria-pressed="true"] .box{background:var(--main);border-color:var(--main)}
+.it[aria-pressed="true"] .box::after{content:"";position:absolute;left:5px;top:1px;width:4px;height:9px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(43deg)}
+.it[aria-pressed="true"] .nm{font-weight:700}
+.it.got .nm{text-decoration:line-through;color:var(--muted)}
+.it.got .nm::after{content:attr(data-done);display:inline-block;margin-left:7px;font-size:.7rem;font-weight:700;color:#fff;background:var(--main);border-radius:99px;padding:1px 7px;vertical-align:middle}
+.it.own{border-style:dashed}
+.it.rm{opacity:.6;border-style:dashed}
+.it.rm .nm{text-decoration:line-through}
+.it.rm:hover{opacity:1}
+h2.aisle.rm .ah{color:var(--muted)}
+.rmfoot{grid-column:1/-1;padding:2px 4px}
+.it small{display:block;font-size:.74rem;color:var(--faint)}
+.it .bag{display:inline-block;font-size:.7rem;color:var(--main-deep);background:var(--wash);border-radius:99px;padding:1px 7px;margin-left:6px;vertical-align:middle;font-weight:700;cursor:pointer}
+.it .bag:hover{background:var(--main);color:#fff}
+.empty{color:var(--muted);text-align:center;padding:40px 10px}
+.empty .qaddb{margin-top:12px}
+.grid.srch{margin-top:6px}
+.it .al{color:var(--muted)}
+.srchadd{padding:12px 0 4px}
+.srchadd .qaddb{margin:6px 0 0}
+.empty b{display:block;font-size:1.05rem;color:var(--ink);margin-bottom:4px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%);background:var(--main-deep);color:#fff;padding:11px 20px;border-radius:9px;font-size:.92rem;z-index:60;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:90vw;text-align:center}
+.fb{margin-top:0;padding:16px 18px 16px;border:1.5px solid var(--line);border-radius:12px;background:var(--card)}
+.fb[hidden]{display:none}
+.fb .fbq{margin:0 0 8px;font-weight:700;color:var(--ink)}
+.fb p{margin:0 0 12px;color:var(--muted);font-size:.9rem}
+#fbtext{width:100%;min-height:88px;padding:11px 13px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit;font-size:.95rem;resize:vertical}
+#fbtext:focus{outline:2px solid var(--main);outline-offset:-1px;border-color:transparent}
+.fb .row{margin-top:10px;justify-content:space-between;flex-wrap:wrap}
+.fb small{color:var(--faint);font-size:.78rem}
+.about{margin-top:36px;padding-top:18px;border-top:1px solid var(--line);font-size:.85rem;color:var(--muted)}
+.about a{color:var(--main-deep)}
+.about .tiny{font-size:.78rem;color:var(--faint)}
+@media (max-width:480px){.actions .btn{padding:11px 8px;font-size:.86rem}}
+.btn.keepb{font-size:.8rem;padding:6px 10px;border-radius:99px;border-color:var(--main);color:var(--main-deep);flex:0 0 auto}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <a class="brand" href="/">Do<span>by</span>Today</a>
+  <h1 class="tagline">Today's list, sorted by when.</h1>
+  <button class="btn keepb" id="keepBtn" type="button">Save this page</button>
+</header>
+<div class="keep" id="keep" hidden></div>
+<div class="keep" id="dayBox" hidden></div>
+
+<div class="sticky">
+  <div class="row">
+    <div class="qwrap"><input id="q" placeholder="Add a job – put a wash on, call Mum, send the invoice…" autocomplete="off" autocapitalize="off" enterkeyhint="search"><button id="qClear" type="button" aria-label="Clear search" hidden>×</button></div>
+    <button class="btn mineb" id="mineOpen" type="button" title="See today's list, sorted by when">Today <span class="tn" id="tabN"></span></button>
+  </div>
+</div>
+
+<div class="paste sortbox" id="sortbox" hidden>
+  <p id="sortMsg"></p>
+  <div id="sortRows"></div>
+  <div class="row"><button class="btn primary" id="sortDone" type="button">Done</button></div>
+</div>
+
+<h2 class="sec"><button class="sect" id="howBtn" type="button" aria-expanded="false" aria-controls="howBox"><span class="c"></span>How it works</button></h2>
+<div class="howwrap" id="howBox" hidden>
+  <div class="steps" id="steps">
+    <div class="step ov on" data-i="ov">
+      <div class="ovrow" data-o="0"><span class="k">1</span><b>Start from a ready-made day</b></div>
+      <div class="ovrow" data-o="1"><span class="k">2</span><b>Tap things off as you go</b></div>
+      <div class="ovrow" data-o="2"><span class="k">3</span><b>Tomorrow starts clean</b></div>
+    </div>
+    <div class="step" data-i="0"><span class="k">1</span><span><b>Start from a ready-made day</b><br>Pick the kind of day – or add your own jobs one by one.</span></div>
+    <div class="step" data-i="1"><span class="k">2</span><span><b>Tap things off as you go</b><br>Today is sorted by when: morning, afternoon, evening. Tap a job – it's done.<br><small class="gtk">Not happening today? Tap again to take it off.</small></span></div>
+    <div class="step" data-i="2"><span class="k">3</span><span><b>Tomorrow starts clean</b><br>Done things disappear overnight. Anything left asks: carry it over, or let it go?<br><small class="gtk">Share the link and the whole house works off the same list.</small></span></div>
+  </div>
+  <!--DEMO--><div class="demo" hidden><video id="demoVid" width="390" height="560" muted playsinline loop preload="metadata" aria-label="Demo: pick a list, tick off, share"><source src="data:video/mp4;base64," type="video/mp4"></video><button class="bigpp" id="demoBig" type="button" aria-label="Pause"><svg class="ip" width="26" height="26" viewBox="0 0 24 24" fill="#fff"><rect x="6" y="5" width="4" height="14" rx="1"/><rect x="14" y="5" width="4" height="14" rx="1"/></svg><svg class="iy" width="26" height="26" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg></button><button class="pp" id="demoPP" type="button" aria-label="Pause"><span id="ppText">Pause</span></button></div>
+</div>
+
+<h2 class="sec"><button class="sect" id="tripBtn" type="button" aria-expanded="false" aria-controls="tripBox"><span class="c"></span>Start from a ready-made day</button></h2>
+<div id="tripBox" hidden>
+  <div class="trips" id="trips"></div>
+  <p class="tripnote">These are starting points, not rules – every house runs differently. Tap anything you don't need to take it off. Something missing, or a day you'd like added? <button class="link" id="tripSuggest" type="button">Suggest an addition</button></p>
+</div>
+
+<div class="drawer" id="mineBox" role="dialog" aria-label="My list" hidden>
+  <div class="dwrap">
+    <div class="dhead">
+      <button class="btn back" id="mineBack" type="button">‹ Back</button>
+      <h2 class="dtitle">Today</h2>
+      <button class="link quiet" id="clear" type="button" hidden>Clear today</button>
+    </div>
+    <div class="count"><span id="count"></span></div>
+    <div id="mine"></div>
+<div id="shareBox" class="paste sharebox" hidden>
+<p><b>Share today's list.</b></p>
+<pre class="paper" id="paper" aria-label="How the message will look"></pre>
+<div class="actions">
+  <button class="btn primary" id="copy">Copy</button>
+  <button class="btn" id="wa">WhatsApp / Messenger</button>
+  <button class="btn" id="mail">Email</button>
+  <button class="btn share" id="share" title="Share this list so the whole house works off it">Share link<small>so the house works off the same list</small></button>
+</div>
+<div class="shared" id="shared" hidden>
+  <span>This list is <b>shared</b> – anyone with the link sees and edits the same list, live.</span>
+  <input id="shareUrl" readonly aria-label="Link to this list">
+  <button class="link" id="shareLink" type="button">Copy link</button>
+  <button class="link quiet" id="shareStop" type="button">Stop sharing</button>
+</div>
+</div>
+    <div class="dfoot">
+      <button class="btn primary" id="mineShare" type="button" aria-expanded="false" aria-controls="shareBox">Share this list</button>
+      <button class="btn" id="mineBack2" type="button">‹ Back</button>
+    </div>
+  </div>
+</div>
+
+<h2 class="sec"><button class="sect" id="shopBtn" type="button" aria-expanded="true" aria-controls="shopBox"><span class="c"></span>Jobs, by category</button></h2>
+<div id="shopBox">
+  <div id="out"></div>
+</div>
+
+<h2 class="sec"><button class="sect" id="fbBtn" type="button" aria-expanded="false" aria-controls="feedback"><span class="c"></span>Feedback &amp; suggestions</button></h2>
+<section class="fb" id="feedback" hidden>
+  <p class="fbq">What would make this better?</p>
+  <p>A job that's missing, a ready-made day you'd like (moving day, a birthday party, the first day of term) – or something a ready-made day gets wrong for how your house runs.</p>
+  <textarea id="fbtext" placeholder="Write anything…"></textarea>
+  <div class="row">
+    <small id="fbnote">No account, no tracking.</small>
+    <button class="btn primary" id="fbsend" type="button">Send</button>
+  </div>
+</section>
+
+<div class="about">
+  <h2 style="font-weight:700;font-size:1.05rem;color:var(--ink);margin:0 0 6px">Why <span class="brand mini">Do<span>by</span>Today</span>?</h2>
+  <p>A to-do list for today only, sorted by when – morning, afternoon, evening, if there's time. Tap things off as you go. Tomorrow it starts clean, so the list never becomes the thing you're avoiding.</p>
+  <p>Free, no account. Share the link and the whole house works off the same list.</p>
+  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools.</p>
+</div>
+</div>
+<script>
+var CAT = {"home":["Make the beds","Put a wash on","Hang the washing out","Bring the washing in","Fold and put clothes away","Empty the dishwasher","Load the dishwasher","Wipe the kitchen surfaces","Hoover","Mop the floors","Clean the bathroom","Clean the loo","Take the bins out","Bring the bins in","Recycling out","Change the bedsheets","Water the plants","Tidy the living room","Sort the post","Iron","Clean the fridge out","Clean the windows","Feed the pet","Walk the dog","Litter tray","Descale the kettle","Wipe the mirrors"],"kids":["School run","Pack the school bags","Make the packed lunches","Sign the reading record","Homework","Reading with the kids","Pack PE kit","Lay out tomorrow's uniform","Check the school app","Reply to the school email","Pay for the school trip","Pick up from club","Bath and bed","Book the kids' dentist","Buy a present for the party","Cut the kids' nails","Wash the school uniform","Fill the water bottles"],"errands":["Food shop","Top-up shop","Post office","Return the parcel","Collect the parcel","Pick up the prescription","Pharmacy","Petrol","Car wash","Dry cleaning","Charity shop drop-off","Buy a birthday card","Bank","Click and collect","Top up the parking","Get cash out","Buy stamps","Recycling centre run"],"work":["Reply to emails","Clear the inbox","Send the invoice","Chase the invoice","Prepare for tomorrow's meeting","Update the tracker","Call the client","Write the report","Book travel","Submit expenses","Timesheet","Follow up on the proposal","Plan the week","Tidy the desk","Back up the laptop","Send the agenda","Read the brief","Update the to-do for the team"],"admin":["Pay a bill","Check the bank","Renew the insurance","Renew the car tax","Book the MOT","Book the dentist","Book the GP","Cancel a subscription","Update the budget","File receipts","Read the meter","Sort the tax return","Back up the phone","Change a password","Check the calendar for the week","Renew the passport","Sort the paperwork pile","Ring the council"],"self":["Drink more water","20 minutes' walk","Exercise","Stretch","Take vitamins","Take medication","Read for 15 minutes","Meditate","Early night","Cook a proper dinner","Prep tomorrow's lunch","No phone after 9","Plan the weekend","Do nothing for 10 minutes","Haircut","Journal","Get some fresh air","Go to bed by 10"],"people":["Call Mum","Call Dad","Message a friend back","Reply to the group chat","Send a thank-you","Send a birthday message","Book dinner with friends","Check on a neighbour","Write the card","Arrange the playdate","Book the babysitter","Call the grandparents","Say yes or no to the invitation","Send the photos"],"hosting":["Strip the beds","Wash the linen","Make up the beds","Fresh towels out","Clean the bathroom (guest)","Restock toilet roll","Restock toiletries","Empty all the bins","Hoover and mop (guest)","Wipe the kitchen (guest)","Check the fridge is empty","Restock tea, coffee and milk","Check the wifi card is there","Set the heating","Leave the keys in the lockbox","Send the check-in message","Send the check-out reminder","Check for damage","Replace anything missing","Take photos of the rooms","Put out the welcome basket","Write the guest review","Reply to guest messages","Check the smoke alarm","Plump the cushions","Open the windows for 10 minutes"],"garden":["Mow the lawn","Water the garden","Weed the beds","Cut the hedge","Sweep the patio","Wash the car","Check the tyre pressures","Fill the screenwash","Clear the gutters","Plant the bulbs","Feed the birds","Clean the barbecue","Put the garden furniture away","Clear the leaves","Empty the car"]};
+var CATS = [["home","Around the house"],["kids","Kids & school"],["errands","Errands & shopping"],["work","Work"],["admin","Admin & money"],["self","Looking after yourself"],["people","People"],["hosting","Guests & Airbnb"],["garden","Garden & car"],["other","Other"]];
+var BAGS = [["morning","Morning",""],["afternoon","Afternoon",""],["evening","Evening",""],["any","Anytime today",""],["iftime","If there's time","no stress if not"]];
+var BAGOF = {"home":"any","kids":"any","errands":"any","work":"any","admin":"any","self":"any","people":"any","hosting":"any","garden":"any","other":"any","Make the beds":"morning","Put a wash on":"morning","Hang the washing out":"morning","Bring the washing in":"evening","Empty the dishwasher":"morning","Load the dishwasher":"evening","Take the bins out":"evening","Bring the bins in":"evening","School run":"morning","Pack the school bags":"morning","Make the packed lunches":"morning","Sign the reading record":"evening","Homework":"afternoon","Reading with the kids":"evening","Pack PE kit":"morning","Lay out tomorrow's uniform":"evening","Pick up from club":"afternoon","Bath and bed":"evening","Fill the water bottles":"morning","Plan the week":"morning","Prepare for tomorrow's meeting":"afternoon","Early night":"evening","Cook a proper dinner":"evening","Prep tomorrow's lunch":"evening","No phone after 9":"evening","Go to bed by 10":"evening","Journal":"evening","Send the check-in message":"morning","Send the check-out reminder":"evening","Strip the beds":"morning","Wash the linen":"morning","Make up the beds":"afternoon","Leave the keys in the lockbox":"afternoon","Write the guest review":"evening","Set the heating":"afternoon","Take photos of the rooms":"afternoon","Feed the pet":"morning","Walk the dog":"morning","Water the plants":"morning","Water the garden":"evening","Check the calendar for the week":"morning","Clear the inbox":"morning","Reply to emails":"morning","Read for 15 minutes":"evening","Meditate":"morning","Take vitamins":"morning","Take medication":"morning","Stretch":"morning","20 minutes' walk":"afternoon","Do nothing for 10 minutes":"iftime","Haircut":"iftime","Clean the windows":"iftime","Descale the kettle":"iftime","Clean the fridge out":"iftime","Clear the gutters":"iftime","Sort the paperwork pile":"iftime","Back up the phone":"iftime","Back up the laptop":"iftime","Tidy the desk":"iftime","Plant the bulbs":"iftime","Clean the barbecue":"iftime","Empty the car":"iftime","Wipe the mirrors":"iftime"};
+var ALIAS = {"washing":"Put a wash on","laundry":"Put a wash on","wash":"Put a wash on","dishwasher":"Empty the dishwasher","bins":"Take the bins out","bin":"Take the bins out","hoovering":"Hoover","vacuum":"Hoover","vacuuming":"Hoover","mop":"Mop the floors","sheets":"Change the bedsheets","plants":"Water the plants","dog":"Walk the dog","cat":"Feed the pet","lunches":"Make the packed lunches","lunchboxes":"Make the packed lunches","uniform":"Lay out tomorrow's uniform","pe kit":"Pack PE kit","school bags":"Pack the school bags","shopping":"Food shop","groceries":"Food shop","supermarket":"Food shop","tesco":"Food shop","sainsburys":"Food shop","aldi":"Food shop","lidl":"Food shop","asda":"Food shop","parcel":"Return the parcel","prescription":"Pick up the prescription","chemist":"Pharmacy","fuel":"Petrol","diesel":"Petrol","emails":"Reply to emails","email":"Reply to emails","inbox":"Clear the inbox","invoice":"Send the invoice","expenses":"Submit expenses","bills":"Pay a bill","bill":"Pay a bill","insurance":"Renew the insurance","mot":"Book the MOT","dentist":"Book the dentist","doctor":"Book the GP","gp":"Book the GP","budget":"Update the budget","receipts":"File receipts","water":"Drink more water","walk":"20 minutes' walk","gym":"Exercise","run":"Exercise","workout":"Exercise","vitamins":"Take vitamins","meds":"Take medication","tablets":"Take medication","read":"Read for 15 minutes","mum":"Call Mum","dad":"Call Dad","nan":"Call the grandparents","grandma":"Call the grandparents","birthday":"Send a birthday message","thank you":"Send a thank-you","linen":"Wash the linen","towels":"Fresh towels out","lockbox":"Leave the keys in the lockbox","keys":"Leave the keys in the lockbox","check in":"Send the check-in message","checkin":"Send the check-in message","check out":"Send the check-out reminder","checkout":"Send the check-out reminder","guest":"Reply to guest messages","airbnb":"Reply to guest messages","review":"Write the guest review","lawn":"Mow the lawn","grass":"Mow the lawn","car":"Wash the car","hedge":"Cut the hedge","weeds":"Weed the beds","weeding":"Weed the beds","leaves":"Clear the leaves","tyres":"Check the tyre pressures","screenwash":"Fill the screenwash","gutters":"Clear the gutters"};
+var RULES = [
+  [/\b(guest|airbnb|linen|lockbox|check.?in|check.?out|welcome basket|host)/, "hosting"],
+  [/\b(school|homework|kids?|child|children|nursery|uniform|pe kit|lunchbox|packed lunch|reading record|playdate|club pick|bedtime|bath)/, "kids"],
+  [/\b(mum|dad|mom|nan|grandma|grandad|grandparent|friend|neighbour|neighbor|call|ring|phone|message|text|whatsapp|reply to|thank|birthday|invite|invitation|card for|dinner with|catch up)/, "people"],
+  [/\b(bed|wash|laundry|iron|dishwasher|hoover|vacuum|mop|clean|wipe|tidy|bins?|recycl|sheets|plants?|fridge|kitchen|bathroom|loo|toilet|windows|post|pet|dog|cat|kettle|declutter|sort out the)/, "home"],
+  [/\b(shop|shopping|groceries|supermarket|tesco|sainsbury|aldi|lidl|asda|waitrose|morrisons|post office|parcel|return|collect|pick up|pharmacy|chemist|prescription|petrol|fuel|diesel|car wash|dry clean|charity shop|bank|cash|stamps|buy|order)/, "errands"],
+  [/\b(email|inbox|invoice|client|meeting|report|deck|slides|proposal|timesheet|expenses|tracker|deadline|agenda|brief|colleague|boss|team|presentation|spreadsheet|call with|zoom|teams)/, "work"],
+  [/\b(bill|bank|insurance|tax|mot|dentist|doctor|gp|appointment|subscription|budget|receipt|meter|password|passport|renew|council|form|paperwork|admin|pension|mortgage|rent)/, "admin"],
+  [/\b(water|walk|exercise|gym|run|yoga|stretch|vitamin|medication|meds|tablet|read|meditat|sleep|early night|bed by|journal|haircut|nails|rest|nap|fresh air|cook|lunch|dinner|breakfast)/, "self"],
+  [/\b(lawn|grass|mow|garden|weed|hedge|patio|car|tyre|screenwash|gutter|bulbs|birds|barbecue|bbq|leaves|shed|garage|bike)/, "garden"]
+];
+var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, guests in. The whole turnaround in order, from stripping the beds to the check-in message.","items":["Reply to guest messages","Strip the beds","Wash the linen","Empty all the bins","Check for damage","Check the fridge is empty","Clean the bathroom (guest)","Wipe the kitchen (guest)","Hoover and mop (guest)","Make up the beds","Fresh towels out","Restock toilet roll","Restock toiletries","Restock tea, coffee and milk","Replace anything missing","Plump the cushions","Open the windows for 10 minutes","Check the wifi card is there","Check the smoke alarm","Set the heating","Put out the welcome basket","Take photos of the rooms","Leave the keys in the lockbox","Send the check-in message","Write the guest review"]},{"id":"schoolday","name":"School day","blurb":"The morning scramble and the evening reset, so tomorrow morning is calmer than today's.","items":["Make the packed lunches","Fill the water bottles","Pack the school bags","Pack PE kit","School run","Check the school app","Reply to the school email","Pick up from club","Homework","Cook a proper dinner","Reading with the kids","Sign the reading record","Bath and bed","Lay out tomorrow's uniform","Load the dishwasher","Early night"]},{"id":"sunday","name":"Sunday reset","blurb":"An hour or two that makes the whole week easier. Nothing heroic – just the basics done.","items":["Change the bedsheets","Put a wash on","Hang the washing out","Hoover","Clean the bathroom","Wipe the kitchen surfaces","Clean the fridge out","Food shop","Prep tomorrow's lunch","Plan the week","Check the calendar for the week","Sort the post","Water the plants","Take the bins out","Lay out tomorrow's uniform","Call Mum","Early night"]},{"id":"wfh","name":"Working from home","blurb":"A work day at the kitchen table, with the house jobs slotted around it instead of eating it.","items":["Put a wash on","Plan the week","Clear the inbox","Reply to emails","Prepare for tomorrow's meeting","Update the tracker","Send the invoice","20 minutes' walk","Drink more water","Bring the washing in","Empty the dishwasher","Cook a proper dinner","Tidy the desk","No phone after 9"]},{"id":"dinner","name":"Guests for dinner","blurb":"Friends coming round tonight. Everything done before the doorbell, not during.","items":["Food shop","Get cash out","Buy a birthday card","Clean the bathroom","Clean the loo","Hoover","Tidy the living room","Wipe the kitchen surfaces","Plump the cushions","Empty the dishwasher","Take the bins out","Cook a proper dinner","Load the dishwasher","Send the photos"]},{"id":"backhome","name":"First day back from holiday","blurb":"Suitcases in the hall, empty fridge, 400 emails. The order that gets you back to normal by tonight.","items":["Put a wash on","Top-up shop","Empty the car","Water the plants","Sort the post","Check the bank","Pay a bill","Clear the inbox","Check the calendar for the week","Empty the dishwasher","Hang the washing out","Cook a proper dinner","Lay out tomorrow's uniform","Early night","Back up the phone"]}];
+
+(function(){
+  var KEY = "dobytoday-v1";
+  var S = {picked:{}, got:{}, own:[], bag:{}, removed:[], day:""};
+  function today(){ var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
+  var query = "";
+  var OKEY = "dobytoday-open-v1", OPEN = {home:1};
+  var $ = function(id){ return document.getElementById(id); };
+  var norm = function(s){ return String(s).toLowerCase().replace(/[’']/g,"").replace(/[^a-z0-9&\s]/g," ").replace(/\s+/g," ").trim(); };
+  var esc = function(s){ return String(s).replace(/[&<>"]/g,function(c){ return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]; }); };
+  var label = {}; CATS.forEach(function(a){ label[a[0]] = a[1]; });
+  var bagLabel = {}; BAGS.forEach(function(b){ bagLabel[b[0]] = b[1]; });
+  var items = [], byNorm = {};
+  CATS.forEach(function(c){ var a = c[0]; (CAT[a] || []).forEach(function(n){ var it = {n:n, a:a, b: BAGOF[n] || BAGOF[a] || "hold"}; items.push(it); byNorm[norm(n)] = it; }); });
+  function bagOf(it){ return S.bag[it.n] || it.b; }
+  function find(n){ n = norm(n); if(byNorm[n]) return byNorm[n]; if(ALIAS[n]) return byNorm[norm(ALIAS[n])] || null;
+    if(n.length > 3 && n.slice(-1) === "s" && byNorm[n.slice(0,-1)]) return byNorm[n.slice(0,-1)];
+    if(byNorm[n + "s"]) return byNorm[n + "s"]; return null; }
+  function classify(n){ var q = norm(n); for(var i = 0; i < RULES.length; i++){ if(RULES[i][0].test(q)) return RULES[i][1]; } return "other"; }
+  function doneWord(b){ return "done"; }
+
+  function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} if(typeof syncPush === "function") syncPush(); }
+  function load(){ try{ var r = localStorage.getItem(KEY); if(r){ var v = JSON.parse(r); if(v && typeof v === "object"){ S.picked = v.picked || {}; S.got = v.got || {}; S.own = v.own || []; S.bag = v.bag || {}; S.removed = v.removed || []; S.day = v.day || ""; } } }catch(e){}
+    newDay();
+    try{ var o = localStorage.getItem(OKEY); if(o) OPEN = JSON.parse(o) || OPEN; }catch(e){}
+    S.own.forEach(function(o){ if(!CATS.some(function(a){ return a[0] === o.a; })) o.a = classify(o.n); if(!bagLabel[o.b]) o.b = BAGOF[o.a] || "hold"; }); }
+  // A new day: whatever was done yesterday goes; whatever wasn't asks to be carried over
+  var LEFT = 0;
+  function newDay(){ var t = today(); if(S.day === t) return; var had = nPicked();
+    if(S.day && had){ Object.keys(S.got).forEach(function(n){ delete S.picked[n]; delete S.bag[n]; }); S.got = {}; S.own = S.own.filter(function(o){ return !o.got; }); LEFT = nPicked(); }
+    S.day = t; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+  function dayBanner(){ var b = $("dayBox"); if(!LEFT){ b.hidden = true; return; }
+    b.innerHTML = '<b>New day.</b> ' + LEFT + ' job' + (LEFT === 1 ? '' : 's') + ' from yesterday ' + (LEFT === 1 ? 'was not' : 'were not') + ' done. <button class="link" id="dayKeep" type="button">Keep them on today</button> · <button class="link quiet" id="dayDrop" type="button">Let them go</button>'; b.hidden = false;
+    $("dayKeep").addEventListener("click", function(){ LEFT = 0; b.hidden = true; toast("Carried over to today"); });
+    $("dayDrop").addEventListener("click", function(){ S.picked = {}; S.got = {}; S.own = []; S.bag = {}; LEFT = 0; save(); render(); b.hidden = true; toast("Fresh start"); }); }
+  function saveOpen(){ try{ localStorage.setItem(OKEY, JSON.stringify(OPEN)); }catch(e){} }
+  function nPicked(){ return Object.keys(S.picked).length + S.own.length; }
+  function nGot(){ var c = 0; Object.keys(S.picked).forEach(function(n){ if(S.got[n]) c++; }); S.own.forEach(function(o){ if(o.got) c++; }); return c; }
+
+  // My list: grouped by bag, in catalogue order inside each bag
+  function chosen(){
+    var out = [];
+    BAGS.forEach(function(b){
+      var rows = items.filter(function(it){ return S.picked[it.n] && bagOf(it) === b[0]; }).map(function(it){ return {n:it.n, got:!!S.got[it.n]}; });
+      S.own.forEach(function(o){ if(o.b === b[0]) rows.push({n:o.n, got:!!o.got}); });
+      if(rows.length) out.push({key:b[0], label:b[1], sub:b[2], rows:rows});
+    });
+    return out;
+  }
+  function asText(){
+    var lines = [];
+    chosen().forEach(function(g){ lines.push(g.label.toUpperCase() + (g.sub ? " – " + g.sub : "")); g.rows.forEach(function(r){ lines.push((r.got ? "☑ " : "☐ ") + r.n); }); lines.push(""); });
+    return lines.join("\n").trim();
+  }
+  function bagTag(b, mine){ return mine ? '<small><span class="mv bag" role="button">change when</span></small>' : '<span class="bag" role="button" title="Change when">'+esc(bagLabel[b])+'</span>'; }
+  function itemBtn(it, showCat, mine){ var on = !!S.picked[it.n], got = on && !!S.got[it.n], b = bagOf(it);
+    return '<button class="it'+(got?" got":"")+'" data-n="'+esc(it.n)+'" aria-pressed="'+on+'"><span class="box"></span><span><span class="nm" data-done="'+doneWord(b)+'">'+esc(it.n)+'</span>'+(on ? bagTag(b, mine) : '')+(showCat ? '<small class="al">'+esc(label[it.a])+'</small>' : '')+'</span></button>'; }
+  function ownBtn(o, i, showCat, mine){ return '<button class="it own'+(o.got?" got":"")+'" data-own="'+i+'" aria-pressed="true"><span class="box"></span><span><span class="nm" data-done="'+doneWord(o.b)+'">'+esc(o.n)+'</span>'+(mine ? '<small><span class="by">added by you · </span><span class="mv bag" role="button">change when</span></small>' : '<span class="bag" role="button" title="Change when">'+esc(bagLabel[o.b])+'</span><small><span class="by">added by you</span></small>')+(showCat ? '<small class="al">'+esc(label[o.a])+'</small>' : '')+'</span></button>'; }
+
+  function draw(mine){
+    var q = mine ? "" : norm(query), html = "", shown = 0;
+    if(q){
+      var hits = [], seen = {};
+      CATS.forEach(function(a, ai){
+        S.own.forEach(function(o, i){ if(o.a === a[0] && norm(o.n).indexOf(q) >= 0) hits.push({own:o, i:i, r: norm(o.n) === q ? 0 : norm(o.n).indexOf(q) === 0 ? 1 : 2, ai:ai}); });
+        items.forEach(function(it){ if(seen[it.n] || it.a !== a[0]) return; var nn = norm(it.n), m = nn.indexOf(q) >= 0 || (ALIAS[q] && norm(ALIAS[q]) === nn); if(!m) return; seen[it.n] = 1; hits.push({it:it, r: nn === q ? 0 : nn.indexOf(q) === 0 ? 1 : 2, ai:ai}); });
+      });
+      hits.sort(function(x, y){ return x.r - y.r || x.ai - y.ai; });
+      if(hits.length){
+        html += '<div class="grid srch">';
+        hits.forEach(function(h){ html += h.own ? ownBtn(h.own, h.i, true) : itemBtn(h.it, true); });
+        html += '</div>';
+        if(splitRaw(query).length === 1 && !hits.some(function(h){ return h.r === 0; })) html += '<div class="empty srchadd">Not the one you meant? <button class="btn primary qaddb" type="button">Add “'+esc(query.trim())+'”</button></div>';
+        return html;
+      }
+      return (splitRaw(query).length > 1
+        ? '<div class="empty"><b>That looks like a list</b>All '+splitRaw(query).length+' jobs go on the list.<br><button class="btn primary qaddb" type="button">Add all '+splitRaw(query).length+'</button></div>'
+        : '<div class="empty"><b>Not in the list yet</b>No problem – add it to today.<br><button class="btn primary qaddb" type="button">Add “'+esc(query.trim())+'”</button></div>');
+    }
+    if(mine){
+      chosen().forEach(function(g){
+        shown += g.rows.length;
+        html += '<h2 class="aisle"><button class="ah" data-a="'+g.key+'"><span class="c"></span>'+esc(g.label)+(g.sub ? ' <span class="sub">– '+esc(g.sub)+'</span>' : '')+'</button></h2><div class="grid">';
+        items.forEach(function(it){ if(S.picked[it.n] && bagOf(it) === g.key) html += itemBtn(it, false, true); });
+        S.own.forEach(function(o, i){ if(o.b === g.key) html += ownBtn(o, i, false, true); });
+        html += '</div>';
+      });
+      if(nPicked()) html += '<div class="rmfoot"><button class="link quiet clearbtn" type="button">Clear today</button></div>';
+      if(S.removed.length){
+        var ropen = OPEN._removed !== 0;
+        html += '<h2 class="aisle rm"><button class="ah" data-a="_removed" aria-expanded="'+ropen+'"><span class="c"></span>Not today</button></h2><div class="grid"'+(ropen ? '' : ' hidden')+'>';
+        S.removed.forEach(function(r, i){ html += '<button class="it rm" data-rm="'+i+'"><span class="box"></span><span><span class="nm">'+esc(r.n)+'</span></span></button>'; });
+        html += '<div class="rmfoot"><button class="link quiet" id="rmForget" type="button">Clear this</button></div></div>';
+        shown += S.removed.length;
+      }
+      if(shown) return html;
+      return '<div class="empty"><b>Nothing on the list yet</b>Pick a ready-made day, type a job at the top, or tap jobs in the categories – they show up here, sorted by when.</div>';
+    }
+    CATS.forEach(function(a){
+      var g = items.filter(function(it){ return it.a === a[0]; });
+      var og = []; S.own.forEach(function(o, i){ if(o.a === a[0]) og.push([o, i]); });
+      if(!g.length && !og.length) return;
+      shown += g.length + og.length;
+      var pk = g.filter(function(it){ return S.picked[it.n]; }).length + og.length;
+      var open = !!OPEN[a[0]];
+      html += '<h2 class="aisle"><button class="ah" data-a="'+a[0]+'" aria-expanded="'+open+'"><span class="c"></span>'+esc(a[1])+'<span class="n">'+(pk ? '<span class="golist" role="link" title="See these on My list">'+pk+' on list · <u>View</u> ›</span>' : '')+'</span></button></h2><div class="grid"'+(open ? '' : ' hidden')+'>';
+      html += '<div class="addrow" data-add="'+a[0]+'"><input placeholder="Search or add to '+esc(a[1])+'…" autocomplete="off" autocapitalize="off" enterkeyhint="done"><button class="btn primary" type="button">Add</button></div>';
+      og.forEach(function(p){ html += ownBtn(p[0], p[1], false); });
+      g.forEach(function(it){ html += itemBtn(it, false); });
+      html += '</div>';
+    });
+    return html;
+  }
+  function drawTrips(){
+    $("trips").innerHTML = TRIPS.map(function(t){ return '<button class="trip" type="button" data-trip="'+t.id+'"><b>'+esc(t.name)+'</b><small>'+esc(t.blurb)+'</small><span class="n">'+t.items.length+' jobs · tap to add them all</span></button>'; }).join("");
+  }
+  function openMine(){ var d = $("mineBox"); if(d.hidden){ d.hidden = false; document.body.classList.add("dopen"); d.scrollTop = 0; } $("mineBack").focus({preventScroll:true}); }
+  function closeMine(){ $("mineBox").hidden = true; document.body.classList.remove("dopen"); $("mineOpen").focus({preventScroll:true}); }
+  function render(){
+    $("mine").innerHTML = draw(true);
+    $("out").innerHTML = draw(false);
+    var p = nPicked();
+    $("count").innerHTML = p ? '<span><b>'+p+'</b> to do today · '+nGot()+' done</span>' : '<span>Nothing on the list yet</span>';
+    $("tabN").textContent = p ? String(p) : "";
+    ["copy","wa","mail"].forEach(function(id){ $(id).disabled = !p; });
+    $("clear").hidden = !p;
+    $("paper").textContent = p ? asText() : "Nothing on the list yet";
+  }
+  function unpark(n){ S.removed = S.removed.filter(function(x){ return norm(x.n) !== norm(n); }); }
+  function park(r){ S.removed = S.removed.filter(function(x){ return norm(x.n) !== norm(r.n); }); S.removed.unshift(r); if(S.removed.length > 60) S.removed.length = 60; }
+  function restore(i){ var r = S.removed.splice(i, 1)[0]; if(!r) return;
+    if(r.own){ if(!S.own.some(function(o){ return norm(o.n) === norm(r.n); })) S.own.push({n:r.n, a:r.own.a, b:r.own.b, got:false}); }
+    else { S.picked[r.n] = 1; delete S.got[r.n]; }
+    save(); render(); toast("Back on the list: " + r.n); }
+  function toast(m){ var d = document.createElement("div"); d.className = "toast"; d.textContent = m; document.body.appendChild(d); setTimeout(function(){ d.remove(); }, 2400); }
+
+  function addOne(v){
+    v = v.trim().replace(/^[-*\u2022\u2610\u2611\u2612\[\]x ]+/i, "").replace(/^\d+\s*x?\s+/i, "").trim(); if(!v) return false;
+    var hit = find(v);
+    if(hit){ S.picked[hit.n] = 1; unpark(hit.n); return hit.n; }
+    var dup = S.own.some(function(o){ return norm(o.n) === norm(v); });
+    if(!dup){ var a = classify(v); S.own.push({n:v, a:a, b:BAGOF[a] || "hold", got:false}); unpark(v); unknown.push(v); }
+    return v;
+  }
+  var known = null;
+  function knownNames(){ if(known) return known; known = [];
+    items.forEach(function(it){ known.push([norm(it.n), it.n]); });
+    Object.keys(ALIAS).forEach(function(k){ known.push([norm(k), k]); });
+    known.sort(function(a,b){ return b[0].length - a[0].length; }); return known; }
+  function pickKnown(text){ var q = " " + norm(text) + " ", out = [];
+    knownNames().forEach(function(p){ var k = " " + p[0] + " ", i = q.indexOf(k);
+      while(i > -1){ out.push([i, p[1]]); q = q.slice(0, i) + " " + new Array(p[0].length + 1).join("#") + " " + q.slice(i + k.length); i = q.indexOf(k); } });
+    out.sort(function(a,b){ return a[0] - b[0]; }); return out.map(function(x){ return x[1]; }); }
+  function splitRaw(t){
+    var parts = String(t).replace(/\r/g, "")
+      .replace(/[•●▪–—☐☑☒✓✔✅❌]/g, "\n")
+      .split(/[\n,;|\t]+|\.\s+|\s+(?:and|&|\+)\s+|\s{2,}/i), out = [];
+    var filler = /^(?:can you|could you|please|pls|pack|bring|take|remember|don't forget|dont forget|some|a|an|the|we need|need|also|and|more|oh|ok|hey|hi|plus|maybe|my|your)\s+|\s+(?:please|pls|thanks|thank you|too|as well|x|xx|xxx|if you can|if poss)[!?]*$/i;
+    var chatter = /^(?:oh|ok|okay|hi|hey|hello|thanks|thank you|cheers|x|xx|xxx|yes|yep|no|love you|lol|haha|please|pls|(?:some |a few |few )?(?:stuff|things|bits|bits and pieces|bits and bobs|clothes))$/i;
+    parts.forEach(function(p){
+      p = p.replace(/^[\s\-*:)\]]*(?:\d+[.)\]:]\s*)?/, "").replace(/[.\s]+$/, "").trim();
+      var prev; do { prev = p; p = p.replace(filler, "").trim(); } while(p && p !== prev);
+      p = p.replace(/[!?]+$/, "").trim();
+      if(!p || /^\d+$/.test(p) || chatter.test(p)) return;
+      if(find(p) || /^\d+\s*x?\s+/i.test(p)) { out.push(p); return; }
+      var hits = pickKnown(p); if(hits.length) hits.forEach(function(h){ out.push(h); }); else out.push(p);
+    });
+    return out;
+  }
+  var unknown = [];
+  function askBag(names, rows){
+    // rows: list of {own:i} or {n:name} for catalogue items
+    if(!names.length) return; var one = names.length === 1;
+    var cap = function(t){ return t.charAt(0).toUpperCase() + t.slice(1); };
+    $("sortMsg").innerHTML = one ? 'When today does <b>' + esc(cap(names[0])) + '</b> go in?' : 'When today do these happen?';
+    var opts = BAGS.map(function(b){ return '<option value="' + b[0] + '">' + b[1] + (b[2] ? ' – ' + b[2] : '') + '</option>'; }).join("");
+    $("sortRows").innerHTML = names.map(function(n){
+      var i = S.own.findIndex(function(o){ return norm(o.n) === norm(n); });
+      if(i >= 0) return '<div class="srow"><b>' + esc(cap(S.own[i].n)) + '</b><select data-own="' + i + '">' + opts + '</select></div>';
+      var it = byNorm[norm(n)]; if(!it) return "";
+      return '<div class="srow"><b>' + esc(it.n) + '</b><select data-n="' + esc(it.n) + '">' + opts + '</select></div>'; }).join("");
+    $("sortRows").querySelectorAll("select").forEach(function(sel){ if(sel.dataset.own !== undefined) sel.value = S.own[+sel.dataset.own].b; else sel.value = bagOf(byNorm[norm(sel.dataset.n)]); });
+    $("sortbox").hidden = false; if(one) $("sortRows").querySelector("select").focus();
+  }
+  $("sortRows").addEventListener("change", function(e){ var sel = e.target.closest("select"); if(!sel) return;
+    if(sel.dataset.own !== undefined){ var o = S.own[+sel.dataset.own]; if(!o) return; o.b = sel.value; toast(o.n + " → " + bagLabel[o.b]); }
+    else { var it = byNorm[norm(sel.dataset.n)]; if(!it) return; if(sel.value === it.b) delete S.bag[it.n]; else S.bag[it.n] = sel.value; toast(it.n + " → " + bagLabel[sel.value]); }
+    save(); render(); });
+  $("sortDone").addEventListener("click", function(){ $("sortbox").hidden = true; });
+  function addTyped(v){
+    if(splitRaw(v).length > 1){ addMany(v); return; }
+    unknown = []; var r = addOne(v); if(!r) return;
+    toast("Added " + r);
+    query = ""; $("q").value = ""; $("qClear").hidden = true; document.body.classList.remove("searching"); save(); render(); askBag(unknown);
+  }
+  function addMany(text){
+    var parts = splitRaw(text), n = 0; unknown = [];
+    parts.forEach(function(x){ if(addOne(x)) n++; });
+    if(!n){ toast("Nothing to add yet"); return false; }
+    query = ""; $("q").value = ""; $("qClear").hidden = true; document.body.classList.remove("searching"); save(); render();
+    if(unknown.length){ askBag(unknown); $("sortbox").scrollIntoView({block:"center"}); } else openMine();
+    toast(n + " job" + (n === 1 ? "" : "s") + " added to today");
+    return true;
+  }
+  $("q").addEventListener("paste", function(e){
+    var t = (e.clipboardData || window.clipboardData); t = t ? t.getData("text") : "";
+    if(splitRaw(t).length > 1){ e.preventDefault(); addMany(t); }
+  });
+  function addTrip(id){
+    var t = TRIPS.filter(function(x){ return x.id === id; })[0]; if(!t) return; var n = 0;
+    t.items.forEach(function(nm){ var it = byNorm[norm(nm)]; if(!it) return; if(!S.picked[it.n]) n++; S.picked[it.n] = 1; unpark(it.n);  });
+    save(); render(); openMine();
+    toast(n ? t.name + ": " + n + " jobs added. Tap anything that isn't happening today." : "All of those are on today already");
+  }
+  $("trips").addEventListener("click", function(e){ var b = e.target.closest(".trip"); if(b) addTrip(b.dataset.trip); });
+  $("tripSuggest").addEventListener("click", function(){ var fx = $("feedback"); fx.hidden = false; $("fbBtn").setAttribute("aria-expanded", "true"); if(!$("fbtext").value) $("fbtext").value = "For the ready-made day \"" + "…" + "\" I'd add: "; fx.scrollIntoView({block:"start", behavior:"smooth"}); setTimeout(function(){ $("fbtext").focus(); }, 300); });
+
+  function addToCat(key, v){
+    v = v.trim(); if(!v) return;
+    var hit = find(v);
+    if(hit){ S.picked[hit.n] = 1; unpark(hit.n); }
+    else if(!S.own.some(function(o){ return norm(o.n) === norm(v); })){ S.own.push({n:v, a:key, b:BAGOF[key] || "hold", got:false}); unpark(v); }
+    OPEN[key] = 1; saveOpen();
+    save(); render(); toast("Added " + v + " → " + bagLabel[hit ? bagOf(hit) : (BAGOF[key] || "hold")]);
+  }
+  function catBar(e){
+    var row = e.target.closest(".addrow"); if(!row) return;
+    var key = row.dataset.add, inp = row.querySelector("input"), grid = row.parentNode;
+    if(e.type === "input"){ var t = norm(inp.value); grid.querySelectorAll(".it").forEach(function(b){ b.hidden = !!t && norm(b.querySelector(".nm").textContent).indexOf(t) < 0; }); return; }
+    if(e.type === "keydown"){ if(e.key === "Enter"){ e.preventDefault(); if(inp.value.trim()) addToCat(key, inp.value); } if(e.key === "Escape"){ inp.value = ""; grid.querySelectorAll(".it").forEach(function(b){ b.hidden = false; }); inp.blur(); } return; }
+    if(e.type === "click" && e.target.closest("button")){ if(inp.value.trim()) addToCat(key, inp.value); else inp.focus(); }
+  }
+  $("out").addEventListener("input", catBar); $("out").addEventListener("keydown", catBar); $("out").addEventListener("click", catBar);
+  function onListClick(e){
+    if(e.target.closest(".qaddb")){ addTyped($("q").value); return; }
+    if(e.target.closest(".addrow")) { e.stopPropagation(); return; }
+    var gl = e.target.closest(".golist");
+    if(gl){ e.stopPropagation(); openMine(); return; }
+    var h = e.target.closest(".ah");
+    if(e.target.closest(".clearbtn")){ clearAll(); return; }
+    if(e.target.closest("#rmForget")){ if(confirm("Clear the taken-off list?")){ S.removed = []; save(); render(); } return; }
+    if(h){ var k = h.dataset.a; if(k === "_removed"){ OPEN._removed = OPEN._removed === 0 ? 1 : 0; } else { if(query || h.closest("#mine")) return; if(OPEN[k]) delete OPEN[k]; else OPEN[k] = 1; }
+      saveOpen(); render(); return; }
+    var b = e.target.closest(".it"); if(!b) return;
+    if(b.dataset.rm !== undefined){ restore(+b.dataset.rm); return; }
+    if(e.target.closest(".bag")){ e.stopPropagation();
+      var nm = b.dataset.own !== undefined ? (S.own[+b.dataset.own] || {}).n : b.dataset.n; if(!nm) return;
+      if(b.closest("#mine")) closeMine(); askBag([nm]); $("sortbox").scrollIntoView({block:"center"}); return; }
+    if(b.dataset.own !== undefined){ var oi = +b.dataset.own, o = S.own[oi]; if(o){ if(!o.got) o.got = true; else { park({n:o.n, own:{a:o.a, b:o.b}}); S.own.splice(oi, 1); toast("Taken off – it's under Taken off if you want it back"); } save(); render(); } return; }
+    var n = b.dataset.n, wasSearch = !!query.trim() && !b.closest("#mine");
+    if(!S.picked[n]){ S.picked[n] = 1; unpark(n); if(wasSearch){ save(); clearSearch(); toast(n + " – on your list, " + bagLabel[bagOf(byNorm[norm(n)])]); return; } }
+    else if(!S.got[n]) S.got[n] = 1;
+    else { park({n:n}); delete S.picked[n]; delete S.got[n]; }
+    save(); render();
+  }
+  $("out").addEventListener("click", onListClick); $("mine").addEventListener("click", onListClick);
+  $("q").addEventListener("input", function(){ var was = !!query.trim(), now = !!this.value.trim(); query = this.value; $("qClear").hidden = !now; document.body.classList.toggle("searching", now); render(); if(now && !was){ var st = document.querySelector(".sticky"); window.scrollTo({top: st.offsetTop, behavior: "auto"}); } });
+  function clearSearch(){ query = ""; $("q").value = ""; $("qClear").hidden = true; document.body.classList.remove("searching"); render(); }
+  $("qClear").addEventListener("click", function(){ clearSearch(); $("q").focus(); });
+  $("q").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); if(splitRaw(this.value).length > 1) addTyped(this.value); else this.blur(); } });
+  function clearAll(){ if(!nPicked()) return; if(!confirm("Clear today's list?")) return; S = {picked:{}, got:{}, own:[], bag:{}, removed:[], day:today()}; save(); render(); toast("Cleared – fresh start"); }
+  $("clear").addEventListener("click", clearAll);
+  $("copy").addEventListener("click", function(){
+    var t = asText(); if(!t) return;
+    if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ toast("Copied"); }, function(){ toast("Could not copy"); }); }
+    else { toast("Copy not available here"); }
+  });
+  $("wa").addEventListener("click", function(){ var t = asText(); if(!t) return; var msg = "Today\n\n" + t;
+    if(navigator.share){ navigator.share({title:"Today", text: msg}).catch(function(){}); return; }
+    window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank"); });
+  $("mail").addEventListener("click", function(){ var t = asText(); if(!t) return; location.href = "mailto:?subject=" + encodeURIComponent("Today's list") + "&body=" + encodeURIComponent(t); });
+
+  load(); drawTrips(); render(); dayBanner();
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden && S.day !== today()){ newDay(); render(); dayBanner(); } });
+  (function(){
+    var deferred = null, box = $("keep");
+    window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferred = e; });
+    function steps(){
+      var ua = navigator.userAgent, ios = /iPhone|iPad|iPod/.test(ua), android = /Android/.test(ua), mac = /Mac/.test(ua);
+      if(ios) return "On iPhone: tap the <b>Share</b> button (the square with an arrow) at the bottom of Safari, then <b>Add to Home Screen</b>. DobyToday gets its own icon, like an app.";
+      if(android) return "Tap the <b>⋮ menu</b> at the top right of the browser, then <b>Add to Home screen</b> (or <b>Install app</b>). DobyToday gets its own icon, like an app.";
+      return "Press <b>" + (mac ? "Cmd + D" : "Ctrl + D") + "</b> to bookmark this page. On your phone, open dobytoday.com and use <b>Add to Home Screen</b> for an app icon.";
+    }
+    $("keepBtn").addEventListener("click", function(){
+      if(deferred){ deferred.prompt(); deferred.userChoice.then(function(){ deferred = null; }); return; }
+      if(!box.hidden){ box.hidden = true; return; }
+      box.innerHTML = steps() + ' <button class="link quiet" id="keepClose" type="button">Close</button>'; box.hidden = false;
+      $("keepClose").addEventListener("click", function(){ box.hidden = true; });
+    });
+  })();
+
+  // How it works: collapsed by default; captions follow the demo video's clock, so Pause freezes both
+  (function(){
+    var btn = $("howBtn"), box = $("howBox"), vid = $("demoVid"), pp = $("demoPP"), big = $("demoBig"), steps = document.querySelectorAll("#steps .step");
+    var AT = [0, 6.1, 14.0], OV = 1.3, cur = "";
+    var ov = document.querySelector("#steps .step.ov"), rows = ov.querySelectorAll(".ovrow");
+    function show(i){ steps.forEach(function(el){ el.classList.toggle("on", el.dataset.i === String(i)); }); }
+    function overview(i){ rows.forEach(function(r, j){ r.classList.toggle("hl", j === i); }); show("ov"); }
+    function caption(){ var t = vid.currentTime, i = 0; for(var k = 0; k < AT.length; k++){ if(t >= AT[k]) i = k; }
+      var key = (t - AT[i] < OV ? "ov" : "s") + i; if(key === cur) return; cur = key; if(key.charAt(0) === "o") overview(i); else show(i); }
+    function setPP(){ var paused = vid.paused; pp.classList.toggle("paused", paused); big.classList.toggle("paused", paused); $("ppText").textContent = paused ? "Play" : "Pause"; pp.setAttribute("aria-label", paused ? "Play" : "Pause"); big.setAttribute("aria-label", paused ? "Play" : "Pause"); }
+    function play(){ var p = vid.play(); if(p && p.catch) p.catch(function(){}); }
+    function run(){ cur = ""; userPaused = false; vid.currentTime = 0; caption(); play(); }
+    function stop(){ vid.pause(); }
+    var userPaused = false;
+    function toggle(){ userPaused = !vid.paused; if(vid.paused) play(); else vid.pause(); }
+    vid.addEventListener("timeupdate", caption); vid.addEventListener("seeked", caption);
+    vid.addEventListener("play", setPP); vid.addEventListener("pause", setPP);
+    pp.addEventListener("click", toggle); big.addEventListener("click", toggle); vid.addEventListener("click", toggle);
+    btn.addEventListener("click", function(){ var open = box.hidden; box.hidden = !open; btn.setAttribute("aria-expanded", String(open)); if(open) run(); else stop(); });
+    document.addEventListener("visibilitychange", function(){ if(box.hidden) return; if(document.hidden) vid.pause(); else if(!userPaused) play(); });
+    setPP();
+  })();
+  (function(){
+    function fold(btnId, boxId){ var b = $(btnId), x = $(boxId); b.addEventListener("click", function(){ var open = x.hidden; x.hidden = !open; b.setAttribute("aria-expanded", String(open)); }); }
+    fold("tripBtn", "tripBox"); fold("shopBtn", "shopBox"); fold("fbBtn", "feedback");
+    var sb = $("mineShare"), sx = $("shareBox");
+    sb.addEventListener("click", function(){ var open = sx.hidden; sx.hidden = !open; sb.setAttribute("aria-expanded", String(open)); sb.textContent = open ? "Hide sharing" : "Share this list"; if(open) setTimeout(function(){ sx.scrollIntoView({block:"start", behavior:"smooth"}); }, 30); });
+    $("mineOpen").addEventListener("click", openMine);
+    $("mineBack").addEventListener("click", closeMine);
+    $("mineBack2").addEventListener("click", closeMine);
+    document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !$("mineBox").hidden) closeMine(); });
+  })();
+
+  // ---------- Shared lists (Supabase) ----------
+  // Same project and the same save_list / get_list functions as ListbyAisle. A list is only its random code, and
+  // packing codes and shopping codes never collide, so the two sites can share one table.
+  var SB_URL = "https://nlbeqaoffratriysazrx.supabase.co";
+  var SB_KEY = "sb_publishable_HjyFCCwqTjqeAIV1bh28ww_li-Rw7CZ";
+  var CKEY = "dobytoday-code-v1", CODE = "", chan = null, pushT = null, lastSent = "", applying = false;
+  function sbHeaders(){ return {"Content-Type":"application/json", "apikey":SB_KEY, "Authorization":"Bearer " + SB_KEY}; }
+  function rpc(fn, body){ return fetch(SB_URL + "/rest/v1/rpc/" + fn, {method:"POST", headers:sbHeaders(), body:JSON.stringify(body)}).then(function(r){ if(!r.ok) throw new Error("rpc " + r.status); return r.text(); }).then(function(t){ return t ? JSON.parse(t) : null; }); }
+  function newCode(){ var a = "abcdefghjkmnpqrstuvwxyz23456789", o = "", c = new Uint32Array(12); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(c) : c.forEach(function(_, i){ c[i] = Math.random() * 1e9; }); for(var i = 0; i < 12; i++) o += a[c[i] % a.length]; return "t" + o.slice(1); }
+  function shareUrl(){ return "https://dobytoday.com/#l=" + CODE; }
+  function snapshot(){ return JSON.stringify({picked:S.picked, got:S.got, own:S.own, bag:S.bag, removed:S.removed, day:S.day}); }
+  function applyRemote(d){ if(!d || typeof d !== "object") return; var j = JSON.stringify({picked:d.picked || {}, got:d.got || {}, own:d.own || [], bag:d.bag || {}, removed:d.removed || [], day:d.day || ""}); if(j === snapshot()) return;
+    applying = true; S.picked = d.picked || {}; S.got = d.got || {}; S.own = d.own || []; S.bag = d.bag || {}; S.removed = d.removed || []; S.day = d.day || S.day; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} lastSent = snapshot(); render(); applying = false; }
+  function syncPush(){ if(!CODE || applying) return; clearTimeout(pushT); pushT = setTimeout(function(){
+    var j = snapshot(); if(j === lastSent) return; lastSent = j;
+    rpc("save_list", {code:CODE, payload:JSON.parse(j)}).catch(function(){ lastSent = ""; });
+    if(chan) chan.send({type:"broadcast", event:"update", payload:JSON.parse(j)});
+  }, 350); }
+  function syncPull(){ if(!CODE) return Promise.resolve(); return rpc("get_list", {code:CODE}).then(function(d){ if(d) applyRemote(d); }).catch(function(){}); }
+  function listen(){ if(!CODE || chan) return;
+    function go(){ try{ var sb = supabase.createClient(SB_URL, SB_KEY); chan = sb.channel("list-" + CODE);
+      chan.on("broadcast", {event:"update"}, function(m){ applyRemote(m.payload); }).subscribe(); }catch(e){} }
+    if(window.supabase) go(); else { var sc = document.createElement("script"); sc.src = "https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.min.js"; sc.onload = go; document.head.appendChild(sc); } }
+  function showShared(){ $("shared").hidden = !CODE; if(CODE) $("shareUrl").value = shareUrl(); $("share").dataset.on = CODE ? "1" : "0"; $("share").innerHTML = CODE ? "Shared<small>anyone with the link sees this list</small>" : "Share link<small>to pack off the same list</small>"; }
+  function startShare(){ CODE = newCode(); try{ localStorage.setItem(CKEY, CODE); }catch(e){} history.replaceState(null, "", "#l=" + CODE);
+    lastSent = ""; syncPush(); listen(); showShared(); sendLink(); }
+  function sendLink(){ var u = $("shareUrl"); u.value = shareUrl();
+    (navigator.clipboard ? navigator.clipboard.writeText(shareUrl()) : Promise.reject()).then(function(){ toast("Link copied – send it to whoever you share the jobs with"); }, function(){ u.focus(); u.select(); toast("Select the link and copy it"); }); }
+  function stopShare(){ if(!confirm("Stop sharing? Your list stays on this phone; the link stops updating it.")) return;
+    CODE = ""; try{ localStorage.removeItem(CKEY); }catch(e){} history.replaceState(null, "", location.pathname); if(chan){ try{ chan.unsubscribe(); }catch(e){} chan = null; } showShared(); }
+  $("share").addEventListener("click", function(){ if(CODE) sendLink(); else startShare(); });
+  $("shareLink").addEventListener("click", sendLink);
+  $("shareStop").addEventListener("click", stopShare);
+  document.addEventListener("visibilitychange", function(){ if(!document.hidden) syncPull(); });
+  window.addEventListener("focus", syncPull);
+  (function initShare(){
+    var m = location.hash.match(/[#&]l=([a-z0-9]{10,14})/); if(m){ CODE = m[1]; try{ localStorage.setItem(CKEY, CODE); }catch(e){} }
+    else { try{ CODE = localStorage.getItem(CKEY) || ""; }catch(e){} }
+    if(!CODE) return; showShared();
+    syncPull().then(function(){ if(m && !lastSent){ lastSent = ""; syncPush(); } listen(); });
+  })();
+
+  // Feedback and suggestions go to the same Formspree form as ListbyAisle; the page URL says which site it came from.
+  var FEEDBACK_URL = "https://formspree.io/f/meaqbeqq";
+  $("fbsend").addEventListener("click", function(){
+    var note = $("fbtext").value.trim();
+    if(!note){ toast("Write a line first"); return; }
+    if(!FEEDBACK_URL){ location.href = "mailto:hello@dobytoday.com?subject=" + encodeURIComponent("Do by Today feedback") + "&body=" + encodeURIComponent(note + "\n\nSent from dobytoday.com"); return; }
+    $("fbsend").disabled = true;
+    fetch(FEEDBACK_URL, {method:"POST", headers:{"Content-Type":"application/json", "Accept":"application/json"}, body: JSON.stringify({message: "[DobyToday] " + note, page: location.href})})
+      .then(function(r){ if(!r.ok) throw new Error(); $("fbtext").value = ""; toast("Thanks – sent"); })
+      .catch(function(){ toast("Couldn't send just now – try again in a minute"); })
+      .then(function(){ $("fbsend").disabled = false; });
+  });
+})();
+</script>
+</body>
+</html>
