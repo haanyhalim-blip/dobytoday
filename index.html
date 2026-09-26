@@ -13,7 +13,12 @@
 <meta property="og:title" content="Do by Today – today's list, sorted by when">
 <meta property="og:description" content="Morning, afternoon, evening, if there's time. Tap things off as you go; tomorrow starts clean. Free, no account.">
 <meta property="og:url" content="https://dobytoday.com/">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://dobytoday.com/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="DobyToday – today's list, sorted by when">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://dobytoday.com/og-image.png">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"WebApplication","name":"Do by Today","url":"https://dobytoday.com/","applicationCategory":"LifestyleApplication","operatingSystem":"Any","offers":{"@type":"Offer","price":"0","priceCurrency":"GBP"},"description":"A to-do list for today only, sorted by when: morning, afternoon, evening, if there's time. Start from a ready-made day, tap things off, share it with the house. Tomorrow it starts clean. Free, no account needed."}</script>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23b0611c'/%3E%3Ccircle cx='32' cy='32' r='17' fill='none' stroke='%23fff' stroke-width='5'/%3E%3Cpath d='M32 20v12l8 6' fill='none' stroke='%23fff' stroke-width='5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
 <link rel="manifest" href="manifest.webmanifest">
@@ -272,6 +277,14 @@ h2.aisle.rm .ah{color:var(--muted)}
 @media (max-width:480px){.actions .btn{padding:11px 8px;font-size:.86rem}}
 .btn.keepb{font-size:.8rem;padding:6px 10px;border-radius:99px;border-color:var(--main);color:var(--main-deep);flex:0 0 auto}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
+.guide{margin:34px 0 0;padding:18px 18px 6px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;font-size:.92rem;color:var(--ink)}
+.guide h2{font-size:1.1rem;margin:0 0 8px;color:var(--main-deep, var(--main))}
+.guide h2+ul,.guide h2+p{margin-top:0}
+.guide ul{margin:0 0 18px;padding-left:18px}
+.guide li{margin:0 0 6px;line-height:1.4}
+.guide li span{color:var(--muted)}
+.guide h3{font-size:.98rem;margin:14px 0 4px}
+.guide p{margin:0 0 10px;line-height:1.5;color:var(--muted)}
 </style>
 </head>
 <body>
@@ -338,6 +351,19 @@ h2.aisle.rm .ah{color:var(--muted)}
   <div id="out"></div>
 </div>
 
+<section class="guide" aria-labelledby="gDays">
+  <h2 id="gDays">Ready-made days</h2>
+  <ul><li><b>Airbnb changeover</b> <span>– Guests out, guests in. The whole turnaround in order, from stripping the beds to the check-in message.</span></li><li><b>School day</b> <span>– The morning scramble and the evening reset, so tomorrow morning is calmer than today&#x27;s.</span></li><li><b>Sunday reset</b> <span>– An hour or two that makes the whole week easier. Nothing heroic – just the basics done.</span></li><li><b>Working from home</b> <span>– A work day at the kitchen table, with the house jobs slotted around it instead of eating it.</span></li><li><b>Guests for dinner</b> <span>– Friends coming round tonight. Everything done before the doorbell, not during.</span></li><li><b>First day back from holiday</b> <span>– Suitcases in the hall, empty fridge, 400 emails. The order that gets you back to normal by tonight.</span></li></ul>
+  <h2>Questions</h2>
+  <h3>How does Do by Today work?</h3>
+  <p>Type your jobs for today, or start from a ready-made day. Each job lands under morning, afternoon, evening, anytime today or if there's time – so you can see what has to happen when, and tap jobs off as you go.</p>
+  <h3>What happens to jobs I don't finish?</h3>
+  <p>Done jobs disappear overnight, so tomorrow starts clean. If anything was left undone, you choose: keep it on today's list or let it go.</p>
+  <h3>Can the whole house share one list?</h3>
+  <p>Yes. Share a link and everyone works off the same list, ticked off as jobs get done. Or send it as a message by WhatsApp or email.</p>
+  <h3>Is it free?</h3>
+  <p>Yes – free, with no account and no sign-up. Your list stays on your phone unless you share it.</p>
+</section>
 <div class="about">
   <p class="footlinks"><button class="link" id="howBtn" type="button" aria-expanded="false" aria-controls="howBox">How it works</button> · <button class="link" id="fbBtn" type="button" aria-expanded="false" aria-controls="feedback">Feedback &amp; suggestions</button></p>
 <div class="howwrap" id="howBox" hidden>
@@ -364,11 +390,11 @@ h2.aisle.rm .ah{color:var(--muted)}
   </div>
 </section>
 
-  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools. <span class="ver">v23</span></p>
+  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools. <span class="ver">v24</span></p>
 </div>
 </div>
 <script>
-var VERSION = 'v23';
+var VERSION = 'v24';
 var CAT = {"home":["Make the beds","Put a wash on","Hang the washing out","Bring the washing in","Fold and put clothes away","Empty the dishwasher","Load the dishwasher","Wipe the kitchen surfaces","Vacuum","Mop the floors","Clean the bathroom","Clean the loo","Take the bins out","Bring the bins in","Recycling out","Change the bedsheets","Water the plants","Tidy the living room","Sort the post","Iron","Clean the fridge out","Clean the windows","Feed the pet","Walk the dog","Litter tray","Descale the kettle","Wipe the mirrors"],"kids":["School run","Pack the school bags","Make the packed lunches","Sign the reading record","Homework","Reading with the kids","Pack PE kit","Lay out tomorrow's uniform","Check the school app","Reply to the school email","Pay for the school trip","Pick up from club","Bath and bed","Book the kids' dentist","Buy a present for the party","Cut the kids' nails","Wash the school uniform","Fill the water bottles"],"errands":["Food shop","Top-up shop","Post office","Return the parcel","Collect the parcel","Pick up the prescription","Pharmacy","Petrol","Car wash","Dry cleaning","Charity shop drop-off","Buy a birthday card","Bank","Click and collect","Top up the parking","Get cash out","Buy stamps","Recycling centre run"],"work":["Reply to emails","Clear the inbox","Send the invoice","Chase the invoice","Prepare for tomorrow's meeting","Update the tracker","Call the client","Write the report","Book travel","Submit expenses","Timesheet","Follow up on the proposal","Plan the week","Tidy the desk","Back up the laptop","Send the agenda","Read the brief","Update the to-do for the team"],"admin":["Pay a bill","Check the bank","Renew the insurance","Renew the car tax","Book the MOT","Book the dentist","Book the GP","Cancel a subscription","Update the budget","File receipts","Read the meter","Sort the tax return","Back up the phone","Change a password","Check the calendar for the week","Renew the passport","Sort the paperwork pile","Ring the council"],"self":["Drink more water","20 minutes' walk","Exercise","Stretch","Take vitamins","Take medication","Read for 15 minutes","Meditate","Early night","Cook a proper dinner","Prep tomorrow's lunch","No phone after 9","Plan the weekend","Do nothing for 10 minutes","Haircut","Journal","Get some fresh air","Go to bed by 10"],"people":["Call Mum","Call Dad","Message a friend back","Reply to the group chat","Send a thank-you","Send a birthday message","Book dinner with friends","Check on a neighbour","Write the card","Arrange the playdate","Book the babysitter","Call the grandparents","Say yes or no to the invitation","Send the photos"],"hosting":["Strip the beds","Wash the linen","Make up the beds","Fresh towels out","Clean the bathroom (guest)","Restock toilet roll","Restock toiletries","Empty all the bins","Vacuum and mop (guest)","Wipe the kitchen (guest)","Check the fridge is empty","Restock tea, coffee and milk","Check the wifi card is there","Set the heating","Leave the keys in the lockbox","Send the check-in message","Send the check-out reminder","Check for damage","Replace anything missing","Take photos of the rooms","Put out the welcome basket","Write the guest review","Reply to guest messages","Check the smoke alarm","Plump the cushions","Open the windows for 10 minutes"],"garden":["Mow the lawn","Water the garden","Weed the beds","Cut the hedge","Sweep the patio","Wash the car","Check the tyre pressures","Fill the screenwash","Clear the gutters","Plant the bulbs","Feed the birds","Clean the barbecue","Put the garden furniture away","Clear the leaves","Empty the car"]};
 var CATS = [["home","Around the house"],["kids","Kids & school"],["errands","Errands & shopping"],["work","Work"],["admin","Admin & money"],["self","Looking after yourself"],["people","People"],["hosting","Guests & Airbnb"],["garden","Garden & car"],["other","Other"]];
 var BAGS = [["morning","Morning",""],["afternoon","Afternoon",""],["evening","Evening",""],["any","Anytime today",""],["iftime","If there's time","no stress if not"]];
