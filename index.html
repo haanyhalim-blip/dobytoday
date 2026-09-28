@@ -326,10 +326,8 @@ h2.aisle.rm .ah{color:var(--muted)}
   <a class="brand" href="/">Do<span>by</span>Today</a>
   <h1 class="tagline">Today's list, sorted by when.</h1>
   <a class="howtop" id="howTop" href="#howBox">How it works</a>
-  <button class="btn keepb" id="keepBtn" type="button">Bookmark this page</button>
   <button class="btn keepb acctb" id="acctBtn" type="button">Sign in</button>
 </header>
-<div class="keep" id="keep" hidden></div>
 <div class="keep" id="dayBox" hidden></div>
 
 <div class="sticky">
@@ -426,7 +424,7 @@ h2.aisle.rm .ah{color:var(--muted)}
   </div>
 </section>
 
-  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools. <span class="ver">v27</span></p>
+  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools. <span class="ver">v28</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -786,23 +784,6 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
 
   load(); drawTrips(); render(); dayBanner();
   document.addEventListener("visibilitychange", function(){ if(!document.hidden && S.day !== today()){ newDay(); render(); dayBanner(); } });
-  (function(){
-    var deferred = null, box = $("keep");
-    window.addEventListener("beforeinstallprompt", function(e){ e.preventDefault(); deferred = e; });
-    function steps(){
-      var ua = navigator.userAgent, ios = /iPhone|iPad|iPod/.test(ua), android = /Android/.test(ua), mac = /Mac/.test(ua);
-      if(ios) return "On iPhone: tap the <b>Share</b> button (the square with an arrow) at the bottom of Safari, then <b>Add to Home Screen</b>. DobyToday gets its own icon, like an app.";
-      if(android) return "Tap the <b>⋮ menu</b> at the top right of the browser, then <b>Add to Home screen</b> (or <b>Install app</b>). DobyToday gets its own icon, like an app.";
-      return "Press <b>" + (mac ? "Cmd + D" : "Ctrl + D") + "</b> to bookmark this page. On your phone, open dobytoday.com and use <b>Add to Home Screen</b> for an app icon.";
-    }
-    $("keepBtn").addEventListener("click", function(){
-      if(deferred){ deferred.prompt(); deferred.userChoice.then(function(){ deferred = null; }); return; }
-      if(!box.hidden){ box.hidden = true; return; }
-      box.innerHTML = steps() + ' <button class="link quiet" id="keepClose" type="button">Close</button>'; box.hidden = false;
-      $("keepClose").addEventListener("click", function(){ box.hidden = true; });
-    });
-  })();
-
   // How it works: collapsed by default; captions follow the demo video's clock, so Pause freezes both
   (function(){
     var btn = $("howBtn"), box = $("howBox"), vid = $("demoVid"), pp = $("demoPP"), big = $("demoBig"), steps = document.querySelectorAll("#steps .step");
