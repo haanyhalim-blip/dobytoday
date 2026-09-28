@@ -32,7 +32,7 @@
 :root{
   color-scheme:light;
   --bg:#f7f1ec; --card:#fff; --line:#e6d6cc; --ink:#2b211c; --muted:#70605a; --faint:#a8968e;
-  --main:#c4603a; --main-deep:#94452a; --wash:#f8e3d9; --accent:#b5532a; --accent-wash:#f6e4db; --second:#2b3a67; --second-deep:#1e2a4d; --second-wash:#e3e7f2;
+  --main:#c4603a; --main-deep:#94452a; --wash:#f8e3d9; --accent:#b5532a; --accent-wash:#f6e4db; --second:#2b211c; --second-deep:#1c1512; --second-wash:#f0eeec; /* list colour = the ink of "by" in the logo */
 }
 *{box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
@@ -131,6 +131,7 @@ body.searching .jumps{display:none}
 #listSec .sharebox{margin:18px 0 0;border-color:var(--second);scroll-margin-top:64px}
 #shopBox{padding:6px 12px 12px;background:#fff;border:1.5px solid var(--main);border-radius:10px}
 #shopBox[hidden]{display:none}
+body.searching #shopBox[hidden]{display:block}
 .mineb{background:var(--second);border-color:var(--second);color:#fff}
 .mineb:hover{background:var(--second-deep);border-color:var(--second-deep)}
 .mineb .tn{background:#fff;color:var(--second-deep);border-radius:99px;padding:1px 7px;font-size:.8rem;margin-left:2px}
@@ -140,18 +141,30 @@ body.searching .jumps{display:none}
 #listSec:has(#mineBody[hidden]) .lhead{border-bottom:0;padding-bottom:2px}
 .sect.mine{color:var(--second-deep);width:auto;gap:8px}
 .sect.mine .brand{font-size:1.25rem;margin-left:2px}
-.lhead{display:flex;align-items:center;gap:10px;padding:6px 0 6px;border-bottom:1.5px solid var(--second, var(--purple))}
+.lhead{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;padding:6px 0 8px;border-bottom:1.5px solid var(--second, var(--purple))}
 .ltitle{flex:1;margin:0;font-size:1.2rem;font-weight:700;color:var(--second-deep, var(--purple-deep))}
 .lhead #clear{font-size:.78rem;color:var(--accent);font-weight:700;text-align:right;line-height:1.15;white-space:nowrap}
 .lhead #clear[hidden]{display:none}
 .btn.back{padding:9px 10px;font-size:.88rem}
 .dfoot{display:flex;gap:10px;flex-wrap:nowrap;align-items:center;justify-content:space-between;margin-top:16px}
 .dfoot .btn{flex:0 0 auto}
+.lhead .hshare{padding:6px 14px;font-size:.88rem;min-height:0;line-height:1.2}
+#listSec:has(#mineBody[hidden]) .lhead .hshare,#listSec:has(#mineBody[hidden]) .lhead .rmlink{display:none}
+.rmlink{font-size:.8rem;color:var(--muted);font-weight:400;text-decoration:underline;text-underline-offset:3px;padding:4px 0}
+.rmlink[hidden]{display:none}
+.rmlink[aria-expanded="true"]{color:var(--ink)}
+.rmpanel{background:#f3f2ee;border-radius:10px;padding:8px 10px;margin:12px 0 4px}
+.rmhead{display:flex;align-items:baseline;gap:8px;font-size:.85rem;color:var(--muted)}
+.rmhead b{color:var(--ink)}
+.rmhead #rmForget{margin-left:auto;font-size:.8rem;color:var(--accent);font-weight:700}
+.count #clear{font-size:.82rem;color:var(--accent);font-weight:700}
+.count #again{font-size:.82rem;color:var(--muted)}
+.count #clear[hidden],.count #again[hidden]{display:none}
 #mineShare{background:var(--second);border-color:var(--second)}
 #mineShare:hover{background:var(--second-deep);border-color:var(--second-deep)}
 #shareBox .btn.primary{background:var(--second);border-color:var(--second)}
 #shareBox .btn.share{border-color:var(--second);color:var(--second-deep)}
-#mine .aisle .ah{color:#8f96ab;font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:4px 0 2px;margin:14px 0 0;background:none;border:0;border-radius:0;text-decoration:none;cursor:default}
+#mine .aisle .ah{color:#8a8f8c;font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:4px 0 2px;margin:14px 0 0;background:none;border:0;border-radius:0;text-decoration:none;cursor:default}
 #mine .aisle .ah .c{display:none}
 #mine .aisle .ah .sub{font-size:.72rem;letter-spacing:0;text-transform:none;font-weight:400;color:var(--muted);margin-left:2px}
 #mine .grid{display:block;margin:0 0 4px}
@@ -278,6 +291,10 @@ h2.aisle.rm .ah{color:var(--muted)}
 .btn.keepb{font-size:.8rem;padding:6px 10px;border-radius:99px;border-color:var(--main);color:var(--main-deep);flex:0 0 auto}
 @media (prefers-reduced-motion:reduce){*{transition:none!important}}
 .guide{margin:34px 0 0;padding:18px 18px 6px;background:var(--card);border:1.5px solid var(--line);border-radius:12px;font-size:.92rem;color:var(--ink)}
+.gfold>summary{cursor:pointer;list-style:none;font-size:1.1rem;font-weight:700;color:var(--main-deep, var(--main));display:flex;align-items:center;gap:10px;padding:2px 0 12px}
+.gfold>summary::-webkit-details-marker{display:none}
+.gfold>summary::before{content:"";width:9px;height:9px;border-right:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:rotate(-45deg);transition:transform .15s;flex:none}
+.gfold[open]>summary::before{transform:rotate(45deg)}
 .guide h2{font-size:1.1rem;margin:0 0 8px;color:var(--main-deep, var(--main))}
 .guide h2+ul,.guide h2+p{margin-top:0}
 .guide ul{margin:0 0 18px;padding-left:18px}
@@ -316,7 +333,8 @@ h2.aisle.rm .ah{color:var(--muted)}
 <section id="listSec">
     <div class="lhead">
       <h2 class="ltitle"><button class="sect mine" id="mineBtn" type="button" aria-expanded="true" aria-controls="mineBody"><span class="c"></span>My list</button></h2>
-      <button class="link quiet" id="clear" type="button" hidden>Clear today</button>
+      <button class="btn primary hshare" id="mineShare" type="button" aria-expanded="false" aria-controls="shareBox">Share</button>
+      <button class="link quiet rmlink" id="rmBtn" type="button" hidden aria-expanded="false">Not today <span id="rmN"></span></button>
     </div>
   <div id="mineBody">
     <div id="mine"></div>
@@ -333,8 +351,7 @@ h2.aisle.rm .ah{color:var(--muted)}
 <div class="shared" id="shared" hidden><input id="shareUrl" readonly aria-label="Link to this list" hidden><button class="link quiet" id="shareStop" type="button">Stop sharing</button></div>
 </div>
     <div class="dfoot">
-      <span class="count" id="countWrap"><span id="count"></span></span>
-      <button class="btn primary" id="mineShare" type="button" aria-expanded="false" aria-controls="shareBox">Share this list</button>
+      <span class="count" id="countWrap"><span id="count"></span> · <button class="link quiet" id="clear" type="button" hidden>Clear today</button></span>
     </div>
   </div>
 </section>
@@ -346,12 +363,13 @@ h2.aisle.rm .ah{color:var(--muted)}
   <p class="tripnote">These are starting points, not rules – every house runs differently. Something missing, or a day you'd like added? <button class="link" id="tripSuggest" type="button">Suggest an addition</button></p>
 </div>
 
-<h2 class="sec"><button class="sect" id="shopBtn" type="button" aria-expanded="true" aria-controls="shopBox"><span class="c"></span>Browse by task</button></h2>
-<div id="shopBox">
+<h2 class="sec"><button class="sect" id="shopBtn" type="button" aria-expanded="false" aria-controls="shopBox"><span class="c"></span>Browse by task</button></h2>
+<div id="shopBox" hidden>
   <div id="out"></div>
 </div>
 
 <section class="guide" aria-labelledby="gDays">
+<details class="gfold"><summary>Ready-made days &amp; common questions</summary>
   <h2 id="gDays">Ready-made days</h2>
   <ul><li><b>Airbnb changeover</b> <span>– Guests out, guests in. The whole turnaround in order, from stripping the beds to the check-in message.</span></li><li><b>School day</b> <span>– The morning scramble and the evening reset, so tomorrow morning is calmer than today&#x27;s.</span></li><li><b>Sunday reset</b> <span>– An hour or two that makes the whole week easier. Nothing heroic – just the basics done.</span></li><li><b>Working from home</b> <span>– A work day at the kitchen table, with the house jobs slotted around it instead of eating it.</span></li><li><b>Guests for dinner</b> <span>– Friends coming round tonight. Everything done before the doorbell, not during.</span></li><li><b>First day back from holiday</b> <span>– Suitcases in the hall, empty fridge, 400 emails. The order that gets you back to normal by tonight.</span></li></ul>
   <h2>Questions</h2>
@@ -363,6 +381,7 @@ h2.aisle.rm .ah{color:var(--muted)}
   <p>Yes. Share a link and everyone works off the same list, ticked off as jobs get done. Or send it as a message by WhatsApp or email.</p>
   <h3>Is it free?</h3>
   <p>Yes – free, with no account and no sign-up. Your list stays on your phone unless you share it.</p>
+</details>
 </section>
 <div class="about">
   <p class="footlinks"><button class="link" id="howBtn" type="button" aria-expanded="false" aria-controls="howBox">How it works</button> · <button class="link" id="fbBtn" type="button" aria-expanded="false" aria-controls="feedback">Feedback &amp; suggestions</button></p>
@@ -390,7 +409,7 @@ h2.aisle.rm .ah{color:var(--muted)}
   </div>
 </section>
 
-  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools. <span class="ver">v24</span></p>
+  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools. <span class="ver">v25</span></p>
 </div>
 </div>
 <script>
@@ -508,15 +527,14 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
         S.own.forEach(function(o, i){ if(o.b === g.key) html += mineOwn(o, i); });
         html += '</div>';
       });
-      if(S.removed.length){
-        var ropen = OPEN._removed === 1;
-        html += '<h2 class="aisle rm"><button class="ah" data-a="_removed" aria-expanded="'+ropen+'"><span class="c"></span>Not today <span class="sub">('+S.removed.length+')</span></button><button class="link quiet" id="rmForget" type="button">Clear</button></h2><div class="grid"'+(ropen ? '' : ' hidden')+'>';
-        S.removed.forEach(function(r, i){ html += '<button class="it rm" data-rm="'+i+'"><span class="box"></span><span><span class="nm">'+esc(r.n)+'</span></span></button>'; });
-        html += '</div>';
-        shown += S.removed.length;
+      var rmHtml = "";
+      if(S.removed.length && OPEN._removed === 1){ // opened from the link in the list heading
+        rmHtml = '<div class="rmpanel"><div class="rmhead"><b>Not today</b><span class="sub">tap one to put it back</span><button class="link quiet" id="rmForget" type="button">Clear</button></div><div class="grid">';
+        S.removed.forEach(function(r, i){ rmHtml += '<button class="it rm" data-rm="'+i+'"><span class="box"></span><span><span class="nm">'+esc(r.n)+'</span></span></button>'; });
+        rmHtml += '</div></div>';
       }
-      if(shown) return html;
-      return '<div class="empty"><b>Nothing on the list yet</b>Type a job at the top, start from a ready-made day, or browse by task.</div>';
+      if(shown) return rmHtml + html;
+      return rmHtml + '<div class="empty"><b>Nothing on the list yet</b>Type a job at the top, start from a ready-made day, or browse by task.</div>';
     }
     CATS.forEach(function(a){
       var az = function(x, y){ return x.localeCompare(y, undefined, {sensitivity:"base"}); };
@@ -546,6 +564,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     $("count").innerHTML = p ? '<b>'+p+'</b> to do today · <b>'+nGot()+'</b> done' : ''; $("countWrap").hidden = !p;
     ["copy","wa","mail"].forEach(function(id){ $(id).disabled = !p; });
     $("clear").hidden = !p;
+    if(!S.removed.length) OPEN._removed = 0;
+    $("rmBtn").hidden = !S.removed.length; $("rmN").textContent = "(" + S.removed.length + ")"; $("rmBtn").setAttribute("aria-expanded", String(OPEN._removed === 1));
     $("paper").textContent = p ? asText() : "Nothing on the list yet";
   }
   function unpark(n){ S.removed = S.removed.filter(function(x){ return norm(x.n) !== norm(n); }); }
@@ -559,7 +579,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function takeOff(b){ var r; if(b.dataset.own !== undefined){ var o = S.own[+b.dataset.own]; if(!o) return; r = {n:o.n, own:{a:o.a, b:o.b}}; S.own.splice(+b.dataset.own, 1); }
     else { r = {n:b.dataset.n}; delete S.picked[r.n]; delete S.got[r.n]; }
     if(S.note) delete S.note[r.n]; park(r); save(); render();
-    toast(r.n + " taken off – it's in Not today at the bottom", function(){ unpark(r.n); if(r.own){ if(!S.own.some(function(o){ return norm(o.n) === norm(r.n); })) S.own.push({n:r.n, a:r.own.a, b:r.own.b, got:false}); } else { S.picked[r.n] = 1; delete S.got[r.n]; } save(); render(); }); }
+    toast(r.n + " taken off – find it under Not today at the top of your list", function(){ unpark(r.n); if(r.own){ if(!S.own.some(function(o){ return norm(o.n) === norm(r.n); })) S.own.push({n:r.n, a:r.own.a, b:r.own.b, got:false}); } else { S.picked[r.n] = 1; delete S.got[r.n]; } save(); render(); }); }
 
   function addOne(v){
     v = v.trim().replace(/^[-*\u2022\u2610\u2611\u2612\[\]x ]+/i, "").replace(/^\d+\s*x?\s+/i, "").trim(); if(!v) return false;
@@ -730,6 +750,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   $("q").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); if(splitRaw(this.value).length > 1) addTyped(this.value); else this.blur(); } });
   function clearAll(){ if(!nPicked()) return; if(!confirm("Clear today's list?")) return; S = {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}, day:today()}; save(); render(); toast("Cleared – fresh start"); }
   $("clear").addEventListener("click", clearAll);
+  $("rmBtn").addEventListener("click", function(){ OPEN._removed = OPEN._removed === 1 ? 0 : 1; render(); });
   $("copy").addEventListener("click", function(){
     var t = asText(); if(!t) return;
     if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ toast("Copied"); }, function(){ toast("Could not copy"); }); }
@@ -786,7 +807,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     function fold(btnId, boxId){ var b = $(btnId), x = $(boxId); b.addEventListener("click", function(){ var open = x.hidden; x.hidden = !open; b.setAttribute("aria-expanded", String(open)); }); }
     fold("tripBtn", "tripBox"); fold("shopBtn", "shopBox"); fold("fbBtn", "feedback"); fold("mineBtn", "mineBody");
     var sb = $("mineShare"), sx = $("shareBox");
-    sb.addEventListener("click", function(){ var open = sx.hidden; sx.hidden = !open; sb.setAttribute("aria-expanded", String(open)); sb.textContent = open ? "Hide sharing" : "Share this list"; if(open) setTimeout(function(){ sx.scrollIntoView({block:"start", behavior:"smooth"}); }, 30); });
+    sb.addEventListener("click", function(){ var open = sx.hidden; sx.hidden = !open; sb.setAttribute("aria-expanded", String(open)); sb.textContent = open ? "Close" : "Share"; if(open) setTimeout(function(){ sx.scrollIntoView({block:"start", behavior:"smooth"}); }, 30); });
   })();
 
   // ---------- Shared lists (Supabase) ----------
