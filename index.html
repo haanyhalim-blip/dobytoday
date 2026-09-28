@@ -150,6 +150,9 @@ body.searching #shopBox[hidden]{display:block}
 .dfoot .btn{flex:0 0 auto}
 .lhead .hshare{padding:6px 14px;font-size:.88rem;min-height:0;line-height:1.2}
 #listSec:has(#mineBody[hidden]) .lhead .hshare,#listSec:has(#mineBody[hidden]) .lhead .rmlink{display:none}
+.lhead .clearlink{font-size:.8rem;color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:4px 0;margin-left:auto}
+.lhead .clearlink[hidden]{display:none}
+#listSec:has(#mineBody[hidden]) .lhead .clearlink{display:none}
 .rmlink{font-size:.8rem;color:var(--muted);font-weight:400;text-decoration:underline;text-underline-offset:3px;padding:4px 0}
 .rmlink[hidden]{display:none}
 .rmlink[aria-expanded="true"]{color:var(--ink)}
@@ -334,7 +337,7 @@ h2.aisle.rm .ah{color:var(--muted)}
     <div class="lhead">
       <h2 class="ltitle"><button class="sect mine" id="mineBtn" type="button" aria-expanded="true" aria-controls="mineBody"><span class="c"></span>My list</button></h2>
       <button class="btn primary hshare" id="mineShare" type="button" aria-expanded="false" aria-controls="shareBox">Share</button>
-      <button class="link quiet rmlink" id="rmBtn" type="button" hidden aria-expanded="false">Not today <span id="rmN"></span></button>
+      <button class="link quiet clearlink" id="clear" type="button" hidden>Clear today</button>
     </div>
   <div id="mineBody">
     <div id="mine"></div>
@@ -351,7 +354,7 @@ h2.aisle.rm .ah{color:var(--muted)}
 <div class="shared" id="shared" hidden><input id="shareUrl" readonly aria-label="Link to this list" hidden><button class="link quiet" id="shareStop" type="button">Stop sharing</button></div>
 </div>
     <div class="dfoot">
-      <span class="count" id="countWrap"><span id="count"></span> · <button class="link quiet" id="clear" type="button" hidden>Clear today</button></span>
+      <span class="count" id="countWrap"><span id="count"></span></span>
     </div>
   </div>
 </section>
@@ -409,7 +412,7 @@ h2.aisle.rm .ah{color:var(--muted)}
   </div>
 </section>
 
-  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools. <span class="ver">v25</span></p>
+  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools. <span class="ver">v26</span></p>
 </div>
 </div>
 <script>
@@ -528,11 +531,6 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
         html += '</div>';
       });
       var rmHtml = "";
-      if(S.removed.length && OPEN._removed === 1){ // opened from the link in the list heading
-        rmHtml = '<div class="rmpanel"><div class="rmhead"><b>Not today</b><span class="sub">tap one to put it back</span><button class="link quiet" id="rmForget" type="button">Clear</button></div><div class="grid">';
-        S.removed.forEach(function(r, i){ rmHtml += '<button class="it rm" data-rm="'+i+'"><span class="box"></span><span><span class="nm">'+esc(r.n)+'</span></span></button>'; });
-        rmHtml += '</div></div>';
-      }
       if(shown) return rmHtml + html;
       return rmHtml + '<div class="empty"><b>Nothing on the list yet</b>Type a job at the top, start from a ready-made day, or browse by task.</div>';
     }
@@ -564,12 +562,10 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     $("count").innerHTML = p ? '<b>'+p+'</b> to do today · <b>'+nGot()+'</b> done' : ''; $("countWrap").hidden = !p;
     ["copy","wa","mail"].forEach(function(id){ $(id).disabled = !p; });
     $("clear").hidden = !p;
-    if(!S.removed.length) OPEN._removed = 0;
-    $("rmBtn").hidden = !S.removed.length; $("rmN").textContent = "(" + S.removed.length + ")"; $("rmBtn").setAttribute("aria-expanded", String(OPEN._removed === 1));
     $("paper").textContent = p ? asText() : "Nothing on the list yet";
   }
   function unpark(n){ S.removed = S.removed.filter(function(x){ return norm(x.n) !== norm(n); }); }
-  function park(r){ S.removed = S.removed.filter(function(x){ return norm(x.n) !== norm(r.n); }); S.removed.unshift(r); if(S.removed.length > 60) S.removed.length = 60; }
+  function park(r){ S.removed = []; } // removed items are no longer kept – the red symbol removes for good (Undo is in the pop-up)
   function restore(i){ var r = S.removed.splice(i, 1)[0]; if(!r) return;
     if(r.own){ if(!S.own.some(function(o){ return norm(o.n) === norm(r.n); })) S.own.push({n:r.n, a:r.own.a, b:r.own.b, got:false}); }
     else { S.picked[r.n] = 1; delete S.got[r.n]; }
@@ -579,7 +575,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function takeOff(b){ var r; if(b.dataset.own !== undefined){ var o = S.own[+b.dataset.own]; if(!o) return; r = {n:o.n, own:{a:o.a, b:o.b}}; S.own.splice(+b.dataset.own, 1); }
     else { r = {n:b.dataset.n}; delete S.picked[r.n]; delete S.got[r.n]; }
     if(S.note) delete S.note[r.n]; park(r); save(); render();
-    toast(r.n + " taken off – find it under Not today at the top of your list", function(){ unpark(r.n); if(r.own){ if(!S.own.some(function(o){ return norm(o.n) === norm(r.n); })) S.own.push({n:r.n, a:r.own.a, b:r.own.b, got:false}); } else { S.picked[r.n] = 1; delete S.got[r.n]; } save(); render(); }); }
+    toast(r.n + " removed", function(){ unpark(r.n); if(r.own){ if(!S.own.some(function(o){ return norm(o.n) === norm(r.n); })) S.own.push({n:r.n, a:r.own.a, b:r.own.b, got:false}); } else { S.picked[r.n] = 1; delete S.got[r.n]; } save(); render(); }); }
 
   function addOne(v){
     v = v.trim().replace(/^[-*\u2022\u2610\u2611\u2612\[\]x ]+/i, "").replace(/^\d+\s*x?\s+/i, "").trim(); if(!v) return false;
@@ -750,7 +746,6 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   $("q").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); if(splitRaw(this.value).length > 1) addTyped(this.value); else this.blur(); } });
   function clearAll(){ if(!nPicked()) return; if(!confirm("Clear today's list?")) return; S = {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}, day:today()}; save(); render(); toast("Cleared – fresh start"); }
   $("clear").addEventListener("click", clearAll);
-  $("rmBtn").addEventListener("click", function(){ OPEN._removed = OPEN._removed === 1 ? 0 : 1; render(); });
   $("copy").addEventListener("click", function(){
     var t = asText(); if(!t) return;
     if(navigator.clipboard && navigator.clipboard.writeText){ navigator.clipboard.writeText(t).then(function(){ toast("Copied"); }, function(){ toast("Could not copy"); }); }
