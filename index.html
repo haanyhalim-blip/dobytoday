@@ -154,9 +154,17 @@ body.searching #shopBox[hidden]{display:block}
 #listSec:has(#mineBody[hidden]) .lhead .hshare,#listSec:has(#mineBody[hidden]) .lhead .rmlink{display:none}
 .lhead .clearlink{font-size:.8rem;color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:4px 0}
 .lhead .hshare{margin-left:auto}
-.htally{font-size:.82rem;color:var(--muted);white-space:nowrap}
+.lhead .clearic{border:0;background:none;padding:4px;margin:0 -4px 0 0;color:var(--accent);cursor:pointer;display:flex;line-height:0}
+.lhead .clearic[hidden]{display:none}
+.ltwrap{display:flex;flex-direction:column;min-width:0}
+.ltwrap .ltitle{white-space:nowrap}
+.htally{font-size:.76rem;color:var(--muted);white-space:nowrap;line-height:1.1;margin:-2px 0 0 26px}
+.lhead .vtog{font-size:.78rem}
+.lhead .vtog button{padding:5px 9px}
+@media (max-width:380px){.lhead{gap:8px 7px}.lhead .hshare{padding:6px 11px}.lhead .vtog button{padding:5px 7px}}
 .htally b{color:var(--second-deep, var(--ink));font-weight:700}
 .htally:empty{display:none}
+#countWrap{display:none!important}
 .lhead .clearlink[hidden]{display:none}
 #listSec:has(#mineBody[hidden]) .lhead .clearlink{display:none}
 .rmlink{font-size:.8rem;color:var(--muted);font-weight:400;text-decoration:underline;text-underline-offset:3px;padding:4px 0}
@@ -324,6 +332,23 @@ h2.aisle.rm .ah{color:var(--muted)}
 .acsmall{font-size:.85rem;color:#6b716c}
 .acx{position:absolute;right:10px;top:8px;border:0;background:none;font-size:1.6rem;line-height:1;color:#888;cursor:pointer}
 .acctb.on{background:var(--main);color:#fff}
+/* My lists: lists you've saved to use again */
+#myl{margin:0 0 14px}
+#myl .mylh{display:flex;align-items:baseline;gap:10px;margin:0 0 8px;font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--second, var(--purple))}
+#myl .mylh small{letter-spacing:0;text-transform:none;font-weight:400;color:var(--muted)}
+#myl .mylgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px}
+#myl .trip.mine{border-color:var(--second, var(--purple));background:var(--second-wash, #f4f4f4)}
+#myl .mylsave{font:inherit;cursor:pointer;border:1.5px dashed var(--second, var(--purple));background:transparent;color:var(--second, var(--purple));border-radius:10px;padding:12px 13px;font-weight:700;text-align:left}
+#myl .mylnote{font-size:.85rem;color:var(--muted);margin:0}
+#myl .mylform{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px;border:1.5px solid var(--second, var(--purple));border-radius:10px;background:var(--card, #fff)}
+#myl .mylform label{flex:1 1 100%;font-weight:700;font-size:.9rem}
+#myl .mylform input{flex:1 1 160px;font:inherit;padding:9px 11px;border:1.5px solid var(--line, #ddd);border-radius:9px}
+#myl .mylopen{grid-column:1/-1;padding:12px 14px;border:1.5px solid var(--second, var(--purple));border-radius:10px;background:var(--card, #fff)}
+#myl .mylopen b{display:block;font-size:1.05rem}
+#myl .mylopen p{margin:4px 0 10px;font-size:.88rem;color:var(--muted)}
+#myl .mylopen .row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
+#myl .mylopen .del{color:var(--accent, #b5532a)}
+.dfoot .mylink{font-size:.8rem;margin-left:8px}
 </style>
 </head>
 <body>
@@ -353,10 +378,9 @@ h2.aisle.rm .ah{color:var(--muted)}
 
 <section id="listSec">
     <div class="lhead">
-      <h2 class="ltitle"><button class="sect mine" id="mineBtn" type="button" aria-expanded="true" aria-controls="mineBody"><span class="c"></span>My list</button></h2>
-      <span class="htally" id="htally"></span>
+      <div class="ltwrap"><h2 class="ltitle"><button class="sect mine" id="mineBtn" type="button" aria-expanded="true" aria-controls="mineBody"><span class="c"></span>My list</button></h2><span class="htally" id="htally"></span></div>
       <button class="btn primary hshare" id="mineShare" type="button" aria-expanded="false" aria-controls="shareBox">Share</button>
-      <button class="link quiet clearlink" id="clear" type="button" hidden>Clear list</button>
+      <button class="clearic" id="clear" type="button" hidden title="Clear the list" aria-label="Clear the list"><svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="3.7" y1="3.7" x2="12.3" y2="12.3" stroke="currentColor" stroke-width="1.7"/></svg></button>
     </div>
   <div id="mineBody">
     <div id="mine"></div>
@@ -373,13 +397,14 @@ h2.aisle.rm .ah{color:var(--muted)}
 <div class="shared" id="shared" hidden><input id="shareUrl" readonly aria-label="Link to this list" hidden><button class="link quiet" id="shareStop" type="button">Stop sharing</button></div>
 </div>
     <div class="dfoot">
-      <span class="count" id="countWrap"><span id="count"></span></span>
+      <button class="link quiet mylink" id="mylSaveLink" type="button" hidden>Save for next time</button><span class="count" id="countWrap"><span id="count"></span></span>
     </div>
   </div>
 </section>
 
 <h2 class="sec"><button class="sect" id="tripBtn" type="button" aria-expanded="false" aria-controls="tripBox"><span class="c"></span>Ready-made days</button></h2>
 <div id="tripBox" hidden>
+  <div id="myl"></div>
   <div class="trips" id="trips"></div>
   <div class="pick" id="listPick" hidden></div>
   <p class="tripnote">These are starting points, not rules – every house runs differently. Something missing, or a day you'd like added? <button class="link" id="tripSuggest" type="button">Suggest an addition</button></p>
@@ -431,7 +456,7 @@ h2.aisle.rm .ah{color:var(--muted)}
   </div>
 </section>
 
-  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools. <span class="ver">v30</span></p>
+  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools. <span class="ver">v31</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -594,7 +619,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     $("mine").innerHTML = draw(true);
     $("out").innerHTML = draw(false);
     var p = nPicked();
-    $("count").innerHTML = p ? '<b>'+p+'</b> to do today · <b>'+nGot()+'</b> done' : ''; $("htally").innerHTML = p ? '<b>'+nGot()+'</b> of <b>'+p+'</b> ✓' : ''; $("countWrap").hidden = !p;
+    $("count").innerHTML = p ? '<b>'+p+'</b> to do today · <b>'+nGot()+'</b> done' : ''; $("htally").textContent = p ? p + (p === 1 ? " job" : " jobs") : ""; if(typeof drawMy === "function") drawMy(); $("countWrap").hidden = !p;
     ["copy","wa","mail"].forEach(function(id){ $(id).disabled = !p; });
     $("clear").hidden = !p;
     $("paper").textContent = p ? asText() : "Nothing on the list yet";
@@ -891,6 +916,56 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       .then(function(){ $("fbsend").disabled = false; });
   });
 
+
+  // ---------- My lists: save a list to use again (on this phone; signed in, it's also kept in your account) ----------
+  var MKEY = "dobytoday-mylists", MYL = [], MOPEN = "", MFORM = false;
+  function myLoad(){ try{ MYL = JSON.parse(localStorage.getItem(MKEY) || "[]") || []; }catch(e){ MYL = []; } return MYL; }
+  function mySave(){ try{ localStorage.setItem(MKEY, JSON.stringify(MYL)); }catch(e){} if(typeof acctPush === "function") acctPush(); }
+  function snapCount(d){ return Object.keys(d.picked || {}).length + (d.own || []).length; }
+  function snapNames(d){ return Object.keys(d.picked || {}).concat((d.own || []).map(function(o){ return (o.w ? o.w + ": " : "") + o.n; })); }
+  function snapshot(){ var d; try{ d = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; }catch(e){ d = {}; } d.got = {}; d.removed = []; (d.own || []).forEach(function(o){ o.got = false; }); return d; }
+  function drawMy(){ var el = $("myl"); if(!el || !MYL) return; var has = nPicked() > 0, h = "";
+    $("mylSaveLink").hidden = !has;
+    h += '<div class="mylh">My lists <small>' + (MYL.length ? 'saved to use again' : '') + '</small></div><div class="mylgrid">';
+    MYL.forEach(function(m){ h += '<button class="trip mine" type="button" data-myl="' + esc(m.id) + '"><b>' + esc(m.name) + '</b><span class="n">' + snapCount(m.s) + ' ' + (snapCount(m.s) === 1 ? 'job' : 'jobs') + ' · tap to use it</span></button>'; });
+    if(MFORM) h += '<div class="mylform"><label for="mylName">Name this list</label><input id="mylName" maxlength="40" placeholder="e.g. Weekly shop" autocomplete="off" enterkeyhint="done"><button class="btn primary" type="button" data-mylok="1">Save</button><button class="link quiet" type="button" data-mylx="1">Cancel</button></div>';
+    else if(has) h += '<button class="mylsave" type="button" data-mylnew="1">+ Save my current list</button>';
+    if(!MYL.length && !has && !MFORM) h += '<p class="mylnote">Make a list, then save it here to use again next time.</p>';
+    var m = MYL.filter(function(x){ return x.id === MOPEN; })[0];
+    if(m){ var nm = snapNames(m.s); h += '<div class="mylopen"><b>' + esc(m.name) + '</b><p>' + esc(nm.slice(0, 12).join(", ")) + (nm.length > 12 ? " and " + (nm.length - 12) + " more" : "") + '</p><div class="row"><button class="btn primary" type="button" data-myadd="1">Add to my list</button><button class="btn" type="button" data-myrep="1">Replace my list</button>'
+      + (has ? '<button class="link quiet" type="button" data-myupd="1">Update it with my current list</button>' : '') + '<button class="link quiet del" type="button" data-mydel="1">Delete</button><button class="link quiet" type="button" data-myx="1">Close</button></div></div>'; }
+    el.innerHTML = h + '</div>'; }
+  function showMine(){ if(typeof openMine === "function") openMine(); else { var t = $("mineBtn"); if(t) t.scrollIntoView({behavior:"smooth", block:"start"}); } }
+  function applyMy(m, replace){ var d = JSON.parse(JSON.stringify(m.s)), cur = snapshot(), n = 0;
+    if(replace){ if("day" in S) d.day = S.day; n = snapCount(d); }
+    else { var keys = {}; (cur.own || []).forEach(function(o){ keys[(o.w || "") + "|" + o.n.toLowerCase()] = 1; });
+      Object.keys(d.picked || {}).forEach(function(k){ if(!(cur.picked || {})[k]){ cur.picked = cur.picked || {}; cur.picked[k] = 1; n++; } });
+      (d.own || []).forEach(function(o){ var k = (o.w || "") + "|" + o.n.toLowerCase(); if(!keys[k]){ cur.own = cur.own || []; cur.own.push(o); keys[k] = 1; n++; } });
+      Object.keys(d).forEach(function(k){ var v = d[k]; if(k === "picked" || k === "own" || k === "got" || k === "removed" || !v || typeof v !== "object" || Array.isArray(v)) return; cur[k] = cur[k] || {}; Object.keys(v).forEach(function(x){ if(!(x in cur[k])) cur[k][x] = v[x]; }); });
+      d = cur; }
+    try{ localStorage.setItem(KEY, JSON.stringify(d)); }catch(e){} load(); save(); render(); return n; }
+  $("myl").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return;
+    if(b.dataset.myl){ MOPEN = MOPEN === b.dataset.myl ? "" : b.dataset.myl; MFORM = false; drawMy(); return; }
+    if(b.dataset.mylnew){ MFORM = true; MOPEN = ""; drawMy(); setTimeout(function(){ var i = $("mylName"); if(i) i.focus(); }, 30); return; }
+    if(b.dataset.mylx){ MFORM = false; drawMy(); return; }
+    if(b.dataset.mylok){ mySaveNew(); return; }
+    var m = MYL.filter(function(x){ return x.id === MOPEN; })[0]; if(!m) return;
+    if(b.dataset.myx){ MOPEN = ""; drawMy(); return; }
+    if(b.dataset.myadd){ var n = applyMy(m, false); MOPEN = ""; drawMy(); showMine(); toast(n ? m.name + ": " + n + " added" : "All of those are on your list already"); return; }
+    if(b.dataset.myrep){ if(nPicked() && !confirm("Replace your current list with “" + m.name + "”?")) return; var before = localStorage.getItem(KEY); applyMy(m, true); MOPEN = ""; drawMy(); showMine();
+      toast("Now using “" + m.name + "”", function(){ try{ localStorage.setItem(KEY, before); }catch(x){} load(); save(); render(); }); return; }
+    if(b.dataset.myupd){ m.s = snapshot(); m.t = Date.now(); mySave(); drawMy(); toast("“" + m.name + "” updated"); return; }
+    if(b.dataset.mydel){ var i = MYL.indexOf(m); MYL.splice(i, 1); MOPEN = ""; mySave(); drawMy(); toast("“" + m.name + "” deleted", function(){ MYL.splice(i, 0, m); mySave(); drawMy(); }); } });
+  function mySaveNew(){ var i = $("mylName"), nm = (i && i.value || "").replace(/\s+/g, " ").trim(); if(!nm){ toast("Give the list a name"); if(i) i.focus(); return; }
+    var same = MYL.filter(function(x){ return x.name.toLowerCase() === nm.toLowerCase(); })[0];
+    if(same){ if(!confirm("You already have “" + same.name + "”. Replace it with your current list?")) return; same.s = snapshot(); same.t = Date.now(); }
+    else MYL.unshift({id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: nm, s: snapshot(), t: Date.now()});
+    MFORM = false; mySave(); drawMy(); toast("Saved to My lists: " + nm); }
+  $("myl").addEventListener("keydown", function(e){ if(e.key === "Enter" && e.target.id === "mylName"){ e.preventDefault(); mySaveNew(); } });
+  $("mylSaveLink").addEventListener("click", function(){ var bx = $("tripBox"); if(bx.hidden){ var t = document.querySelector('[aria-controls="tripBox"]'); if(t) t.click(); } MFORM = true; MOPEN = ""; drawMy();
+    setTimeout(function(){ $("myl").scrollIntoView({behavior:"smooth", block:"start"}); var i = $("mylName"); if(i) i.focus({preventScroll:true}); }, 60); });
+  myLoad(); drawMy();
+
   // ---------- Sign in (optional): your list is saved to your account and opens on any device ----------
   // One sign-in for all the Handy Little Tools sites (same Supabase project). Sharing links keep working as before.
   var SITE = "dobytoday", ATKEY = SITE + "-acct-t", asb = null, AUSER = null, apushT = null, acEmailV = "", aApplying = false;
@@ -903,12 +978,14 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function acctState(t){ var el = $("acState"); if(el) el.textContent = t; }
   function acctPush(){ if(aApplying) return; setLocalT(Date.now()); if(!AUSER || !asb) return; clearTimeout(apushT); apushT = setTimeout(function(){
     var raw; try{ raw = JSON.parse(localStorage.getItem(KEY) || "{}"); }catch(e){ raw = {}; }
-    acctState("Saving…"); asb.rpc("hlt_save", {p_site:SITE, p_data:{s:raw, t:localT()}}).then(function(res){ acctState(res.error ? "Saved on this phone – it'll save to your account when you're connected" : "✓ Saved to your account"); }); }, 1500); }
+    acctState("Saving…"); asb.rpc("hlt_save", {p_site:SITE, p_data:{s:raw, t:localT(), m:myLoad()}}).then(function(res){ acctState(res.error ? "Saved on this phone – it'll save to your account when you're connected" : "✓ Saved to your account"); }); }, 1500); }
   function acctPull(first){ if(!AUSER || !asb) return;
     asb.rpc("hlt_get", {p_site:SITE}).then(function(res){ if(res.error) return acctState("Saved on this phone – it'll save to your account when you're connected");
       var d = res.data, lt = localT();
-      if(d && d.s && (first || (d.t || 0) > lt)){ // just signed in: the list saved in your account wins
-        aApplying = true; try{ localStorage.setItem(KEY, JSON.stringify(d.s)); }catch(e){} setLocalT(d.t || Date.now()); load(); render(); aApplying = false; acctState("✓ Saved to your account"); }
+      var blank = !nPicked() && !(typeof myLoad === "function" && myLoad().length); // a new phone with nothing on it never overwrites your account
+      if(d && d.s && (first || blank || (d.t || 0) > lt)){ // just signed in: the list saved in your account wins
+        aApplying = true; try{ localStorage.setItem(KEY, JSON.stringify(d.s)); }catch(e){}
+        if(d.m){ var mine0 = myLoad(), ids = {}; d.m.forEach(function(x){ ids[x.id] = 1; }); MYL = first ? d.m.concat(mine0.filter(function(x){ return !ids[x.id]; })) : d.m; try{ localStorage.setItem(MKEY, JSON.stringify(MYL)); }catch(e){} drawMy(); } setLocalT(d.t || Date.now()); load(); render(); aApplying = false; acctState("✓ Saved to your account"); }
       else if(!d || lt > (d.t || 0)){ acctPush(); }
       else acctState("✓ Saved to your account"); }); }
   function acctUI(){ var b = $("acctBtn"); b.textContent = AUSER ? "✓ Signed in" : "Sign in"; b.classList.toggle("on", !!AUSER);
