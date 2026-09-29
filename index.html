@@ -385,6 +385,19 @@ body.hasmic #qClear{right:40px}
 #mine .mrow.editing{flex-wrap:wrap}
 #mine .mrow.editing .mctl{flex:1 1 100%;flex-wrap:wrap;justify-content:flex-end;row-gap:6px;padding-bottom:6px}
 #mine .mrow.editing .mctl .qc{display:block;order:9;flex:1 1 100%;height:32px;font-size:.92rem;margin:0}
+#mine .mrow .mctl{display:none}
+#mine .mctl .more,#mine .mrow>.more{flex:none;display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;margin-left:auto;border:0;border-radius:10px;background:none;color:#8d938a;cursor:pointer;padding:0}
+#mine .mrow>.more:hover,#mine .mrow>.more[aria-expanded="true"]{background:var(--second-wash,#eef0ea);color:var(--ink)}
+#mine .mrow.open{flex-wrap:wrap;background:var(--second-wash,#f2f4ef);border-radius:10px;border-bottom-color:transparent;margin:2px 0}
+#mine .mrow.open .mctl{display:flex;flex:1 1 100%;flex-wrap:wrap;align-items:center;gap:8px 10px;max-width:none;margin:0;padding:2px 10px 12px 38px}
+#mine .mrow.open .mctl .cmt{display:none}
+#mine .mrow.open .mctl .qm,#mine .mrow.open .mctl .qp{width:34px;height:34px;font-size:1.15rem;color:var(--ink);background:#fff}
+#mine .mrow.open .mctl .qv{min-width:22px;font-size:1rem;color:var(--ink)}
+#mine .mrow.open .mctl .mv,#mine .mrow.open .mctl .rmv{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;margin:0;border:1.5px solid var(--line);border-radius:999px;background:#fff;font-size:.9rem;font-weight:700;color:var(--ink);opacity:1}
+#mine .mrow.open .mctl .rmv{color:#c0392b;border-color:#efc4bf}
+#mine .mrow.open .mctl .qc{display:block;order:9;flex:1 1 100%;height:38px;font-size:.95rem;margin:0;padding:6px 10px;background:#fff}
+#mine .mctl .lbl{display:none}
+#mine .mrow.open .mctl .lbl{display:inline}
 #mine .mrow .it .cnote,#mine .cnote{display:block;font-size:.8rem;color:var(--muted);font-weight:400;margin-top:1px}
 /* Faint clipboard and clock drawing at the top (in the margin on wide screens) */
 header{position:relative}header>*{position:relative;z-index:1}header::after{content:"";position:absolute;pointer-events:none;z-index:0;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20190%22%20fill%3D%22none%22%20stroke%3D%22%23b0611c%22%20stroke-width%3D%223.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%0A%3Crect%20x%3D%2236%22%20y%3D%2226%22%20width%3D%22112%22%20height%3D%22150%22%20rx%3D%2212%22%2F%3E%0A%3Cpath%20d%3D%22M72%2026v-6a6%206%200%200%201%206-6h28a6%206%200%200%201%206%206v6%22%2F%3E%3Crect%20x%3D%2266%22%20y%3D%2222%22%20width%3D%2252%22%20height%3D%2214%22%20rx%3D%225%22%2F%3E%0A%3Crect%20x%3D%2252%22%20y%3D%2254%22%20width%3D%2214%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M55%2061l4%204%207-9%22%2F%3E%3Cpath%20d%3D%22M76%2061h52%22%2F%3E%0A%3Crect%20x%3D%2252%22%20y%3D%2284%22%20width%3D%2214%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M55%2091l4%204%207-9%22%2F%3E%3Cpath%20d%3D%22M76%2091h44%22%2F%3E%0A%3Crect%20x%3D%2252%22%20y%3D%22114%22%20width%3D%2214%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M76%20121h50%22%2F%3E%0A%3Crect%20x%3D%2252%22%20y%3D%22144%22%20width%3D%2214%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M76%20151h30%22%2F%3E%0A%3Ccircle%20cx%3D%22160%22%20cy%3D%22146%22%20r%3D%2228%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M160%20130v16l11%208%22%2F%3E%0A%3Cpath%20d%3D%22M160%20118v-4M188%20146h4M160%20174v4M132%20146h-4%22%2F%3E%0A%3C%2Fsvg%3E") no-repeat center/contain}header::after{right:-6px;top:4px;width:120px;height:114px;opacity:.16}@media (min-width:600px) and (max-width:1079px){header::after{display:none}}@media (min-width:1080px){header::after{right:-150px;top:8px;width:120px;height:114px;opacity:.16;transform:none}}
@@ -495,7 +508,7 @@ header{position:relative}header>*{position:relative;z-index:1}header::after{cont
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v40</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v41</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -593,10 +606,16 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
 
   var MV = '<span class="mv" role="button" title="Change when" aria-label="Change when"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5h11M10 2.5l3 3-3 3"/><path d="M14 10.5H3M6 7.5l-3 3 3 3"/></svg></span>';
   function noteTag(n){ var c = (S.note || {})[n]; return c ? '<span class="qty">'+esc(c)+'</span>' : ''; }
-  function ctl(n, ref){ var c = (S.note || {})[n] || ""; return '<div class="mctl" '+ref+'><span class="cmt'+(c ? ' has' : '')+'" role="button" title="Add a comment" aria-label="Add a comment"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span><input class="qc" type="text" maxlength="60" value="'+esc(c)+'" aria-label="Comment" placeholder="Comment, e.g. the big one">'+MV+RMV+'</div>'; }
-  function mineRow(n, ref, got, cls, b){ return '<div class="mrow'+(got?" got":"")+'"><button class="it'+cls+(got?" got":"")+'" '+ref+' aria-pressed="'+got+'"><span class="box"></span><span><span class="nm" data-done="'+doneWord(b)+'">'+esc(n)+'</span>'+(got ? noteTag(n) : ''+((S.note || {})[n] ? '<small class="cnote">'+esc((S.note || {})[n])+'</small>' : '')+'')+'</span></button>'+(got ? '' : ctl(n, ref))+'</div>'; }
+  function ctl(n, ref){ var c = (S.note || {})[n] || ""; return '<div class="mctl" '+ref+'><span class="cmt'+(c ? ' has' : '')+'" role="button" title="Add a comment" aria-label="Add a comment"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span><input class="qc" type="text" maxlength="60" value="'+esc(c)+'" aria-label="Comment" placeholder="Add a comment">'+MV.replace('</svg></span>', '</svg><span class="lbl">Change time</span></span>')+RMV.replace('</svg></span>', '</svg><span class="lbl">Remove</span></span>')+'</div>'; }
+  // One tidy row per item: the tick box, the name, and a "⋯" button that opens everything else
+  var MOREN = "";
+  function moreBtn(k){ return '<button type="button" class="more" data-more="'+esc(k)+'" aria-label="More options" aria-expanded="'+(MOREN === k)+'"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>'; }
+  function mineRow(n, ref, got, cls, b){ var mk = cls + "|" + n; return '<div class="mrow'+(got?" got":"")+(!got && MOREN === mk ? " open" : "")+'"><button class="it'+cls+(got?" got":"")+'" '+ref+' aria-pressed="'+got+'"><span class="box"></span><span><span class="nm" data-done="'+doneWord(b)+'">'+esc(n)+'</span>'+(got ? noteTag(n) : ''+((S.note || {})[n] ? '<small class="cnote">'+esc((S.note || {})[n])+'</small>' : '')+'')+'</span></button>'+(got ? '' : moreBtn(mk) + ctl(n, ref))+'</div>'; }
   function mineBtn(it){ return mineRow(it.n, 'data-n="'+esc(it.n)+'"', !!S.got[it.n], '', bagOf(it)); }
   function mineOwn(o, i){ return mineRow(o.n, 'data-own="'+i+'"', !!o.got, ' own', o.b); }
+  function moreSet(k){ MOREN = k; document.querySelectorAll("#mine .mrow").forEach(function(r){ var b = r.querySelector(".more"), on = !!b && b.dataset.more === k; r.classList.toggle("open", on); if(b) b.setAttribute("aria-expanded", String(on)); }); }
+  $("mine").addEventListener("click", function(e){ var b = e.target.closest(".more"); if(!b) return; e.stopPropagation(); moreSet(MOREN === b.dataset.more ? "" : b.dataset.more); }, true);
+  document.addEventListener("click", function(e){ if(MOREN && !e.target.closest(".mrow.open")) moreSet(""); });
   function ctlKey(c){ return c.dataset.own !== undefined ? ((S.own[+c.dataset.own] || {}).n || "") : c.dataset.n; }
 
   function draw(mine){
