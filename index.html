@@ -48,7 +48,7 @@ header{padding:26px 0 14px;margin-bottom:6px;border-bottom:1px solid var(--line)
 .brand{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:1.55rem;letter-spacing:-.01em;color:var(--main);margin:0;text-decoration:none}
 .brand span{color:var(--ink)}
 .brand.mini{font-size:1.05rem}
-body.searching #howBox,body.searching h2.sec:has(#tripBtn),body.searching #tripBox,body.searching h2.sec:has(#shopBtn){display:none}
+body.searching #howBox,body.searching .sectabs,body.searching #tripBox,body.searching h2.sec:has(#shopBtn){display:none}
 body.searching #listSec,body.searching h2.sec:has(#fbBtn),body.searching #feedback,body.searching .about{display:none}
 .sticky{position:sticky;top:0;z-index:10;background:var(--wash);border:1.5px solid var(--main);border-radius:12px;padding:10px 12px 8px;margin:4px 0 14px;box-shadow:0 3px 10px rgba(0,0,0,.08)}
 .stitle{color:var(--main-deep);margin:0 0 6px;font-size:1.2rem;font-weight:700}
@@ -76,6 +76,15 @@ body.searching .jumps{display:none}
 .sect .c{width:10px;height:10px;border-right:2.5px solid currentColor;border-bottom:2.5px solid currentColor;transform:rotate(-45deg);transition:transform .15s}
 .sect[aria-expanded="true"] .c{transform:rotate(45deg)}
 .sect:hover{opacity:.85}
+/* One bar of buttons for the ready-made lists and browsing – only the one you tap is open */
+.sectabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:22px 0 12px}
+.sectabs .sect{width:auto;min-width:0;justify-content:center;gap:7px;font-size:.95rem;padding:11px 8px;border-radius:12px;white-space:nowrap;background:var(--card,#fff);border:1.5px solid var(--main);color:var(--main-deep);box-shadow:0 1px 3px rgba(0,0,0,.06);transition:background .15s,color .15s}
+.sectabs .sect .c{display:none}
+.sectabs .sect .ti{flex:none}
+.sectabs .sect:hover{background:var(--wash);opacity:1}
+.sectabs .sect[aria-expanded="true"]{background:var(--main);color:#fff;border-color:var(--main)}
+@media (max-width:520px){.sectabs{gap:6px}.sectabs .sect{flex-direction:column;gap:3px;font-size:.84rem;padding:9px 4px 8px;line-height:1.15}.sectabs .sect .ti{width:20px;height:20px}}
+@media (max-width:340px){.sectabs .sect{font-size:.78rem}}
 .howwrap{margin:0 0 4px;padding:14px 16px;background:var(--card);border:1.5px solid var(--main);border-radius:10px;display:grid;gap:14px;grid-template-columns:1fr auto;align-items:center}
 .howwrap[hidden]{display:none}
 .steps{display:grid;align-items:center}
@@ -410,7 +419,7 @@ body.hasmic #qClear{right:40px}
   </div>
 </section>
 
-<h2 class="sec"><button class="sect" id="tripBtn" type="button" aria-expanded="false" aria-controls="tripBox"><span class="c"></span>Ready-made days</button></h2>
+<div class="sectabs" role="group" aria-label="Ready-made days or browse by task"><button class="sect" id="tripBtn" type="button" aria-expanded="false" aria-controls="tripBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h3"/></svg><span class="tl">Ready-made days</span></button><button class="sect" id="shopBtn" type="button" aria-expanded="false" aria-controls="shopBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg><span class="tl">Browse by task</span></button></div>
 <div id="tripBox" hidden>
   <div id="myl"></div>
   <div class="trips" id="trips"></div>
@@ -418,7 +427,6 @@ body.hasmic #qClear{right:40px}
   <p class="tripnote">These are starting points, not rules – every house runs differently. Something missing, or a day you'd like added? <button class="link" id="tripSuggest" type="button">Suggest an addition</button></p>
 </div>
 
-<h2 class="sec"><button class="sect" id="shopBtn" type="button" aria-expanded="false" aria-controls="shopBox"><span class="c"></span>Browse by task</button></h2>
 <div id="shopBox" hidden>
   <div id="out"></div>
 </div>
@@ -464,7 +472,7 @@ body.hasmic #qClear{right:40px}
   </div>
 </section>
 
-  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools. <span class="ver">v32</span></p>
+  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools. <span class="ver">v33</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -808,7 +816,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   $("q").addEventListener("input", function(){ var was = !!query.trim(), now = !!this.value.trim(); query = this.value; $("qClear").hidden = !now; document.body.classList.toggle("searching", now); render(); if(now && !was){ var st = document.querySelector(".sticky"); window.scrollTo({top: st.offsetTop, behavior: "auto"}); } });
   window.addEventListener("scroll", function(){ $("toTop").hidden = window.pageYOffset < 320; }, {passive:true});
   $("toTop").addEventListener("click", function(){ window.scrollTo({top:0, behavior:"smooth"}); });
-  document.querySelectorAll(".jump").forEach(function(a){ a.addEventListener("click", function(e){ e.preventDefault(); var b = $(a.dataset.to), x = $(b.getAttribute("aria-controls")); if(x.hidden) b.click(); var t = b.closest("h2").getBoundingClientRect().top + window.pageYOffset - 70; window.scrollTo({top:t, behavior:"smooth"}); }); });
+  document.querySelectorAll(".jump").forEach(function(a){ a.addEventListener("click", function(e){ e.preventDefault(); var b = $(a.dataset.to), x = $(b.getAttribute("aria-controls")); if(x.hidden) b.click(); var st = document.querySelector(".sticky"), t = b.closest("h2, .sectabs").getBoundingClientRect().top + window.pageYOffset - (st ? st.offsetHeight + 12 : 70); window.scrollTo({top:t, behavior:"smooth"}); }); });
   function clearSearch(){ query = ""; $("q").value = ""; $("qClear").hidden = true; document.body.classList.remove("searching"); render(); }
   $("qClear").addEventListener("click", function(){ clearSearch(); $("q").focus(); });
   $("q").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); if(splitRaw(this.value).length > 1) addTyped(this.value); else this.blur(); } });
@@ -851,7 +859,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   })();
   (function(){
     function fold(btnId, boxId){ var b = $(btnId), x = $(boxId); b.addEventListener("click", function(){ var open = x.hidden; x.hidden = !open; b.setAttribute("aria-expanded", String(open)); }); }
-    fold("tripBtn", "tripBox"); fold("shopBtn", "shopBox"); fold("fbBtn", "feedback"); fold("mineBtn", "mineBody");
+    fold("tripBtn", "tripBox"); fold("shopBtn", "shopBox");
+    // The two tab buttons: opening one closes the other
+    [["tripBtn","shopBtn"],["shopBtn","tripBtn"]].forEach(function(pr){ $(pr[0]).addEventListener("click", function(){ if($(pr[0]).getAttribute("aria-expanded") === "true"){ var o = $(pr[1]); $(o.getAttribute("aria-controls")).hidden = true; o.setAttribute("aria-expanded", "false"); } }); }); fold("fbBtn", "feedback"); fold("mineBtn", "mineBody");
     var sb = $("mineShare"), sx = $("shareBox");
     sb.addEventListener("click", function(){ var open = sx.hidden; sx.hidden = !open; sb.setAttribute("aria-expanded", String(open)); sb.textContent = open ? "Close" : "Share"; if(open) setTimeout(function(){ sx.scrollIntoView({block:"start", behavior:"smooth"}); }, 30); });
   })();
