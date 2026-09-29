@@ -163,6 +163,15 @@ body.searching #shopBox[hidden]{display:block}
 #listSec:has(#mineBody[hidden]) .lhead .hshare,#listSec:has(#mineBody[hidden]) .lhead .rmlink{display:none}
 .lhead .clearlink{font-size:.8rem;color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:4px 0}
 .lhead .hshare{margin-left:auto}
+/* Share · Save · Clear: small icon buttons with a word under each */
+.lhead button.hic{display:flex;flex-direction:column;align-items:center;gap:2px;min-width:40px;border:0;background:none;padding:3px 2px;margin:0;font:inherit;cursor:pointer;color:var(--second-deep, var(--ink));line-height:0;border-radius:8px}
+.lhead .hic:hover{background:rgba(0,0,0,.05)}
+.lhead .hic .cap{font-size:.68rem;font-weight:700;line-height:1;letter-spacing:.01em}
+.lhead .hic[hidden]{display:none}
+.lhead .hic.clearic{color:var(--accent)}
+.lhead .hic.hshare[aria-expanded="true"]{color:var(--accent)}
+.lhead button.hic#mineShare,.lhead button.hic#mineShare:hover{background:none;border:0;box-shadow:none;color:var(--second-deep, var(--ink))}
+.lhead button.hic#mineShare[aria-expanded="true"]{color:var(--accent)}
 .lhead .clearic{border:0;background:none;padding:4px;margin:0 -4px 0 0;color:var(--accent);cursor:pointer;display:flex;line-height:0}
 .lhead .clearic[hidden]{display:none}
 .ltwrap{display:flex;flex-direction:column;min-width:0}
@@ -396,8 +405,9 @@ body.hasmic #qClear{right:40px}
 <section id="listSec">
     <div class="lhead">
       <div class="ltwrap"><h2 class="ltitle"><button class="sect mine" id="mineBtn" type="button" aria-expanded="true" aria-controls="mineBody"><span class="c"></span>My list</button></h2><span class="htally" id="htally"></span></div>
-      <button class="btn primary hshare" id="mineShare" type="button" aria-expanded="false" aria-controls="shareBox">Share</button>
-      <button class="clearic" id="clear" type="button" hidden title="Clear the list" aria-label="Clear the list"><svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="3.7" y1="3.7" x2="12.3" y2="12.3" stroke="currentColor" stroke-width="1.7"/></svg></button>
+      <button class="hic hshare" id="mineShare" type="button" aria-expanded="false" aria-controls="shareBox" title="Share this list"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg><span class="cap">Share</span></button>
+      <button class="hic" id="mylSaveLink" type="button" hidden title="Save as a ready-made list"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span class="cap">Save</span></button>
+      <button class="hic clearic" id="clear" type="button" hidden title="Clear the whole list"><svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="3.7" y1="3.7" x2="12.3" y2="12.3" stroke="currentColor" stroke-width="1.7"/></svg><span class="cap">Clear</span></button>
     </div>
   <div id="mineBody">
     <div id="mine"></div>
@@ -414,7 +424,7 @@ body.hasmic #qClear{right:40px}
 <div class="shared" id="shared" hidden><input id="shareUrl" readonly aria-label="Link to this list" hidden><button class="link quiet" id="shareStop" type="button">Stop sharing</button></div>
 </div>
     <div class="dfoot">
-      <button class="link quiet mylink" id="mylSaveLink" type="button" hidden>Save for next time</button><span class="count" id="countWrap"><span id="count"></span></span>
+      <span class="count" id="countWrap"><span id="count"></span></span>
     </div>
   </div>
 </section>
@@ -472,7 +482,7 @@ body.hasmic #qClear{right:40px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v34</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v35</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -863,7 +873,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     // The two tab buttons: opening one closes the other
     [["tripBtn","shopBtn"],["shopBtn","tripBtn"]].forEach(function(pr){ $(pr[0]).addEventListener("click", function(){ if($(pr[0]).getAttribute("aria-expanded") === "true"){ var o = $(pr[1]); $(o.getAttribute("aria-controls")).hidden = true; o.setAttribute("aria-expanded", "false"); } }); }); fold("fbBtn", "feedback"); fold("mineBtn", "mineBody");
     var sb = $("mineShare"), sx = $("shareBox");
-    sb.addEventListener("click", function(){ var open = sx.hidden; sx.hidden = !open; sb.setAttribute("aria-expanded", String(open)); sb.textContent = open ? "Close" : "Share"; if(open) setTimeout(function(){ sx.scrollIntoView({block:"start", behavior:"smooth"}); }, 30); });
+    sb.addEventListener("click", function(){ var open = sx.hidden; sx.hidden = !open; sb.setAttribute("aria-expanded", String(open)); sb.querySelector(".cap").textContent = open ? "Close" : "Share"; if(open) setTimeout(function(){ sx.scrollIntoView({block:"start", behavior:"smooth"}); }, 30); });
   })();
 
   // ---------- Shared lists (Supabase) ----------
@@ -964,7 +974,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     $("mylSaveLink").hidden = !has;
     h += '<div class="mylh">My lists <small>' + (MYL.length ? 'saved to use again' : '') + '</small></div><div class="mylgrid">';
     MYL.forEach(function(m){ h += '<button class="trip mine" type="button" data-myl="' + esc(m.id) + '"><b>' + esc(m.name) + '</b><span class="n">' + snapCount(m.s) + ' ' + (snapCount(m.s) === 1 ? 'job' : 'jobs') + ' · tap to use it</span></button>'; });
-    if(MFORM) h += '<div class="mylform"><label for="mylName">Name this list</label><input id="mylName" maxlength="40" placeholder="e.g. Weekly shop" autocomplete="off" enterkeyhint="done"><button class="btn primary" type="button" data-mylok="1">Save</button><button class="link quiet" type="button" data-mylx="1">Cancel</button></div>';
+    if(MFORM) h += '<div class="mylform"><label for="mylName">Save as a ready-made list – give it a name</label><input id="mylName" maxlength="40" placeholder="e.g. Weekly shop" autocomplete="off" enterkeyhint="done"><button class="btn primary" type="button" data-mylok="1">Save</button><button class="link quiet" type="button" data-mylx="1">Cancel</button></div>';
     else if(has) h += '<button class="mylsave" type="button" data-mylnew="1">+ Save my current list</button>';
     if(!MYL.length && !has && !MFORM) h += '<p class="mylnote">Make a list, then save it here to use again next time.</p>';
     var m = MYL.filter(function(x){ return x.id === MOPEN; })[0];
