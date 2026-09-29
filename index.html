@@ -349,6 +349,14 @@ h2.aisle.rm .ah{color:var(--muted)}
 #myl .mylopen .row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center}
 #myl .mylopen .del{color:var(--accent, #b5532a)}
 .dfoot .mylink{font-size:.8rem;margin-left:8px}
+.micb{border:0;background:none;color:var(--muted, #666);width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;padding:0}
+.micb:hover{color:var(--ink, #222);background:rgba(0,0,0,.05)}
+.micb.on{color:#fff;background:#c0392b;animation:micpulse 1.2s ease-in-out infinite}
+@keyframes micpulse{0%,100%{box-shadow:0 0 0 0 rgba(192,57,43,.45)}50%{box-shadow:0 0 0 7px rgba(192,57,43,0)}}
+@media (prefers-reduced-motion:reduce){.micb.on{animation:none}}
+.qwrap .micb{position:absolute;right:6px;top:50%;transform:translateY(-50%)}
+body.hasmic .sticky #q{padding-right:76px}
+body.hasmic #qClear{right:40px}
 </style>
 </head>
 <body>
@@ -456,7 +464,7 @@ h2.aisle.rm .ah{color:var(--muted)}
   </div>
 </section>
 
-  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools. <span class="ver">v31</span></p>
+  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools. <span class="ver">v32</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -916,6 +924,24 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       .then(function(){ $("fbsend").disabled = false; });
   });
 
+
+
+  // ---------- Speak instead of typing: the browser's own free speech-to-text (hidden where it isn't available) ----------
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition, MICON = null;
+  var MICSVG = '<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg>';
+  function micBtn(el, listy){ var b = document.createElement("button"); b.type = "button"; b.className = "micb"; b.innerHTML = MICSVG;
+    b.title = listy ? "Speak your list – say “and” between things" : "Speak instead of typing"; b.setAttribute("aria-label", b.title);
+    b.addEventListener("click", function(){ micGo(el, b, listy); }); return b; }
+  function micGo(el, b, listy){ if(MICON){ MICON.stop(); return; }
+    var r = new SR(); r.lang = navigator.language || "en-GB"; r.interimResults = true; r.continuous = false; r.maxAlternatives = 1;
+    var base = el.value, sep = base && !/[\s,]$/.test(base) ? (listy ? ", " : " ") : "";
+    r.onresult = function(e){ var t = ""; for(var i = 0; i < e.results.length; i++) t += e.results[i][0].transcript;
+      if(listy) t = t.replace(/\s+(and|comma|then)\s+/gi, ", ").replace(/\s*,\s*/g, ", ");
+      var v = base + sep + t; if(el.maxLength > 0) v = v.slice(0, el.maxLength); el.value = v; el.dispatchEvent(new Event("input", {bubbles:true})); };
+    r.onerror = function(e){ if(e.error === "not-allowed" || e.error === "service-not-allowed") toast("Allow the microphone to speak instead of typing"); else if(e.error === "no-speech") toast("Didn't catch that – tap the microphone and try again"); };
+    r.onend = function(){ MICON = null; b.classList.remove("on"); try{ el.focus({preventScroll:true}); }catch(x){} };
+    MICON = r; b.classList.add("on"); try{ r.start(); }catch(x){ MICON = null; b.classList.remove("on"); } }
+  if(SR){ var qw = $("q").parentNode; qw.appendChild(micBtn($("q"), true)); document.body.classList.add("hasmic"); }
 
   // ---------- My lists: save a list to use again (on this phone; signed in, it's also kept in your account) ----------
   var MKEY = "dobytoday-mylists", MYL = [], MOPEN = "", MFORM = false;
