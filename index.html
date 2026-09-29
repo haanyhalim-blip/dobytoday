@@ -152,7 +152,11 @@ body.searching #shopBox[hidden]{display:block}
 .dfoot .btn{flex:0 0 auto}
 .lhead .hshare{padding:6px 14px;font-size:.88rem;min-height:0;line-height:1.2}
 #listSec:has(#mineBody[hidden]) .lhead .hshare,#listSec:has(#mineBody[hidden]) .lhead .rmlink{display:none}
-.lhead .clearlink{font-size:.8rem;color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:4px 0;margin-left:auto}
+.lhead .clearlink{font-size:.8rem;color:var(--accent);font-weight:700;text-decoration:underline;text-underline-offset:3px;padding:4px 0}
+.lhead .hshare{margin-left:auto}
+.htally{font-size:.82rem;color:var(--muted);white-space:nowrap}
+.htally b{color:var(--second-deep, var(--ink));font-weight:700}
+.htally:empty{display:none}
 .lhead .clearlink[hidden]{display:none}
 #listSec:has(#mineBody[hidden]) .lhead .clearlink{display:none}
 .rmlink{font-size:.8rem;color:var(--muted);font-weight:400;text-decoration:underline;text-underline-offset:3px;padding:4px 0}
@@ -350,8 +354,9 @@ h2.aisle.rm .ah{color:var(--muted)}
 <section id="listSec">
     <div class="lhead">
       <h2 class="ltitle"><button class="sect mine" id="mineBtn" type="button" aria-expanded="true" aria-controls="mineBody"><span class="c"></span>My list</button></h2>
+      <span class="htally" id="htally"></span>
       <button class="btn primary hshare" id="mineShare" type="button" aria-expanded="false" aria-controls="shareBox">Share</button>
-      <button class="link quiet clearlink" id="clear" type="button" hidden>Clear today</button>
+      <button class="link quiet clearlink" id="clear" type="button" hidden>Clear list</button>
     </div>
   <div id="mineBody">
     <div id="mine"></div>
@@ -426,7 +431,7 @@ h2.aisle.rm .ah{color:var(--muted)}
   </div>
 </section>
 
-  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools. <span class="ver">v29</span></p>
+  <p class="tiny">Sister site of <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle) and <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag). All from Handy Little Tools. <span class="ver">v30</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -589,7 +594,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     $("mine").innerHTML = draw(true);
     $("out").innerHTML = draw(false);
     var p = nPicked();
-    $("count").innerHTML = p ? '<b>'+p+'</b> to do today · <b>'+nGot()+'</b> done' : ''; $("countWrap").hidden = !p;
+    $("count").innerHTML = p ? '<b>'+p+'</b> to do today · <b>'+nGot()+'</b> done' : ''; $("htally").innerHTML = p ? '<b>'+nGot()+'</b> of <b>'+p+'</b> ✓' : ''; $("countWrap").hidden = !p;
     ["copy","wa","mail"].forEach(function(id){ $(id).disabled = !p; });
     $("clear").hidden = !p;
     $("paper").textContent = p ? asText() : "Nothing on the list yet";
