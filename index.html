@@ -356,6 +356,8 @@ h2.aisle.rm .ah{color:var(--muted)}
 #myl .mylh small{letter-spacing:0;text-transform:none;font-weight:400;color:var(--muted)}
 #myl .mylgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px}
 #myl .trip.mine{border-color:var(--second, var(--purple));background:var(--second-wash, #f4f4f4)}
+.trip.mkcard{border-style:dashed;border-width:1.5px}
+#myl[hidden]{display:none}
 #myl .mylsave{font:inherit;cursor:pointer;border:1.5px dashed var(--second, var(--purple));background:transparent;color:var(--second, var(--purple));border-radius:10px;padding:12px 13px;font-weight:700;text-align:left}
 #myl .mylnote{font-size:.85rem;color:var(--muted);margin:0}
 #myl .mylform{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;align-items:center;padding:12px;border:1.5px solid var(--second, var(--purple));border-radius:10px;background:var(--card, #fff)}
@@ -432,7 +434,7 @@ header{position:relative}header>*{position:relative;z-index:1}header::after{cont
     <div class="lhead">
       <div class="ltwrap"><h2 class="ltitle"><button class="sect mine" id="mineBtn" type="button" aria-expanded="true" aria-controls="mineBody"><span class="c"></span>My list</button></h2><span class="htally" id="htally"></span></div>
       <button class="hic hshare" id="mineShare" type="button" aria-expanded="false" aria-controls="shareBox" title="Share this list"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg><span class="cap">Share</span></button>
-      <button class="hic" id="mylSaveLink" type="button" hidden title="Save as a ready-made list"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span class="cap">Save</span></button>
+      <button class="hic" id="mylSaveLink" type="button" hidden title="Save to My Lists"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span class="cap">Save</span></button>
       <button class="hic clearic" id="clear" type="button" hidden title="Clear the whole list"><svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="3.7" y1="3.7" x2="12.3" y2="12.3" stroke="currentColor" stroke-width="1.7"/></svg><span class="cap">Clear</span></button>
     </div>
   <div id="mineBody">
@@ -508,7 +510,7 @@ header{position:relative}header>*{position:relative;z-index:1}header::after{cont
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v41</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v42</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1018,16 +1020,26 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function snapNames(d){ return Object.keys(d.picked || {}).concat((d.own || []).map(function(o){ return (o.w ? o.w + ": " : "") + o.n; })); }
   function snapshot(){ var d; try{ d = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; }catch(e){ d = {}; } d.got = {}; d.removed = []; (d.own || []).forEach(function(o){ o.got = false; }); return d; }
   function drawMy(){ var el = $("myl"); if(!el || !MYL) return; var has = nPicked() > 0, h = "";
-    $("mylSaveLink").hidden = !has;
-    h += '<div class="mylh">My lists <small>' + (MYL.length ? 'saved to use again' : '') + '</small></div><div class="mylgrid">';
+    $("mylSaveLink").hidden = !has; mkCard(has);
+    // "My Lists" only shows once something has been saved (or while you're naming the first one)
+    if(!MYL.length && !MFORM){ el.innerHTML = ""; el.hidden = true; return; } el.hidden = false;
+    h += '<div class="mylh">My Lists <small>saved to use again</small></div><div class="mylgrid">';
+    if(MFORM) h += '<div class="mylform"><label for="mylName">Save to My Lists – give it a name</label><input id="mylName" maxlength="40" placeholder="e.g. Weekly shop" autocomplete="off" enterkeyhint="done"><button class="btn primary" type="button" data-mylok="1">Save to My Lists</button><button class="link quiet" type="button" data-mylx="1">Cancel</button></div>';
     MYL.forEach(function(m){ h += '<button class="trip mine" type="button" data-myl="' + esc(m.id) + '"><b>' + esc(m.name) + '</b><span class="n">' + snapCount(m.s) + ' ' + (snapCount(m.s) === 1 ? 'job' : 'jobs') + ' · tap to use it</span></button>'; });
-    if(MFORM) h += '<div class="mylform"><label for="mylName">Save as a ready-made list – give it a name</label><input id="mylName" maxlength="40" placeholder="e.g. Weekly shop" autocomplete="off" enterkeyhint="done"><button class="btn primary" type="button" data-mylok="1">Save</button><button class="link quiet" type="button" data-mylx="1">Cancel</button></div>';
-    else if(has) h += '<button class="mylsave" type="button" data-mylnew="1">+ Save my current list</button>';
-    if(!MYL.length && !has && !MFORM) h += '<p class="mylnote">Make a list, then save it here to use again next time.</p>';
     var m = MYL.filter(function(x){ return x.id === MOPEN; })[0];
     if(m){ var nm = snapNames(m.s); h += '<div class="mylopen"><b>' + esc(m.name) + '</b><p>' + esc(nm.slice(0, 12).join(", ")) + (nm.length > 12 ? " and " + (nm.length - 12) + " more" : "") + '</p><div class="row"><button class="btn primary" type="button" data-myadd="1">Add to my list</button><button class="btn" type="button" data-myrep="1">Replace my list</button><button class="btn" type="button" data-mypage="1">Tick-off page</button>'
       + (has ? '<button class="link quiet" type="button" data-myupd="1">Update it with my current list</button>' : '') + '<button class="link quiet del" type="button" data-mydel="1">Delete</button><button class="link quiet" type="button" data-myx="1">Close</button></div></div>'; }
     el.innerHTML = h + '</div>'; }
+  // "+ Create your own list" is the first box among the ready-made lists, same size as the rest
+  function mkCard(has){ var g = $("trips"); if(!g) return; var c = $("mylCreate");
+    if(!c){ c = document.createElement("button"); c.type = "button"; c.id = "mylCreate"; c.className = "trip mkcard"; }
+    var kids = [].filter.call(g.children, function(x){ return x !== c; }), at = kids[0] && kids[0].classList.contains("tgrp") ? kids[1] : kids[0];
+    if(c.parentNode !== g || c.nextElementSibling !== (at || null)) g.insertBefore(c, at || null);
+    c.innerHTML = '<b>+ Create your own list</b><small>' + (has ? 'Keep the list you’ve made, to use again any time.' : 'Make your list, then save it here to use again any time.') + '</small><span class="n">' + (has ? 'Tap to Save to My Lists' : 'Start by adding things above') + '</span>'; }
+  (function(){ var g = $("trips"); if(g && window.MutationObserver) new MutationObserver(function(){ if(!g.contains($("mylCreate"))) drawMy(); }).observe(g, {childList: true}); })();
+  document.addEventListener("click", function(e){ if(!e.target.closest("#mylCreate")) return; e.stopPropagation();
+    if(nPicked()){ MFORM = true; MOPEN = ""; drawMy(); setTimeout(function(){ $("myl").scrollIntoView({behavior:"smooth", block:"start"}); var i = $("mylName"); if(i) i.focus({preventScroll:true}); }, 60); }
+    else { toast("Add a few things to your list first, then tap here to save it"); var q = $("q"); if(q){ window.scrollTo({top: 0, behavior: "smooth"}); setTimeout(function(){ q.focus(); }, 300); } } }, true);
   function showMine(){ if(typeof openMine === "function") openMine(); else { var t = $("mineBtn"); if(t) t.scrollIntoView({behavior:"smooth", block:"start"}); } }
   function applyMy(m, replace){ var d = JSON.parse(JSON.stringify(m.s)), cur = snapshot(), n = 0;
     if(replace){ if("day" in S) d.day = S.day; n = snapCount(d); }
@@ -1063,7 +1075,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var same = MYL.filter(function(x){ return x.name.toLowerCase() === nm.toLowerCase(); })[0];
     if(same){ if(!confirm("You already have “" + same.name + "”. Replace it with your current list?")) return; same.s = snapshot(); same.t = Date.now(); }
     else MYL.unshift({id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: nm, s: snapshot(), t: Date.now()});
-    MFORM = false; mySave(); drawMy(); toast("Saved to My lists: " + nm); }
+    MFORM = false; mySave(); drawMy(); toast("Saved to My Lists: " + nm); }
   $("myl").addEventListener("keydown", function(e){ if(e.key === "Enter" && e.target.id === "mylName"){ e.preventDefault(); mySaveNew(); } });
   $("mylSaveLink").addEventListener("click", function(){ var bx = $("tripBox"); if(bx.hidden){ var t = document.querySelector('[aria-controls="tripBox"]'); if(t) t.click(); } MFORM = true; MOPEN = ""; drawMy();
     setTimeout(function(){ $("myl").scrollIntoView({behavior:"smooth", block:"start"}); var i = $("mylName"); if(i) i.focus({preventScroll:true}); }, 60); });
