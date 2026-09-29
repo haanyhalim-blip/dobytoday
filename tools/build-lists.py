@@ -192,6 +192,33 @@ open(os.path.join(out, "index.html"), "w", encoding="utf-8").write(
          [("DobyToday", "/"), ("Ready-made lists", None)]))
 pages.insert(0, "lists/")
 
+
+# ---------- my-list.html: a tick-off page for a list someone saved themselves (the list travels in the link: /my-list#…) ----------
+def build_my_list(site_name, word, daily):
+    body = """<h1 id="mlT">Your list</h1><p class="lead" id="mlL">Tick things off as you go – the ticks stay on this phone.</p>
+<p class="acts2"><button type="button" id="mlShare" data-share="">Share</button><button type="button" onclick="print()">Print</button></p>
+<div class="prog" id="prog" data-slug="my" data-daily="DAILY"><div class="pbar"><i></i></div><div class="pt"><span class="pn">0 WORD</span><button type="button" data-again="1" hidden>Start again</button></div></div>
+<div class="card" id="mlBody"></div>
+<div class="done" id="done" hidden>DONE<small>DONESUB</small></div>
+<p class="lead" style="font-size:.88rem">This is a list someone saved on SITE. Only people with this link can see it.</p>
+<script>
+(function(){ var d = null; try{ d = JSON.parse(decodeURIComponent(escape(atob(location.hash.slice(1).replace(/-/g, "+").replace(/_/g, "/"))))); }catch(e){}
+  function $(i){ return document.getElementById(i); } function x(s){ var t = document.createElement("i"); t.textContent = s; return t.innerHTML.replace(/"/g, "&quot;"); }
+  if(!d || !d.g){ $("mlT").textContent = "This link looks incomplete"; $("mlL").textContent = "Ask the person who sent it to share it again."; $("mlBody").hidden = true; $("prog").hidden = true; $("mlShare").parentNode.hidden = true; return; }
+  $("mlT").textContent = d.n; document.title = d.n + " – checklist | SITE";
+  $("prog").setAttribute("data-slug", "my-" + (d.i || d.n)); $("mlShare").setAttribute("data-share", location.href);
+  $("mlBody").innerHTML = d.g.map(function(g){ return "<h2>" + x(g[0]) + (g[1] ? " <small>– " + x(g[1]) + "</small>" : "") + "</h2><ul class=\\"items chk\\">"
+    + g[2].map(function(r){ return "<li><button class=\\"tk\\" type=\\"button\\" data-n=\\"" + x(r[0] + (r[1] ? " – " + r[1] : "")) + "\\" aria-pressed=\\"false\\"><span>" + x(r[0]) + (r[1] ? "<small class=\\"tn\\">" + x(r[1]) + "</small>" : "") + "</span></button></li>"; }).join("") + "</ul>"; }).join(""); })();
+</script>"""
+    done = "All " + word + "! ⭐"
+    body = (body.replace("DAILY", "1" if daily else "0").replace("DONESUB", "Well done. It starts fresh again tomorrow." if daily else "Well done. Press Start again to use it next time.")
+            .replace("DONE", done).replace("WORD", word).replace("SITE", site_name))
+    h = page("my-list", "Your list | " + site_name, "A list saved on " + site_name + ", to tick off on your phone.", body, [(site_name, "/"), ("Your list", None)])
+    h = h.replace('<meta name="viewport"', '<meta name="robots" content="noindex">\n<meta name="viewport"', 1)
+    h = h.replace("</style>", ".tk .tn{display:block;font-size:.85rem;color:var(--muted);text-decoration:none;font-weight:400}\n</style>", 1)
+    open(os.path.join(ROOT, "my-list.html"), "w", encoding="utf-8").write(h)
+build_my_list("DobyToday", "done", True)
+
 today = datetime.date.today().isoformat()
 urls = [""] + pages
 open(os.path.join(ROOT, "sitemap.xml"), "w", encoding="utf-8").write(
