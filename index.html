@@ -628,7 +628,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v67</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v68</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1360,14 +1360,14 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function sbHeaders(){ return {"Content-Type":"application/json", "apikey":SB_KEY, "Authorization":"Bearer " + SB_KEY}; }
   function rpc(fn, body){ return fetch(SB_URL + "/rest/v1/rpc/" + fn, {method:"POST", headers:sbHeaders(), body:JSON.stringify(body)}).then(function(r){ if(!r.ok) return r.text().then(function(t){ throw new Error(r.status + " " + String(t || "").slice(0, 160)); }); return r.text(); }).then(function(t){ return t ? JSON.parse(t) : null; }); }
   function newCode(){ var a = "abcdefghjkmnpqrstuvwxyz23456789", o = "", c = new Uint32Array(12); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(c) : c.forEach(function(_, i){ c[i] = Math.random() * 1e9; }); for(var i = 0; i < 12; i++) o += a[c[i] % a.length]; return "t" + o.slice(1); }
-  function shareUrl(){ return "https://dobytoday.com/" + (TABS.active === "today" ? "#l=" + CODE : "#page=" + CODE + "&d=" + packPage()); }
+  function shareUrl(){ return "https://dobytoday.com/" + (TABS.active === "today" ? "#l=" + CODE : "#page=" + CODE + (SAVED === CODE ? "" : "&d=" + packPage())); }
   // a page's link also carries the page itself, so it still opens if the online copy hasn't arrived yet
   function packPage(){ try{ var j = JSON.stringify({title:S.title || "", notes:S.notes || "", after:S.after || "", kind:S.kind || "", keep:true, day:S.day, own:S.own.map(function(o){ var x = {n:o.n, a:"other", b:"any", got:!!o.got}; if(o.d && o.d.length) x.d = o.d; if(o.url) x.url = o.url; return x; })});
     return btoa(unescape(encodeURIComponent(j))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }catch(e){ return ""; } }
   function unpackPage(){ var m = location.hash.match(/[#&]d=([A-Za-z0-9_-]+)/); if(!m) return null;
     try{ var d = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, "+").replace(/_/g, "/"))))); return d && typeof d === "object" ? d : null; }catch(e){ return null; } }
   function snapshot(){ return JSON.stringify({picked:S.picked, got:S.got, own:S.own, bag:S.bag, removed:S.removed, note:S.note || {}, day:S.day, later:S.later || [], past:S.past || [], title:S.title || "", notes:S.notes || "", after:S.after || "", keep:!!S.keep, kind:S.kind || ""}); }
-  var SAVEERR = false, lastT = 0, BKEY = "dobytoday-backup-v1";
+  var SAVED = "", SAVEERR = false, lastT = 0, BKEY = "dobytoday-backup-v1";
   function countOf(d){ return Object.keys(d.picked || {}).length + (d.own || []).length + (d.later || []).length + (d.title || d.notes ? 1 : 0); }
   function mergeInto(d){ var r = {picked:Object.assign({}, d.picked || {}, S.picked || {}), got:Object.assign({}, d.got || {}, S.got || {}), bag:Object.assign({}, d.bag || {}, S.bag || {}), note:Object.assign({}, d.note || {}, S.note || {}), own:(d.own || []).slice(), removed:(d.removed || []).slice(), day:S.day || d.day || "", title:S.title || d.title || "", notes:S.notes || d.notes || "", after:S.after || d.after || "", keep:!!(S.keep || d.keep), kind:S.kind || d.kind || "", later:(d.later || []).slice(), past:(d.past || []).slice()};
     (S.later || []).forEach(function(j){ if(!r.later.some(function(x){ return x.id === j.id; })) r.later.push(j); });
@@ -1385,8 +1385,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(!viaJoin && lost > 0){ toast("List updated from the shared link (" + lost + " fewer)", function(){ try{ var b = JSON.parse(before); applying = true; S.picked = b.picked || {}; S.got = b.got || {}; S.own = b.own || []; S.bag = b.bag || {}; S.removed = b.removed || []; S.note = b.note || {}; S.day = b.day || ""; S.later = b.later || []; S.past = b.past || []; S.title = b.title || ""; S.notes = b.notes || ""; S.after = b.after || ""; S.keep = !!b.keep; S.kind = b.kind || ""; applying = false; save(); render(); lastSent = ""; syncPush(true); }catch(e){} }); } }
   function syncPush(now){ if(!CODE || applying) return; clearTimeout(pushT); var go = function(){
     var j = snapshot(); if(j === lastSent) return; lastSent = j; lastT = Date.now(); var payload = JSON.parse(j); payload.t = lastT;
-    rpc("save_list", {code:CODE, payload:payload}).then(function(){ SAVEERR = false; var w = document.querySelector("#shared .shon"); if(w) w.textContent = "✓ Shared – anyone with the link sees your changes as you make them."; }, function(er){ lastSent = ""; SAVEERR = true; var w = document.querySelector("#shared .shon"); if(w) w.textContent = "⚠ Not saved online yet, so changes won't show up for others. The Copy link still opens the page for them. (" + (er && er.message || "no connection") + ")"; });
-    if(TABS.active !== "today" && /^#page=/.test(location.hash)) history.replaceState(null, "", "#page=" + CODE + "&d=" + packPage());   // the address bar link works on its own too
+    var sc = CODE; rpc("save_list", {code:CODE, payload:payload}).then(function(){ SAVEERR = false; SAVED = sc; if(sc === CODE && /&d=/.test(location.hash)) history.replaceState(null, "", "#page=" + CODE); var w = document.querySelector("#shared .shon"); if(w) w.textContent = "✓ Shared – anyone with the link sees your changes as you make them."; }, function(er){ lastSent = ""; SAVEERR = true; var w = document.querySelector("#shared .shon"); if(w) w.textContent = "⚠ Not saved online yet, so changes won't show up for others. The Copy link still opens the page for them. (" + (er && er.message || "no connection") + ")"; });
+    if(SAVED !== CODE && TABS.active !== "today" && /^#page=/.test(location.hash)) history.replaceState(null, "", "#page=" + CODE + "&d=" + packPage());   // the address bar link works on its own too
     if(chan) chan.send({type:"broadcast", event:"update", payload:payload});
   }; if(now) go(); else pushT = setTimeout(go, 350); }
   function syncPull(){ if(!CODE) return Promise.resolve(); return rpc("get_list", {code:CODE}).then(function(d){ if(d) applyRemote(d); }).catch(function(){}); }
@@ -1416,7 +1416,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       if(!have){ var fromLink = unpackPage(), joined = function(d){ var mine = !d && !!fromLink; if(mine) d = fromLink; var t0 = readList("today"), todayFree = !countOf(t0) && !(function(){ try{ return localStorage.getItem(ckeyOf("today")); }catch(e){ return ""; } })();
           if(d && (d.keep || d.title) || !todayFree){ switchTo(newTab((d && d.title) || "Shared list")); } else if(TABS.active !== "today") switchTo("today");
           CODE = code; try{ localStorage.setItem(CKEY, CODE); }catch(e){} history.replaceState(null, "", (TABS.active === "today" ? "#l=" : "#page=") + CODE); showShared();
-          if(d) applyRemote(d, true); if(mine){ lastSent = ""; syncPush(true); } listen(); render(); window.scrollTo(0, 0); };
+          if(d && !mine) SAVED = code; if(d) applyRemote(d, true); if(mine){ lastSent = ""; syncPush(true); } listen(); render(); window.scrollTo(0, 0); };
         rpc("get_list", {code:code}).then(joined, function(){ joined(null); }); return; }
       CODE = code; }
     else { try{ CODE = localStorage.getItem(CKEY) || ""; }catch(e){} }
