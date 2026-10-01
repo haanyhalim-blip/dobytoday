@@ -450,6 +450,10 @@ h2.dsec .sub{text-transform:none;letter-spacing:0;font-weight:400}
 .prow.pnew{border:2px dashed var(--main);border-left-width:2px;background:transparent}
 .prow.pnew .pn{color:var(--main)}
 .gchips{display:flex;flex-wrap:wrap;gap:6px}
+.phead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.phead .pedb{flex:none;padding:6px 14px;font-size:.9rem;margin-top:4px}
+body.pagemode .phead{margin-top:22px}
+body.pagemode .phead .ptitle{margin-top:0}
 .mymore[hidden]{display:none!important}
 .mylopen .mymore{margin-top:6px}
 .links{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px;margin:8px 0}
@@ -600,7 +604,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v57</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v58</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -855,12 +859,13 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function projHTML(){ var has = S.title || S.notes;
     if(PEDIT === "new") return '<div class="pedit"><label for="pPaste">Create your own – paste or type</label><small class="phint">A title on the first line, then anything you like. A numbered list, or a list under a line that says Steps or To do, becomes tick boxes. Lines with web links become Open and Copy buttons.</small><textarea id="pPaste" rows="12" placeholder="Kitchen redo&#10;&#10;Budget 5,000. Builder starts 3 Nov.&#10;&#10;Steps&#10;1. Pick the worktop&#10;2. Order the units&#10;3. Book the electrician"></textarea>'
       + groupField("") + '<div class="row"><button type="button" class="btn primary" data-pmake="1">Create it</button><button type="button" class="link quiet" data-pdel="1">Cancel</button></div></div>';
-    if(PEDIT) return '<div class="pedit"><label for="pTitle">Title</label><input id="pTitle" maxlength="120" value="' + esc(S.title) + '" placeholder="e.g. Overdue occupancy tax"><label for="pNotes">Notes <small>– what it\'s about, who\'s who, numbers to hand. Start a line with "- " for a bullet.</small></label><textarea id="pNotes" rows="10">' + esc(S.notes) + '</textarea>'
+    if(PEDIT) return '<div class="pedit"><label for="pTitle">Title</label><input id="pTitle" maxlength="120" value="' + esc(S.title) + '" placeholder="e.g. Overdue occupancy tax"><label for="pNotes">Notes <small>– what it\'s about, who\'s who, numbers to hand. Start a line with "- " for a bullet.</small></label><textarea id="pNotes" rows="10">' + esc(S.notes) + '</textarea>' + (TABS.active !== "today" ? (S.kind === "links" ? '<label for="pItems">Links <small>– one per line: a name, then the link</small></label><textarea id="pItems" rows="6">' + esc(S.own.map(function(o){ return o.n + " – " + (o.url || ""); }).join("\n")) + "</textarea>"
+        : '<label for="pItems">Steps <small>– one per line. Change, add, delete or move lines; ticks stay on steps you keep.</small></label><textarea id="pItems" rows="8">' + esc(S.own.map(function(o){ return o.n; }).join("\n")) + "</textarea>") : "")
       + (TABS.active !== "today" ? groupField(curTab().group || "") + '<label class="pkeep"><input type="checkbox" id="pPin"' + (curTab().pin ? " checked" : "") + '> Pin it to the top of My days</label>' : "")
       + (TABS.active === "today" ? '<label class="pkeep"><input type="checkbox" id="pKeep"' + (S.keep ? " checked" : "") + '> Keep ticked jobs and the order I add them (like a project)</label>' : "")
       + '<div class="row"><button type="button" class="btn primary" data-psave="1">Save</button><button type="button" class="link quiet" data-px="1">Cancel</button>' + (TABS.active !== "today" ? '<button type="button" class="link danger" data-pdel="1">Delete this page</button>' : "") + '</div></div>';
     if(!has) return "";
-    return '<div class="proj">' + (S.title ? '<h3 class="ptitle">' + esc(S.title) + "</h3>" : "") + (S.notes ? '<details class="pnotes"' + (NOPEN ? " open" : "") + '><summary>Notes</summary><div class="pbody">' + fmtNotes(S.notes) + "</div></details>" : "") + '<button type="button" class="link quiet pedb" data-pedit="1">✎ Edit title and notes</button></div>'; }
+    return '<div class="proj"><div class="phead">' + (S.title ? '<h3 class="ptitle">' + esc(S.title) + "</h3>" : "<span></span>") + '<button type="button" class="btn pedb" data-pedit="1">✎ Edit</button></div>' + (S.notes ? '<details class="pnotes"' + (NOPEN ? " open" : "") + '><summary>Notes</summary><div class="pbody">' + fmtNotes(S.notes) + "</div></details>" : "") + "</div>"; }
   function asText(){
     var lines = []; if(S.title) lines.push(S.title.toUpperCase(), "");
     chosen().forEach(function(g){ lines.push(g.label.toUpperCase() + (g.sub ? " – " + g.sub : "")); g.rows.forEach(function(r){ var c = (S.note || {})[r.n]; lines.push((r.got ? "☑ " : "☐ ") + r.n + (c ? " – " + c : "")); }); lines.push(""); });
@@ -1169,7 +1174,11 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       else S.own = pr.steps.map(function(n){ return {n:n, a:"other", b:"any", got:false}; });
       PEDIT = false; ensurePage(); save(); render(); window.scrollTo(0, 0); toast(pr.links.length ? pr.links.length + (pr.links.length === 1 ? " link" : " links") + " – tap Open or Copy" : pr.steps.length ? pr.steps.length + " steps found – tick them off as you go" : "Page made – add steps below"); return; }
     if(e.target.closest("[data-psave]")){ e.stopPropagation(); var tv = $("pTitle").value.trim(), pr2 = parsePaste($("pNotes").value, true), nAdd = 0;
-      S.title = tv; S.notes = pr2.notes; pr2.steps.forEach(function(n){ if(!S.own.some(function(o){ return o.n === n; })){ S.own.push({n:n, a:"other", b:"any", got:false}); nAdd++; } });
+      S.title = tv; S.notes = pr2.notes;
+      var pi = $("pItems"); if(pi){ var old = {}; S.own.forEach(function(o){ old[o.n] = o; });
+        if(S.kind === "links") S.own = pi.value.split("\n").map(linkOf).filter(Boolean).map(function(l){ var was = old[l.n]; return {n:l.n, url:l.url, a:"other", b:"any", got:false}; });
+        else S.own = splitSteps(pi.value).map(function(n){ var was = old[n]; return was ? was : {n:n, a:"other", b:"any", got:false}; }); }
+      pr2.steps.forEach(function(n){ if(!S.own.some(function(o){ return o.n === n; })){ S.own.push({n:n, a:"other", b:"any", got:false}); nAdd++; } });
       if(TABS.active !== "today"){ S.keep = true; curTab().group = ($("pGroup").value || "").trim(); curTab().pin = !!($("pPin") && $("pPin").checked); saveTabs(); } else { var kp = $("pKeep") && $("pKeep").checked; S.keep = !!kp; }
       PEDIT = false; save(); render(); toast(nAdd ? "Saved – " + nAdd + " steps found in the notes, now below" : "Saved"); return; }
     if(e.target.closest("[data-addstep]")){ e.stopPropagation(); addStep(); return; }
