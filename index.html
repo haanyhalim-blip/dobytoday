@@ -544,6 +544,8 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
 .past summary small{font-weight:400;color:var(--muted)}
 .pastday{padding:6px 0;border-top:1px solid var(--line);font-size:.9rem}
 .pastday b{color:var(--ink)}
+.sharedone{display:flex;justify-content:flex-end;margin-top:12px}
+.shared .shon{display:block;font-size:.85rem;color:var(--muted);margin:8px 0 4px}
 </style>
 </head>
 <body>
@@ -581,7 +583,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   <div id="mineBody">
     <div id="mine"></div>
 <div id="shareBox" class="paste sharebox" hidden>
-<p><b>Share today's list.</b></p>
+<p><b id="shareHead">Share today's list.</b></p>
 <pre class="paper" id="paper" aria-label="How the message will look"></pre>
 <div class="actions">
   <button class="btn primary" id="copy">Copy</button>
@@ -590,7 +592,8 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   <button class="btn share" id="share" title="Share a link so someone else can edit this list with you">Share link</button>
   <button class="btn share" id="shareLink" type="button" title="Copy the link to this list">Copy link</button>
 </div>
-<div class="shared" id="shared" hidden><input id="shareUrl" readonly aria-label="Link to this list" hidden><button class="link quiet" id="shareStop" type="button">Stop sharing</button></div>
+<div class="shared" id="shared" hidden><input id="shareUrl" readonly aria-label="Link to this list" hidden><span class="shon">✓ Shared – anyone with the link sees your changes as you make them.</span><button class="link quiet" id="shareStop" type="button">Stop sharing</button></div>
+<div class="sharedone"><button class="btn primary" id="shareDone" type="button">Done</button></div>
 </div>
     <div class="dfoot">
       <span class="count" id="countWrap"><span id="count"></span></span>
@@ -623,7 +626,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v64</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v65</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -916,6 +919,10 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     return '<div class="proj"><div class="phead">' + (S.title ? '<h3 class="ptitle">' + esc(S.title) + "</h3>" : TABS.active !== "today" ? '<h3 class="ptitle untitled">Untitled page</h3>' : "<span></span>") + '<button type="button" class="btn pedb" data-pedit="1">✎ Edit</button></div>' + (S.notes ? '<details class="pnotes"' + (NOPEN ? " open" : "") + '><summary>Notes</summary><div class="pbody">' + fmtNotes(S.notes) + "</div></details>" : "") + "</div>"; }
   function asText(){
     var lines = []; if(S.title) lines.push(S.title.toUpperCase(), "");
+    if(S.keep){   // a page: its steps (or links) in order, with any details under each
+      if(S.kind === "links") S.own.forEach(function(o){ lines.push(o.n + ": " + (o.url || "")); });
+      else S.own.forEach(function(o, k){ lines.push((o.got ? "☑ " : "☐ ") + (k + 1) + ". " + o.n); (o.d || []).forEach(function(x){ lines.push("     – " + x); }); });
+      return lines.join("\n").trim(); }
     chosen().forEach(function(g){ lines.push(g.label.toUpperCase() + (g.sub ? " – " + g.sub : "")); g.rows.forEach(function(r){ var c = (S.note || {})[r.n]; lines.push((r.got ? "☑ " : "☐ ") + r.n + (c ? " – " + c : "")); }); lines.push(""); });
     return lines.join("\n").trim();
   }
@@ -1059,6 +1066,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     ["copy","wa","mail"].forEach(function(id){ $(id).disabled = !p; });
     $("clear").hidden = !p;
     $("paper").textContent = p ? asText() : "Nothing on the list yet";
+    $("shareHead").textContent = TABS.active === "today" ? "Share today's list." : "Share this page.";
   }
   function unpark(n){ S.removed = S.removed.filter(function(x){ return norm(x.n) !== norm(n); }); }
   function park(r){ S.removed = []; } // removed items are no longer kept – the red symbol removes for good (Undo is in the pop-up)
@@ -1314,6 +1322,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     // The three tab buttons: opening one closes the others
     var TB = ["tripBtn","projBtn","shopBtn"]; TB.forEach(function(id){ $(id).addEventListener("click", function(){ if($(id).getAttribute("aria-expanded") !== "true") return; TB.forEach(function(o){ if(o === id) return; $($(o).getAttribute("aria-controls")).hidden = true; $(o).setAttribute("aria-expanded", "false"); }); }); }); fold("fbBtn", "feedback"); fold("mineBtn", "mineBody");
     var sb = $("mineShare"), sx = $("shareBox");
+    $("shareDone").addEventListener("click", function(){ if(!sx.hidden) sb.click(); });
     sb.addEventListener("click", function(){ var open = sx.hidden; sx.hidden = !open; sb.setAttribute("aria-expanded", String(open)); sb.querySelector(".cap").textContent = open ? "Close" : ""; if(open) setTimeout(function(){ sx.scrollIntoView({block:"start", behavior:"smooth"}); }, 30); });
   })();
 
@@ -1367,7 +1376,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function startShare(){ ensureShare(); if(navigator.share){ navigator.share({title:"Today's list", text:"Our list – add to it here:", url:shareUrl()}).catch(function(){}); return; } sendLink(); }
   function sendLink(){ ensureShare(); var u = $("shareUrl"); u.value = shareUrl();
     (navigator.clipboard ? navigator.clipboard.writeText(shareUrl()) : Promise.reject()).then(function(){ toast("Link copied"); }, function(){ u.hidden = false; u.focus(); u.select(); toast("Select the link and copy it"); }); }
-  function stopShare(){ if(!confirm("Stop sharing? Your list stays on this phone; the link stops updating it.")) return;
+  function stopShare(){ if(!confirm("Stop sharing this list?\n\nYou keep your list. The people you sent the link to will stop seeing your changes, and their changes won't reach you.")) return;
     CODE = ""; try{ localStorage.removeItem(CKEY); }catch(e){} history.replaceState(null, "", location.pathname); if(chan){ try{ chan.unsubscribe(); }catch(e){} chan = null; } showShared(); }
   $("share").addEventListener("click", startShare);
   $("shareLink").addEventListener("click", sendLink);
