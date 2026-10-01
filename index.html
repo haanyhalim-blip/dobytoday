@@ -405,6 +405,35 @@ body.hasmic #qClear{right:40px}
 /* Faint clipboard and clock drawing at the top (in the margin on wide screens) */
 header{position:relative}header>*{position:relative;z-index:1}header::after{content:"";position:absolute;pointer-events:none;z-index:0;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20190%22%20fill%3D%22none%22%20stroke%3D%22%23b0611c%22%20stroke-width%3D%223.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%0A%3Crect%20x%3D%2236%22%20y%3D%2226%22%20width%3D%22112%22%20height%3D%22150%22%20rx%3D%2212%22%2F%3E%0A%3Cpath%20d%3D%22M72%2026v-6a6%206%200%200%201%206-6h28a6%206%200%200%201%206%206v6%22%2F%3E%3Crect%20x%3D%2266%22%20y%3D%2222%22%20width%3D%2252%22%20height%3D%2214%22%20rx%3D%225%22%2F%3E%0A%3Crect%20x%3D%2252%22%20y%3D%2254%22%20width%3D%2214%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M55%2061l4%204%207-9%22%2F%3E%3Cpath%20d%3D%22M76%2061h52%22%2F%3E%0A%3Crect%20x%3D%2252%22%20y%3D%2284%22%20width%3D%2214%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M55%2091l4%204%207-9%22%2F%3E%3Cpath%20d%3D%22M76%2091h44%22%2F%3E%0A%3Crect%20x%3D%2252%22%20y%3D%22114%22%20width%3D%2214%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M76%20121h50%22%2F%3E%0A%3Crect%20x%3D%2252%22%20y%3D%22144%22%20width%3D%2214%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M76%20151h30%22%2F%3E%0A%3Ccircle%20cx%3D%22160%22%20cy%3D%22146%22%20r%3D%2228%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M160%20130v16l11%208%22%2F%3E%0A%3Cpath%20d%3D%22M160%20118v-4M188%20146h4M160%20174v4M132%20146h-4%22%2F%3E%0A%3C%2Fsvg%3E") no-repeat center/contain}header::after{right:-6px;top:4px;width:120px;height:114px;opacity:.16}@media (min-width:600px) and (max-width:1079px){header::after{display:none}}@media (min-width:1080px){header::after{right:-150px;top:8px;width:120px;height:114px;opacity:.16;transform:none}}
 #mineShare .cap:empty{display:none}
+#mine .mctl .dayb{flex:none;display:inline-flex;align-items:center;color:#a39a94;cursor:pointer;padding:5px 0 5px 4px}
+#mine .mrow.open .mctl .dayb{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;margin:0;border:1.5px solid var(--line);border-radius:999px;background:#fff;font-size:.9rem;font-weight:700;color:var(--ink)}
+#mine .mctl.asking{flex-basis:100%}
+.dayask{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:.9rem;font-weight:700}
+.dayask .pillb{height:34px;padding:0 14px;border:1.5px solid var(--main);border-radius:999px;background:#fff;color:var(--main);font:inherit;font-weight:700}
+.dayask .dayin{height:34px;font:inherit;font-size:.9rem;padding:0 8px;border:1.5px solid var(--line);border-radius:8px;background:#fff}
+h2.dsec{margin:24px 0 6px;font-size:.8rem;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h2.dsec .sub{text-transform:none;letter-spacing:0;font-weight:400}
+.later .lday{margin:6px 0 10px}
+.later .ldate{font-weight:800;font-size:.95rem}
+.later .ldate small{font-weight:400;color:var(--muted)}
+.later ul{list-style:none;margin:4px 0 0;padding:0}
+.later li{display:flex;align-items:center;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:10px;background:var(--card);margin-top:6px}
+.later .ln{flex:1;min-width:0}
+.later .lnow{font-size:.85rem;white-space:nowrap}
+.later .x,.later .x:hover{border:0;background:none;color:var(--muted);font-size:1.2rem;line-height:1;padding:2px 4px;cursor:pointer}
+.jlink{font-size:.85rem;white-space:nowrap;color:var(--main);font-weight:700}
+#mine .rowlink{flex:none;align-self:center;margin:0 4px}
+.past{margin:18px 0 6px;color:var(--muted)}
+.qlater{margin-top:10px;font-size:.9rem;color:var(--muted)}
+.qlater label,.inbox label{position:relative;cursor:pointer}
+.qlater input[type=date],.inbox input[type=date]{position:absolute;inset:0;opacity:0;width:100%;cursor:pointer}
+.keep.inbox{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.keep .pillb{height:32px;padding:0 14px;border:1.5px solid var(--main);border-radius:999px;background:#fff;color:var(--main);font:inherit;font-weight:700;cursor:pointer}
+.keep .pillb.on{background:var(--main);color:#fff}
+.past summary{cursor:pointer;font-weight:800;color:var(--ink)}
+.past summary small{font-weight:400;color:var(--muted)}
+.pastday{padding:6px 0;border-top:1px solid var(--line);font-size:.9rem}
+.pastday b{color:var(--ink)}
 </style>
 </head>
 <body>
@@ -497,7 +526,7 @@ header{position:relative}header>*{position:relative;z-index:1}header::after{cont
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v47</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v48</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -536,7 +565,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
 
 (function(){
   var KEY = "dobytoday-v1";
-  var S = {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}, day:""};
+  var S = {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}, day:"", later:[], past:[], seen:[]};
   function today(){ var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
   var query = "";
   var OKEY = "dobytoday-open-v1", OPEN = {home:1};
@@ -556,19 +585,73 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function doneWord(b){ return "done"; }
 
   function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} if(typeof syncPush === "function") syncPush(); if(typeof acctPush === "function") acctPush(); }
-  function load(){ try{ var r = localStorage.getItem(KEY); if(r){ var v = JSON.parse(r); if(v && typeof v === "object"){ S.picked = v.picked || {}; S.got = v.got || {}; S.own = v.own || []; S.bag = v.bag || {}; S.removed = v.removed || []; S.note = v.note || {}; S.day = v.day || ""; } } }catch(e){}
+  function load(){ try{ var r = localStorage.getItem(KEY); if(r){ var v = JSON.parse(r); if(v && typeof v === "object"){ S.picked = v.picked || {}; S.got = v.got || {}; S.own = v.own || []; S.bag = v.bag || {}; S.removed = v.removed || []; S.note = v.note || {}; S.day = v.day || ""; S.later = v.later || []; S.past = v.past || []; S.seen = v.seen || []; } } }catch(e){}
     newDay();
     try{ var o = localStorage.getItem(OKEY); if(o) OPEN = JSON.parse(o) || OPEN; }catch(e){}
     S.own.forEach(function(o){ if(!CATS.some(function(a){ return a[0] === o.a; })) o.a = classify(o.n); if(!bagLabel[o.b]) o.b = BAGOF[o.a] || "hold"; }); }
-  // A new day: whatever was done yesterday goes; whatever wasn't asks to be carried over
-  var LEFT = 0;
+  // ---------- Days: today's list, jobs for later days, and what got done on earlier days ----------
+  var WDN = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  function pad2(n){ return (n < 10 ? "0" : "") + n; }
+  function iso(ms){ var d = ms == null ? new Date() : new Date(ms); return d.getFullYear() + "-" + pad2(d.getMonth() + 1) + "-" + pad2(d.getDate()); }
+  function isoIn(n){ var d = new Date(); d.setDate(d.getDate() + n); return iso(d.getTime()); }
+  function isoOf(day){ var m = String(day || "").split("-"); return m.length === 3 ? m[0] + "-" + pad2(+m[1]) + "-" + pad2(+m[2]) : ""; }   // "2026-10-1" -> "2026-10-01"
+  function niceD(d){ var x = new Date(d + "T12:00"); return WDN[x.getDay()] + " " + x.getDate() + " " + MON[x.getMonth()] + (x.getFullYear() !== new Date().getFullYear() ? " " + x.getFullYear() : ""); }
+  function dayLabel(d){ return d === isoIn(1) ? "Tomorrow" : d === iso() ? "Today" : d === isoIn(-1) ? "Yesterday" : niceD(d); }
+  function lid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2, 6); }
+  // A job for another day comes back onto today's list on the morning it's due
+  function bringBack(j){ var hit = !j.link && find(j.n);
+    if(hit){ S.picked[hit.n] = 1; delete S.got[hit.n]; if(j.b && j.b !== hit.b && bagLabel[j.b]) S.bag[hit.n] = j.b; unpark(hit.n); }
+    else if(!S.own.some(function(o){ return norm(o.n) === norm(j.n); })){ var a = j.a || classify(j.n); S.own.push({n:j.n, a:a, b:bagLabel[j.b] ? j.b : (BAGOF[a] || "any"), got:false, link:j.link || undefined}); }
+    if(j.note){ S.note = S.note || {}; S.note[j.n] = j.note; } }
+  function bringDue(){ var t = iso(), due = (S.later || []).filter(function(j){ return j.d <= t; }); if(!due.length) return 0;
+    due.forEach(bringBack); S.later = S.later.filter(function(j){ return j.d > t; }); return due.length; }
+  // Move a job off today to another day (rb is the row's tick button)
+  function moveLater(rb, d){ if(!d) return; if(d <= iso()){ toast("Pick a day after today"); return; } var job;
+    if(rb.dataset.own !== undefined){ var o = S.own[+rb.dataset.own]; if(!o) return; job = {n:o.n, a:o.a, b:o.b, link:o.link}; S.own.splice(+rb.dataset.own, 1); }
+    else { var n = rb.dataset.n; job = {n:n, b:S.bag[n]}; delete S.picked[n]; delete S.got[n]; delete S.bag[n]; }
+    job.id = lid(); job.d = d; var c = (S.note || {})[job.n]; if(c){ job.note = c; delete S.note[job.n]; }
+    S.later = (S.later || []).concat([job]); MOREN = ""; save(); render();
+    toast(job.n + " → " + dayLabel(d), function(){ S.later = S.later.filter(function(x){ return x !== job; }); bringBack(job); save(); render(); }); }
+  function addLater(name, d, extra){ var j = Object.assign({id:lid(), n:name, d:d}, extra || {}); S.later = (S.later || []).concat([j]); return j; }
+  function laterHTML(){ var l = (S.later || []).slice().sort(function(a, b){ return a.d < b.d ? -1 : a.d > b.d ? 1 : 0; }); if(!l.length) return "";
+    var h = '<h2 class="aisle dsec"><span class="c"></span>Coming up <span class="sub">– comes onto today\'s list on the day</span></h2><div class="later">', last = "";
+    l.forEach(function(j){ if(j.d !== last){ if(last) h += "</ul></div>"; last = j.d; h += '<div class="lday"><div class="ldate">' + esc(dayLabel(j.d)) + (dayLabel(j.d) !== niceD(j.d) ? " <small>" + esc(niceD(j.d)) + "</small>" : "") + "</div><ul>"; }
+      h += '<li><span class="ln">' + esc(j.n) + (j.note ? ' <small class="cnote">' + esc(j.note) + "</small>" : "") + (j.link ? ' <a class="jlink" href="' + esc(j.link) + '" target="_blank" rel="noopener">Open list ↗</a>' : "") + '</span><button type="button" class="link lnow" data-lnow="' + esc(j.id) + '">Do today</button><button type="button" class="x" data-ldel="' + esc(j.id) + '" aria-label="Remove">×</button></li>'; });
+    return h + "</ul></div></div>"; }
+  function pastHTML(){ var l = S.past || []; if(!l.length) return "";
+    return '<details class="past"><summary>Earlier days <small>' + l.length + "</small></summary>" + l.map(function(p){ return '<div class="pastday"><b>' + esc(dayLabel(p.d)) + (dayLabel(p.d) !== niceD(p.d) ? " · " + esc(niceD(p.d)) : "") + '</b> <span>' + p.done.length + " done: " + esc(p.done.join(", ")) + "</span></div>"; }).join("") + "</details>"; }
+
+  // A new day: whatever was done yesterday goes into Earlier days; whatever wasn't asks to be carried over; jobs set for today come in
+  var LEFT = 0, CARRY = [];
   function newDay(){ var t = today(); if(S.day === t) return; var had = nPicked();
-    if(S.day && had){ S.note = S.note || {}; Object.keys(S.got).forEach(function(n){ delete S.picked[n]; delete S.bag[n]; delete S.note[n]; }); S.own.forEach(function(o){ if(o.got) delete S.note[o.n]; }); S.got = {}; S.own = S.own.filter(function(o){ return !o.got; }); LEFT = nPicked(); }
-    S.day = t; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+    if(S.day && had){ S.note = S.note || {};
+      var done = Object.keys(S.got).filter(function(n){ return S.picked[n]; }).concat(S.own.filter(function(o){ return o.got; }).map(function(o){ return o.n; }));
+      if(done.length){ S.past = [{d:isoOf(S.day), done:done}].concat((S.past || []).filter(function(p){ return p.d !== isoOf(S.day); })).slice(0, 60); } Object.keys(S.got).forEach(function(n){ delete S.picked[n]; delete S.bag[n]; delete S.note[n]; }); S.own.forEach(function(o){ if(o.got) delete S.note[o.n]; }); S.got = {}; S.own = S.own.filter(function(o){ return !o.got; }); LEFT = nPicked(); CARRY = Object.keys(S.picked).concat(S.own.map(function(o){ return o.n; })); }
+    S.day = t; bringDue(); try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} }
+  // Something sent from another Handy Little Tools site: {i:id, n:"Do the shopping (8 things)", l:link, d:"2026-10-02", f:"ListbyAisle"}
+  function seenIn(id){ return (S.seen || []).indexOf(id) > -1; }
+  function markSeen(id){ S.seen = [id].concat((S.seen || []).filter(function(x){ return x !== id; })).slice(0, 200); }
+  function takeIn(x, d){ if(!x || !x.n) return; d = d || x.d || iso(); markSeen(x.i);
+    if(d <= iso()){ if(!S.own.some(function(o){ return norm(o.n) === norm(x.n); })) S.own.push({n:x.n, a:"other", b:"any", got:false, link:x.l || undefined}); }
+    else addLater(x.n, d, {a:"other", b:"any", link:x.l || undefined}); }
+  function inboxFromLink(){ var m = location.hash.match(/^#add=([A-Za-z0-9_-]+)/); if(!m) return;
+    var x; try{ x = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, "+").replace(/_/g, "/"))))); }catch(e){ x = null; }
+    history.replaceState(null, "", location.pathname + location.search); if(!x || !x.n) return;
+    var b = $("dayBox"); if(seenIn(x.i)){ toast("Already on your list: " + x.n); return; }
+    if(x.d){ var dd = x.d < iso() ? iso() : x.d; takeIn(x, dd); save(); render();   // the day was picked when it was sent
+      toast("“" + x.n + "” → " + dayLabel(dd), function(){ S.later = (S.later || []).filter(function(j){ return j.n !== x.n; }); S.own = S.own.filter(function(o){ return o.n !== x.n; }); save(); render(); }); return; }
+    var t = x.d && x.d > iso() ? x.d : iso();
+    b.innerHTML = '<b>From ' + esc(x.f || "your list") + ':</b> “' + esc(x.n) + '”. Add it to <button class="pillb" type="button" data-inday="' + iso() + '">Today</button> <button class="pillb" type="button" data-inday="' + isoIn(1) + '">Tomorrow</button> <label class="link">another day<input type="date" class="indate" min="' + isoIn(1) + '"></label> · <button class="link quiet" type="button" data-inno="1">No thanks</button>';
+    b.hidden = false; b.classList.add("inbox");
+    var fin = function(d){ b.hidden = true; b.classList.remove("inbox"); if(d){ takeIn(x, d); save(); render(); toast("“" + x.n + "” → " + dayLabel(d)); } else { markSeen(x.i); save(); } };
+    b.querySelectorAll("[data-inday]").forEach(function(btn){ btn.addEventListener("click", function(){ fin(btn.dataset.inday); }); });
+    b.querySelector(".indate").addEventListener("change", function(){ if(this.value) fin(this.value); });
+    b.querySelector("[data-inno]").addEventListener("click", function(){ fin(""); });
+    var pre = b.querySelector('[data-inday="' + t + '"]'); if(pre) pre.classList.add("on"); }
   function dayBanner(){ var b = $("dayBox"); if(!LEFT){ b.hidden = true; return; }
     b.innerHTML = '<b>New day.</b> ' + LEFT + ' job' + (LEFT === 1 ? '' : 's') + ' from yesterday ' + (LEFT === 1 ? 'was not' : 'were not') + ' done. <button class="link" id="dayKeep" type="button">Keep them on today</button> · <button class="link quiet" id="dayDrop" type="button">Let them go</button>'; b.hidden = false;
     $("dayKeep").addEventListener("click", function(){ LEFT = 0; b.hidden = true; toast("Carried over to today"); });
-    $("dayDrop").addEventListener("click", function(){ S.picked = {}; S.got = {}; S.own = []; S.bag = {}; S.note = {}; LEFT = 0; save(); render(); b.hidden = true; toast("Fresh start"); }); }
+    $("dayDrop").addEventListener("click", function(){ CARRY.forEach(function(n){ delete S.picked[n]; delete S.got[n]; delete S.bag[n]; if(S.note) delete S.note[n]; }); S.own = S.own.filter(function(o){ return CARRY.indexOf(o.n) < 0; }); CARRY = []; LEFT = 0; save(); render(); b.hidden = true; toast("Fresh start"); }); }
   function saveOpen(){ try{ localStorage.setItem(OKEY, JSON.stringify(OPEN)); }catch(e){} }
   function nPicked(){ return Object.keys(S.picked).length + S.own.length; }
   function nGot(){ var c = 0; Object.keys(S.picked).forEach(function(n){ if(S.got[n]) c++; }); S.own.forEach(function(o){ if(o.got) c++; }); return c; }
@@ -595,14 +678,15 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function ownBtn(o, i, showCat, mine){ return '<button class="it own'+(o.got?" got":"")+'" data-own="'+i+'" aria-pressed="'+(mine ? !!o.got : true)+'"><span class="box"></span><span><span class="nm" data-done="'+doneWord(o.b)+'">'+esc(o.n)+'</span>'+(mine ? '<small><span class="by">added by you · </span><span class="mv bag" role="button">change when</span></small>' : '<span class="bag" role="button" title="Change when">'+esc(bagLabel[o.b])+'</span><small><span class="by">added by you</span></small>')+(showCat ? '<small class="al">'+esc(label[o.a])+'</small>' : '')+'</span></button>'; }
 
   var MV = '<span class="mv" role="button" title="Change when" aria-label="Change when"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5h11M10 2.5l3 3-3 3"/><path d="M14 10.5H3M6 7.5l-3 3 3 3"/></svg></span>';
+  var DAYB = '<span class="dayb" role="button" title="Move to another day"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span class="lbl">Another day</span></span>';
   function noteTag(n){ var c = (S.note || {})[n]; return c ? '<span class="qty">'+esc(c)+'</span>' : ''; }
-  function ctl(n, ref){ var c = (S.note || {})[n] || ""; return '<div class="mctl" '+ref+'><span class="cmt'+(c ? ' has' : '')+'" role="button" title="Add a comment" aria-label="Add a comment"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span><input class="qc" type="text" maxlength="60" value="'+esc(c)+'" aria-label="Comment" placeholder="Add a comment">'+MV.replace('</svg></span>', '</svg><span class="lbl">Change time</span></span>')+RMV.replace('</svg></span>', '</svg><span class="lbl">Remove</span></span>')+'</div>'; }
+  function ctl(n, ref){ var c = (S.note || {})[n] || ""; return '<div class="mctl" '+ref+'><span class="cmt'+(c ? ' has' : '')+'" role="button" title="Add a comment" aria-label="Add a comment"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span><input class="qc" type="text" maxlength="60" value="'+esc(c)+'" aria-label="Comment" placeholder="Add a comment">'+MV.replace('</svg></span>', '</svg><span class="lbl">Change time</span></span>')+DAYB+RMV.replace('</svg></span>', '</svg><span class="lbl">Remove</span></span>')+'</div>'; }
   // One tidy row per item: the tick box, the name, and a "⋯" button that opens everything else
   var MOREN = "";
   function moreBtn(k){ return '<button type="button" class="more" data-more="'+esc(k)+'" aria-label="More options" aria-expanded="'+(MOREN === k)+'"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>'; }
-  function mineRow(n, ref, got, cls, b){ var mk = cls + "|" + n; return '<div class="mrow'+(got?" got":"")+(!got && MOREN === mk ? " open" : "")+'"><button class="it'+cls+(got?" got":"")+'" '+ref+' aria-pressed="'+got+'"><span class="box"></span><span><span class="nm" data-done="'+doneWord(b)+'">'+esc(n)+'</span>'+(got ? noteTag(n) : ''+((S.note || {})[n] ? '<small class="cnote">'+esc((S.note || {})[n])+'</small>' : '')+'')+'</span></button>'+(got ? '' : moreBtn(mk) + ctl(n, ref))+'</div>'; }
+  function mineRow(n, ref, got, cls, b, link){ var mk = cls + "|" + n; return '<div class="mrow'+(got?" got":"")+(!got && MOREN === mk ? " open" : "")+'"><button class="it'+cls+(got?" got":"")+'" '+ref+' aria-pressed="'+got+'"><span class="box"></span><span><span class="nm" data-done="'+doneWord(b)+'">'+esc(n)+'</span>'+(got ? noteTag(n) : ''+((S.note || {})[n] ? '<small class="cnote">'+esc((S.note || {})[n])+'</small>' : '')+'')+'</span></button>'+(link ? '<a class="jlink rowlink" href="'+esc(link)+'" target="_blank" rel="noopener">Open list ↗</a>' : '')+(got ? '' : moreBtn(mk) + ctl(n, ref))+'</div>'; }
   function mineBtn(it){ return mineRow(it.n, 'data-n="'+esc(it.n)+'"', !!S.got[it.n], '', bagOf(it)); }
-  function mineOwn(o, i){ return mineRow(o.n, 'data-own="'+i+'"', !!o.got, ' own', o.b); }
+  function mineOwn(o, i){ return mineRow(o.n, 'data-own="'+i+'"', !!o.got, ' own', o.b, o.link); }
   function moreSet(k){ MOREN = k; document.querySelectorAll("#mine .mrow").forEach(function(r){ var b = r.querySelector(".more"), on = !!b && b.dataset.more === k; r.classList.toggle("open", on); if(b) b.setAttribute("aria-expanded", String(on)); }); }
   $("mine").addEventListener("click", function(e){ var b = e.target.closest(".more"); if(!b) return; e.stopPropagation(); moreSet(MOREN === b.dataset.more ? "" : b.dataset.more); }, true);
   document.addEventListener("click", function(e){ if(MOREN && !e.target.closest(".mrow.open")) moreSet(""); });
@@ -625,8 +709,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
         return html;
       }
       return (splitRaw(query).length > 1
-        ? '<div class="empty"><b>That looks like a list</b>All '+splitRaw(query).length+' jobs go on the list.<br><button class="btn primary qaddb" type="button">Add all '+splitRaw(query).length+'</button></div>'
-        : '<div class="empty"><b>Not in the list yet</b>No problem – add it to today.<br><button class="btn primary qaddb" type="button">Add “'+esc(query.trim())+'”</button></div>');
+        ? '<div class="empty"><b>That looks like a list</b>All '+splitRaw(query).length+' jobs go on the list.<br><button class="btn primary qaddb" type="button">Add all '+splitRaw(query).length+'</button>'+LATERQ+'</div>'
+        : '<div class="empty"><b>Not in the list yet</b>No problem – add it to today.<br><button class="btn primary qaddb" type="button">Add “'+esc(query.trim())+'”</button>'+LATERQ+'</div>');
     }
     if(mine){
       chosen().forEach(function(g){
@@ -636,9 +720,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
         S.own.forEach(function(o, i){ if(o.b === g.key) html += mineOwn(o, i); });
         html += '</div>';
       });
-      var rmHtml = "";
-      if(shown) return rmHtml + html;
-      return rmHtml + '<div class="empty"><b>Nothing on the list yet</b>Type a job at the top, start from a ready-made day, or browse by task.</div>';
+      var rmHtml = "", rest = laterHTML() + pastHTML();
+      if(shown) return rmHtml + html + rest;
+      return rmHtml + '<div class="empty"><b>Nothing on today\'s list yet</b>Type a job at the top, start from a ready-made day, or browse by task.</div>' + rest;
     }
     CATS.forEach(function(a){
       var az = function(x, y){ return x.localeCompare(y, undefined, {sensitivity:"base"}); };
@@ -747,6 +831,10 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(cv) cv.textContent = bagLabel[sel.value];
     save(); render(); });
   $("sortDone").addEventListener("click", function(){ $("sortbox").hidden = true; });
+  var LATERQ = '<div class="qlater">or for <button class="link qaddl" type="button" data-when="1">tomorrow</button> · <label class="link">another day<input type="date" class="qdate"></label></div>';
+  function addTypedLater(v, d){ if(!d) return; if(d <= iso()){ addTyped(v); return; } var names = splitRaw(v).map(function(x){ return x.trim().replace(/^[-*\u2022\u2610\u2611\u2612\[\]x ]+/i, "").trim(); }).filter(Boolean); if(!names.length) return;
+    names.forEach(function(n){ var hit = find(n); addLater(hit ? hit.n : n, d); });
+    toast((names.length === 1 ? names[0] : names.length + " jobs") + " → " + dayLabel(d)); query = ""; $("q").value = ""; $("qClear").hidden = true; document.body.classList.remove("searching"); save(); render(); }
   function addTyped(v){
     if(splitRaw(v).length > 1){ addMany(v); return; }
     unknown = []; var r = addOne(v); if(!r) return;
@@ -820,9 +908,19 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var mc = e.target.closest(".mctl");
     if(mc){ e.stopPropagation(); var rb = mc.closest(".mrow").querySelector(".it"); if(!rb) return;
       if(e.target.closest(".rmv")){ takeOff(rb); return; }
+      if(e.target.closest("[data-mvday]")){ moveLater(rb, isoIn(1)); return; }
+      if(e.target.closest("[data-mvx]")){ render(); return; }
+      if(e.target.closest(".dayin")) return;
+      if(e.target.closest(".dayb")){ mc.classList.add("asking"); mc.innerHTML = '<span class="dayask">Move to <button type="button" class="pillb" data-mvday="1">Tomorrow</button><input type="date" class="dayin" min="' + isoIn(1) + '" aria-label="Pick a day"><button type="button" class="link quiet" data-mvx="1">Cancel</button></span>';
+        mc.querySelector(".dayin").addEventListener("change", function(){ moveLater(rb, this.value); }); return; }
       if(e.target.closest(".mv")){ var mn = ctlKey(mc); if(mn){ askBag([mn], true); $("sortbox").scrollIntoView({block:"center"}); } return; }
       return; }
     if(e.target.closest(".qaddb")){ addTyped($("q").value); return; }
+    if(e.target.closest(".qaddl")){ addTypedLater($("q").value, isoIn(1)); return; }
+    if(e.target.closest(".qdate")){ var qd = e.target.closest(".qdate"); qd.min = isoIn(1); if(!qd.dataset.on){ qd.dataset.on = 1; qd.addEventListener("change", function(){ addTypedLater($("q").value, qd.value); }); } return; }
+    var ln = e.target.closest("[data-lnow]"); if(ln){ e.stopPropagation(); var jn = (S.later || []).filter(function(x){ return x.id === ln.dataset.lnow; })[0]; if(jn){ S.later = S.later.filter(function(x){ return x !== jn; }); bringBack(jn); save(); render(); toast(jn.n + " is on today's list"); } return; }
+    var ld = e.target.closest("[data-ldel]"); if(ld){ e.stopPropagation(); var jd = (S.later || []).filter(function(x){ return x.id === ld.dataset.ldel; })[0]; if(jd){ var at = S.later.indexOf(jd); S.later.splice(at, 1); save(); render(); toast(jd.n + " removed", function(){ S.later.splice(at, 0, jd); save(); render(); }); } return; }
+    if(e.target.closest(".jlink") || e.target.closest(".past")) return;
     if(e.target.closest(".addrow")) { e.stopPropagation(); return; }
     var gl = e.target.closest(".golist");
     if(gl){ e.stopPropagation(); openMine(); return; }
@@ -831,6 +929,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(e.target.closest("#rmForget")){ if(confirm("Clear the taken-off list?")){ S.removed = []; save(); render(); } return; }
     if(h){ var k = h.dataset.a; if(k === "_removed"){ OPEN._removed = OPEN._removed === 1 ? 0 : 1; } else { if(query || h.closest("#mine")) return; if(OPEN[k]) delete OPEN[k]; else OPEN[k] = 1; }
       saveOpen(); render(); return; }
+    if(e.target.closest(".jlink")) return;   // the link opens the list; it doesn't tick the job
     var b = e.target.closest(".it"); if(!b) return;
     if(b.dataset.rm !== undefined){ restore(+b.dataset.rm); return; }
     if(e.target.closest(".bag")){ e.stopPropagation();
@@ -866,7 +965,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     window.open("https://wa.me/?text=" + encodeURIComponent(msg), "_blank"); });
   $("mail").addEventListener("click", function(){ var t = asText(); if(!t) return; location.href = "mailto:?subject=" + encodeURIComponent("Today's list") + "&body=" + encodeURIComponent(t); });
 
-  load(); drawTrips(); render(); dayBanner();
+  load(); drawTrips(); render(); dayBanner(); inboxFromLink();
+  window.addEventListener("hashchange", inboxFromLink);
   document.addEventListener("visibilitychange", function(){ if(!document.hidden && S.day !== today()){ newDay(); render(); dayBanner(); } });
   (function(){
     function fold(btnId, boxId){ var b = $(btnId), x = $(boxId); b.addEventListener("click", function(){ var open = x.hidden; x.hidden = !open; b.setAttribute("aria-expanded", String(open)); }); }
@@ -895,22 +995,23 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function rpc(fn, body){ return fetch(SB_URL + "/rest/v1/rpc/" + fn, {method:"POST", headers:sbHeaders(), body:JSON.stringify(body)}).then(function(r){ if(!r.ok) throw new Error("rpc " + r.status); return r.text(); }).then(function(t){ return t ? JSON.parse(t) : null; }); }
   function newCode(){ var a = "abcdefghjkmnpqrstuvwxyz23456789", o = "", c = new Uint32Array(12); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(c) : c.forEach(function(_, i){ c[i] = Math.random() * 1e9; }); for(var i = 0; i < 12; i++) o += a[c[i] % a.length]; return "t" + o.slice(1); }
   function shareUrl(){ return "https://dobytoday.com/#l=" + CODE; }
-  function snapshot(){ return JSON.stringify({picked:S.picked, got:S.got, own:S.own, bag:S.bag, removed:S.removed, note:S.note || {}, day:S.day}); }
+  function snapshot(){ return JSON.stringify({picked:S.picked, got:S.got, own:S.own, bag:S.bag, removed:S.removed, note:S.note || {}, day:S.day, later:S.later || [], past:S.past || []}); }
   var lastT = 0, BKEY = "dobytoday-backup-v1";
-  function countOf(d){ return Object.keys(d.picked || {}).length + (d.own || []).length; }
-  function mergeInto(d){ var r = {picked:Object.assign({}, d.picked || {}, S.picked || {}), got:Object.assign({}, d.got || {}, S.got || {}), bag:Object.assign({}, d.bag || {}, S.bag || {}), note:Object.assign({}, d.note || {}, S.note || {}), own:(d.own || []).slice(), removed:(d.removed || []).slice(), day:S.day || d.day || ""};
+  function countOf(d){ return Object.keys(d.picked || {}).length + (d.own || []).length + (d.later || []).length; }
+  function mergeInto(d){ var r = {picked:Object.assign({}, d.picked || {}, S.picked || {}), got:Object.assign({}, d.got || {}, S.got || {}), bag:Object.assign({}, d.bag || {}, S.bag || {}), note:Object.assign({}, d.note || {}, S.note || {}), own:(d.own || []).slice(), removed:(d.removed || []).slice(), day:S.day || d.day || "", later:(d.later || []).slice(), past:(d.past || []).slice()};
+    (S.later || []).forEach(function(j){ if(!r.later.some(function(x){ return x.id === j.id; })) r.later.push(j); });
     S.own.forEach(function(o){ if(!r.own.some(function(x){ return norm(x.n) === norm(o.n); })) r.own.push(o); }); return r; }
   function applyRemote(d, viaJoin){ if(!d || typeof d !== "object") return;
     if(d.t && d.t < lastT) return;
     var here = countOf(S), there = countOf(d);
     if(!there && here){ lastSent = ""; syncPush(true); return; }
     var merged = false; if(viaJoin && here && there){ d = mergeInto(d); merged = true; }
-    var j = JSON.stringify({picked:d.picked || {}, got:d.got || {}, own:d.own || [], bag:d.bag || {}, removed:d.removed || [], note:d.note || {}, day:d.day || ""}); if(j === snapshot()) return;
+    var j = JSON.stringify({picked:d.picked || {}, got:d.got || {}, own:d.own || [], bag:d.bag || {}, removed:d.removed || [], note:d.note || {}, day:d.day || "", later:d.later || [], past:d.past || []}); if(j === snapshot()) return;
     var before = snapshot(), lost = here - there;
     try{ localStorage.setItem(BKEY, before); }catch(e){}
-    applying = true; S.picked = d.picked || {}; S.got = d.got || {}; S.own = d.own || []; S.bag = d.bag || {}; S.removed = d.removed || []; S.note = d.note || {}; S.day = d.day || ""; if(d.t) lastT = d.t; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} lastSent = snapshot(); render(); applying = false;
+    applying = true; S.picked = d.picked || {}; S.got = d.got || {}; S.own = d.own || []; S.bag = d.bag || {}; S.removed = d.removed || []; S.note = d.note || {}; S.day = d.day || ""; S.later = d.later || []; S.past = d.past || []; if(d.t) lastT = d.t; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} lastSent = snapshot(); render(); applying = false;
     if(merged){ lastSent = ""; syncPush(true); }
-    if(!viaJoin && lost > 0){ toast("List updated from the shared link (" + lost + " fewer)", function(){ try{ var b = JSON.parse(before); applying = true; S.picked = b.picked || {}; S.got = b.got || {}; S.own = b.own || []; S.bag = b.bag || {}; S.removed = b.removed || []; S.note = b.note || {}; S.day = b.day || ""; applying = false; save(); render(); lastSent = ""; syncPush(true); }catch(e){} }); } }
+    if(!viaJoin && lost > 0){ toast("List updated from the shared link (" + lost + " fewer)", function(){ try{ var b = JSON.parse(before); applying = true; S.picked = b.picked || {}; S.got = b.got || {}; S.own = b.own || []; S.bag = b.bag || {}; S.removed = b.removed || []; S.note = b.note || {}; S.day = b.day || ""; S.later = b.later || []; S.past = b.past || []; applying = false; save(); render(); lastSent = ""; syncPush(true); }catch(e){} }); } }
   function syncPush(now){ if(!CODE || applying) return; clearTimeout(pushT); var go = function(){
     var j = snapshot(); if(j === lastSent) return; lastSent = j; lastT = Date.now(); var payload = JSON.parse(j); payload.t = lastT;
     rpc("save_list", {code:CODE, payload:payload}).catch(function(){ lastSent = ""; });
@@ -1065,11 +1166,15 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     asb.rpc("hlt_get", {p_site:SITE}).then(function(res){ if(res.error) return acctState("Saved on this phone – it'll save to your account when you're connected");
       var d = res.data, lt = localT();
       var blank = !nPicked() && !(typeof myLoad === "function" && myLoad().length); // a new phone with nothing on it never overwrites your account
-      if(d && d.s && (first || blank || (d.t || 0) > lt)){ // just signed in: the list saved in your account wins
+      if(d && d.s && (first || (blank && !(S.later || []).length) || (d.t || 0) > lt)){ // just signed in: the list saved in your account wins
         aApplying = true; try{ localStorage.setItem(KEY, JSON.stringify(d.s)); }catch(e){}
         if(d.m){ var mine0 = myLoad(), ids = {}; d.m.forEach(function(x){ ids[x.id] = 1; }); MYL = first ? d.m.concat(mine0.filter(function(x){ return !ids[x.id]; })) : d.m; try{ localStorage.setItem(MKEY, JSON.stringify(MYL)); }catch(e){} drawMy(); } setLocalT(d.t || Date.now()); load(); render(); aApplying = false; acctState("✓ Saved to your account"); }
       else if(!d || lt > (d.t || 0)){ acctPush(); }
-      else acctState("✓ Saved to your account"); }); }
+      else acctState("✓ Saved to your account"); inboxFromSites(); }); }
+  function inboxFromSites(){ if(!AUSER || !asb) return; [["listbyaisle","ListbyAisle"],["packbybag","PackbyBag"]].forEach(function(st){
+    asb.rpc("hlt_get", {p_site:st[0]}).then(function(res){ var o = res && res.data && res.data.o; if(!Array.isArray(o)) return; var got = [];
+      o.forEach(function(x){ if(x && x.i && x.n && !seenIn(x.i)){ takeIn(x); got.push(x.n); } });
+      if(got.length){ save(); render(); toast("From " + st[1] + ": " + got.join(", ")); } }); }); }
   function acctUI(){ var b = $("acctBtn"); b.textContent = AUSER ? "✓ Signed in" : "Sign in"; b.classList.toggle("on", !!AUSER);
     $("acOut").hidden = !!AUSER; $("acIn").hidden = !AUSER; if(AUSER) $("acWho").textContent = AUSER.email || ""; }
   function acctOpen(){ $("acct").hidden = false; $("acStep1").hidden = false; $("acStep2").hidden = true; acctUI(); if(!AUSER) setTimeout(function(){ $("acEmail").focus(); }, 50); }
