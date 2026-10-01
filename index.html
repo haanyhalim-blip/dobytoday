@@ -48,7 +48,7 @@ header{padding:26px 0 14px;margin-bottom:6px;border-bottom:1px solid var(--line)
 .brand{font-family:Fraunces,Georgia,serif;font-weight:600;font-size:1.55rem;letter-spacing:-.01em;color:var(--main);margin:0;text-decoration:none}
 .brand span{color:var(--ink)}
 .brand.mini{font-size:1.05rem}
-body.searching #howBox,body.searching .sectabs,body.searching #tripBox,body.searching h2.sec:has(#shopBtn){display:none}
+body.searching #howBox,body.searching .sectabs,body.searching #tripBox,body.searching #projBox,body.searching h2.sec:has(#shopBtn){display:none}
 body.searching #listSec,body.searching h2.sec:has(#fbBtn),body.searching #feedback,body.searching .about{display:none}
 .sticky{position:sticky;top:0;z-index:10;background:var(--wash);border:1.5px solid var(--main);border-radius:12px;padding:10px 12px 8px;margin:4px 0 14px;box-shadow:0 3px 10px rgba(0,0,0,.08)}
 .stitle{color:var(--main-deep);margin:0 0 6px;font-size:1.2rem;font-weight:700}
@@ -77,13 +77,13 @@ body.searching .jumps{display:none}
 .sect[aria-expanded="true"] .c{transform:rotate(45deg)}
 .sect:hover{opacity:.85}
 /* One bar of buttons for the ready-made lists and browsing – only the one you tap is open */
-.sectabs{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:22px 0 12px}
+.sectabs{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:22px 0 12px}
 .sectabs .sect{width:auto;min-width:0;justify-content:center;gap:7px;font-size:.95rem;padding:11px 8px;border-radius:12px;white-space:nowrap;background:var(--card,#fff);border:1.5px solid var(--main);color:var(--main-deep);box-shadow:0 1px 3px rgba(0,0,0,.06);transition:background .15s,color .15s}
 .sectabs .sect .c{display:none}
 .sectabs .sect .ti{flex:none}
 .sectabs .sect:hover{background:var(--wash);opacity:1}
 .sectabs .sect[aria-expanded="true"]{background:var(--main);color:#fff;border-color:var(--main)}
-@media (max-width:520px){.sectabs{gap:6px}.sectabs .sect{flex-direction:column;gap:3px;font-size:.84rem;padding:9px 4px 8px;line-height:1.15}.sectabs .sect .ti{width:20px;height:20px}}
+@media (max-width:520px){.sectabs{gap:6px}.sectabs .sect{flex-direction:column;gap:3px;font-size:.84rem;padding:9px 4px 8px;line-height:1.15;white-space:normal;text-align:center}.sectabs .sect .ti{width:20px;height:20px}}
 @media (max-width:340px){.sectabs .sect{font-size:.78rem}}
 .howwrap{margin:0 0 4px;padding:14px 16px;background:var(--card);border:1.5px solid var(--main);border-radius:10px;display:grid;gap:14px;grid-template-columns:1fr auto;align-items:center}
 .howwrap[hidden]{display:none}
@@ -425,7 +425,7 @@ h2.dsec .sub{text-transform:none;letter-spacing:0;font-weight:400}
 #mine .rowlink{flex:none;align-self:center;margin:0 4px}
 .past{margin:18px 0 6px;color:var(--muted)}
 .projsec{margin:22px 0 8px}
-.psh{font-size:1.05rem;margin:0 0 10px}
+.psh{font-size:.9rem;font-weight:400;color:var(--muted);margin:0 0 10px}
 .psh small{font-size:.8rem;font-weight:400;color:var(--muted)}
 .pgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px}
 .pcard{display:flex;flex-direction:column;align-items:flex-start;gap:4px;text-align:left;padding:14px;border:1px solid var(--line);border-left:5px solid var(--main);border-radius:12px;background:var(--card);font:inherit;cursor:pointer;min-height:84px}
@@ -502,7 +502,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
     <div class="qwrap"><input id="q" placeholder="Type or paste your jobs – put a wash on, call Dad…" autocomplete="off" autocapitalize="off" enterkeyhint="search"><button id="qClear" type="button" aria-label="Clear search" hidden>×</button></div>
     <button class="btn totop" id="toTop" type="button" hidden>↑ Top</button>
   </div>
-  <p class="jumps"><a class="jump" data-to="tripBtn" href="#">Ready-made days</a> · <a class="jump" data-to="shopBtn" href="#">Browse by task</a></p>
+  <p class="jumps"><a class="jump" data-to="tripBtn" href="#">Ready-made days</a> · <a class="jump" data-to="projBtn" href="#">Projects</a> · <a class="jump" data-to="shopBtn" href="#">Browse by task</a></p>
 </div>
 
 <div class="paste sortbox" id="sortbox" hidden>
@@ -538,9 +538,8 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
     </div>
   </div>
 </section>
-<section class="projsec" id="projSec"></section>
 
-<div class="sectabs" role="group" aria-label="Ready-made days or browse by task"><button class="sect" id="tripBtn" type="button" aria-expanded="false" aria-controls="tripBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h3"/></svg><span class="tl">Ready-made days</span></button><button class="sect" id="shopBtn" type="button" aria-expanded="false" aria-controls="shopBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg><span class="tl">Browse by task</span></button></div>
+<div class="sectabs" role="group" aria-label="Ready-made days, projects or browse by task"><button class="sect" id="tripBtn" type="button" aria-expanded="false" aria-controls="tripBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h3"/></svg><span class="tl">Ready-made days</span></button><button class="sect" id="projBtn" type="button" aria-expanded="false" aria-controls="projBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M8 13l2.5 2.5L16 10"/></svg><span class="tl">Projects</span></button><button class="sect" id="shopBtn" type="button" aria-expanded="false" aria-controls="shopBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg><span class="tl">Browse by task</span></button></div>
 <div id="tripBox" hidden>
   <div id="myl"></div>
   <div class="trips" id="trips"></div>
@@ -548,6 +547,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   <p class="tripnote">These are starting points, not rules – every house runs differently. Something missing, or a day you'd like added? <button class="link" id="tripSuggest" type="button">Suggest an addition</button></p>
 </div>
 
+<div id="projBox" hidden><section class="projsec" id="projSec"></section></div>
 <div id="shopBox" hidden>
   <div id="out"></div>
 </div>
@@ -579,7 +579,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v51</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v52</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -737,7 +737,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function tabName(l){ if(l.id === TABS.active) return S.title || (l.id === "today" ? "Today" : l.name || "Untitled"); return l.name || (l.id === "today" ? "Today" : "Untitled"); }
   function drawTabs(){ var el = $("ltabs"); if(!el) return; var page = TABS.active !== "today"; document.body.classList.toggle("pagemode", page); el.hidden = !page; projCards();
     if(page){ var cur0 = TABS.lists.filter(function(l){ return l.id === TABS.active; })[0]; if(cur0 && S.title && cur0.name !== S.title){ cur0.name = S.title; saveTabs(); }
-      el.innerHTML = '<button type="button" class="pback" data-tab="today">← My list &amp; projects</button>'; return; } var cur = TABS.lists.filter(function(l){ return l.id === TABS.active; })[0];
+      el.innerHTML = '<button type="button" class="pback" data-tab="today">← My list &amp; projects</button>'; return; }
+    if(BACKTOP){ BACKTOP = false; setTimeout(function(){ if($("projBox").hidden) $("projBtn").click(); $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 0); } var cur = TABS.lists.filter(function(l){ return l.id === TABS.active; })[0];
     if(cur && cur.id !== "today" && S.title && cur.name !== S.title){ cur.name = S.title; saveTabs(); }
     el.innerHTML = TABS.lists.map(function(l){ return '<button type="button" data-tab="' + esc(l.id) + '"' + (l.id === TABS.active ? ' aria-current="page"' : "") + ">" + esc(tabName(l)) + "</button>"; }).join("") + '<button type="button" class="tnew" data-newproj="1">+ Project</button>'; }
   function newProject(){ var id = newTab("New project"); switchTo(id); S.keep = true; PEDIT = "new"; render(); window.scrollTo(0, 0); var ti = $("pPaste"); if(ti) ti.focus(); }
@@ -745,7 +746,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   // Every project has its own address: a share code made when the page is made
   function ensurePage(){ if(CODE) return; CODE = newCode(); try{ localStorage.setItem(CKEY, CODE); }catch(e){} history.replaceState(null, "", "#page=" + CODE); lastSent = ""; syncPush(true); listen(); showShared(); }
   function projCards(){ var el = $("projSec"); if(!el) return; var ps = TABS.lists.filter(function(l){ return l.id !== "today"; });
-    var h = '<h2 class="psh">Projects <small>– a page each: a title, notes and steps to tick, to share and work on together</small></h2><div class="pgrid">';
+    var h = '<p class="psh">A page each: a title, notes and steps to tick – share it and work on it together.</p><div class="pgrid">';
     ps.forEach(function(l){ var d = l.id === TABS.active ? S : readList(l.id), n = (d.own || []).length + Object.keys(d.picked || {}).length, g = (d.own || []).filter(function(o){ return o.got; }).length + Object.keys(d.got || {}).filter(function(k){ return (d.picked || {})[k]; }).length, sh = "";
       try{ sh = localStorage.getItem(ckeyOf(l.id)) || ""; }catch(e){}
       h += '<button type="button" class="pcard" data-proj="' + esc(l.id) + '"><b>' + esc(d.title || l.name || "Untitled") + "</b><span>" + (n ? g + " of " + n + " steps done" : "No steps yet") + "</span>" + (n ? '<i class="pbar"><i style="width:' + Math.round(g / n * 100) + '%"></i></i>' : "") + "</button>"; });
@@ -798,7 +799,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       flush(); var head = x.length < 70 && !/[.!?:]$/.test(x) && /^([-*•]|\d+[.)])\s/.test(nx);
       h += head ? "<h4>" + esc(x) + "</h4>" : "<p>" + esc(x) + "</p>"; });
     flush(); return h; }
-  var NOPEN = true, PEDIT = false;
+  var NOPEN = true, PEDIT = false, BACKTOP = false;
   function projHTML(){ var has = S.title || S.notes;
     if(PEDIT === "new") return '<div class="pedit"><label for="pPaste">Paste or type your project</label><small class="phint">Title on the first line, then whatever notes you have. Steps can be a numbered list, or a list under a line that says Steps or To do – they become tick boxes.</small><textarea id="pPaste" rows="12" placeholder="Kitchen redo&#10;&#10;Budget 5,000. Builder starts 3 Nov.&#10;&#10;Steps&#10;1. Pick the worktop&#10;2. Order the units&#10;3. Book the electrician"></textarea>'
       + '<div class="row"><button type="button" class="btn primary" data-pmake="1">Make the page</button><button type="button" class="link quiet" data-pdel="1">Cancel</button></div></div>';
@@ -834,7 +835,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function mineBtn(it){ return mineRow(it.n, 'data-n="'+esc(it.n)+'"', !!S.got[it.n], '', bagOf(it)); }
   function mineOwn(o, i){ return mineRow(o.n, 'data-own="'+i+'"', !!o.got, ' own', o.b, o.link); }
   function moreSet(k){ MOREN = k; document.querySelectorAll("#mine .mrow").forEach(function(r){ var b = r.querySelector(".more"), on = !!b && b.dataset.more === k; r.classList.toggle("open", on); if(b) b.setAttribute("aria-expanded", String(on)); }); }
-  $("ltabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.tab){ if(PEDIT === "new" && !S.title && !nPicked()){ dropProject(); return; } switchTo(b.dataset.tab); window.scrollTo(0, 0); } });
+  $("ltabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.tab){ if(PEDIT === "new" && !S.title && !nPicked()){ dropProject(); return; } BACKTOP = true; switchTo(b.dataset.tab); } });
   $("mine").addEventListener("click", function(e){ var b = e.target.closest(".more"); if(!b) return; e.stopPropagation(); moreSet(MOREN === b.dataset.more ? "" : b.dataset.more); }, true);
   document.addEventListener("click", function(e){ if(MOREN && !e.target.closest(".mrow.open")) moreSet(""); });
   function ctlKey(c){ return c.dataset.own !== undefined ? ((S.own[+c.dataset.own] || {}).n || "") : c.dataset.n; }
@@ -1145,9 +1146,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   document.addEventListener("visibilitychange", function(){ if(!document.hidden && S.day !== today()){ newDay(); render(); dayBanner(); } });
   (function(){
     function fold(btnId, boxId){ var b = $(btnId), x = $(boxId); b.addEventListener("click", function(){ var open = x.hidden; x.hidden = !open; b.setAttribute("aria-expanded", String(open)); }); }
-    fold("tripBtn", "tripBox"); fold("shopBtn", "shopBox");
-    // The two tab buttons: opening one closes the other
-    [["tripBtn","shopBtn"],["shopBtn","tripBtn"]].forEach(function(pr){ $(pr[0]).addEventListener("click", function(){ if($(pr[0]).getAttribute("aria-expanded") === "true"){ var o = $(pr[1]); $(o.getAttribute("aria-controls")).hidden = true; o.setAttribute("aria-expanded", "false"); } }); }); fold("fbBtn", "feedback"); fold("mineBtn", "mineBody");
+    fold("tripBtn", "tripBox"); fold("projBtn", "projBox"); fold("shopBtn", "shopBox");
+    // The three tab buttons: opening one closes the others
+    var TB = ["tripBtn","projBtn","shopBtn"]; TB.forEach(function(id){ $(id).addEventListener("click", function(){ if($(id).getAttribute("aria-expanded") !== "true") return; TB.forEach(function(o){ if(o === id) return; $($(o).getAttribute("aria-controls")).hidden = true; $(o).setAttribute("aria-expanded", "false"); }); }); }); fold("fbBtn", "feedback"); fold("mineBtn", "mineBody");
     var sb = $("mineShare"), sx = $("shareBox");
     sb.addEventListener("click", function(){ var open = sx.hidden; sx.hidden = !open; sb.setAttribute("aria-expanded", String(open)); sb.querySelector(".cap").textContent = open ? "Close" : ""; if(open) setTimeout(function(){ sx.scrollIntoView({block:"start", behavior:"smooth"}); }, 30); });
   })();
