@@ -450,6 +450,12 @@ h2.dsec .sub{text-transform:none;letter-spacing:0;font-weight:400}
 .prow.pnew{border:2px dashed var(--main);border-left-width:2px;background:transparent}
 .prow.pnew .pn{color:var(--main)}
 .gchips{display:flex;flex-wrap:wrap;gap:6px}
+.pedit .ph{font-size:1.05rem}
+.pmode{display:flex;gap:6px;margin:2px 0 6px}
+.aitip{margin:6px 0 2px;border:1px dashed var(--line);border-radius:8px;padding:8px 10px;font-size:.9rem}
+.aitip summary{cursor:pointer;font-weight:700;color:var(--main-deep)}
+.aitip p{margin:8px 0}
+.aiprompt{background:var(--wash);border-radius:6px;padding:8px 10px;font-size:.85rem;line-height:1.45}
 .pafter{margin-top:18px}
 #mine .steps .mrow{flex-wrap:wrap}
 .sdet{flex-basis:100%;margin:2px 0 6px 2.4em;padding:0 0 0 1em;font-size:.88rem;color:var(--muted);line-height:1.45}
@@ -614,7 +620,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v62</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v63</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -776,12 +782,12 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(CODE) rpc("get_list", {code:CODE}).then(function(d){ if(d) applyRemote(d); }).catch(function(){}).then(listen); }
   function newTab(name){ var id = "p" + lid(); TABS.lists.push({id:id, name:name || "New project"}); saveTabs(); return id; }
   function tabName(l){ if(l.id === TABS.active) return S.title || (l.id === "today" ? "Today" : l.name || "Untitled"); return l.name || (l.id === "today" ? "Today" : "Untitled"); }
-  function drawTabs(){ var el = $("ltabs"); if(!el) return; var page = TABS.active !== "today"; document.body.classList.toggle("pagemode", page); el.hidden = !page; projCards();
+  function drawTabs(){ var el = $("ltabs"); if(!el) return; setTimeout(function(){ Object.keys(NEWDRAFT).forEach(function(id){ var f = $(id); if(f && !f.value) f.value = NEWDRAFT[id]; }); }, 0); var page = TABS.active !== "today"; document.body.classList.toggle("pagemode", page); el.hidden = !page; projCards();
     if(page){ var cur0 = TABS.lists.filter(function(l){ return l.id === TABS.active; })[0]; if(cur0 && S.title && cur0.name !== S.title){ cur0.name = S.title; saveTabs(); }
       el.innerHTML = '<button type="button" class="pback" data-tab="today">← My list &amp; projects</button>'; return; }
     if(BACKTOP){ BACKTOP = false; setTimeout(function(){ if($("projBox").hidden) $("projBtn").click(); $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 0); }
     el.innerHTML = ""; }
-  function newProject(){ var id = newTab("New project"); switchTo(id); S.keep = true; PEDIT = "new"; render(); window.scrollTo(0, 0); var ti = $("pPaste"); if(ti) ti.focus(); }
+  function newProject(){ var id = newTab("New project"); switchTo(id); S.keep = true; PEDIT = "new"; NEWDRAFT = {}; PMODE = "fields"; render(); window.scrollTo(0, 0); var ti = $("nTitle") || $("pPaste"); if(ti) ti.focus(); }
   function dropProject(){ var id = TABS.active; try{ localStorage.removeItem(keyOf(id)); localStorage.removeItem(ckeyOf(id)); }catch(e){} TABS.lists = TABS.lists.filter(function(l){ return l.id !== id; }); saveTabs(); switchTo("today"); }
   // Every project has its own address: a share code made when the page is made
   function ensurePage(){ if(CODE) return; CODE = newCode(); try{ localStorage.setItem(CKEY, CODE); }catch(e){} history.replaceState(null, "", "#page=" + CODE); lastSent = ""; syncPush(true); listen(); showShared(); }
@@ -879,13 +885,21 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       if(!head && capsHead(x)) head = true;
       h += head ? "<h4>" + esc(niceCase(x)) + "</h4>" : "<p>" + esc(x) + "</p>"; });
     flush(); return h; }
-  var NOPEN = true, PEDIT = false, BACKTOP = false, LASTPG = "", PF = "all";
+  var NOPEN = true, PEDIT = false, BACKTOP = false, LASTPG = "", PF = "all", PMODE = "fields";
+  var AIPROMPT = "Turn the message below into a to-do page. Give me: a short title on the first line; then a short description (keep any figures, names, phone numbers and addresses); then a line that says Steps, followed by the steps to do, one per line, numbered, in order. Put anything useful about a step (who to ask, what to say) on the same line after a dash. Leave out anything that isn't needed.";
   function curTab(){ return TABS.lists.filter(function(l){ return l.id === TABS.active; })[0] || {}; }
   function groupField(v){ var gs = []; TABS.lists.forEach(function(l){ var g = (l.group || "").trim(); if(g && gs.indexOf(g) < 0) gs.push(g); });
     return '<label for="pGroup">Group <small>– optional, e.g. Kids, House, Money</small></label><input id="pGroup" maxlength="30" list="pGroups" value="' + esc(v) + '" placeholder="No group"><datalist id="pGroups">' + gs.map(function(g){ return '<option value="' + esc(g) + '">'; }).join("") + "</datalist>"
       + (gs.length ? '<div class="gchips">' + gs.map(function(g){ return '<button type="button" class="chip" data-gpick="' + esc(g) + '">' + esc(g) + "</button>"; }).join("") + "</div>" : ""); }
   function projHTML(){ var has = S.title || S.notes;
-    if(PEDIT === "new") return '<div class="pedit"><label for="pPaste">Create your own – paste or type</label><small class="phint">A title on the first line, then anything you like. A numbered list, or a list under a line that says Steps or To do, becomes tick boxes. Lines with web links become Open and Copy buttons.</small><textarea id="pPaste" rows="12" placeholder="Kitchen redo&#10;&#10;Budget 5,000. Builder starts 3 Nov.&#10;&#10;Steps&#10;1. Pick the worktop&#10;2. Order the units&#10;3. Book the electrician"></textarea>'
+    if(PEDIT === "new") return '<div class="pedit"><b class="ph">Create your own</b>'
+      + '<div class="pmode" role="group"><button type="button" class="fchip" data-pmode="fields" aria-pressed="' + (PMODE !== "paste") + '">Fill it in</button><button type="button" class="fchip" data-pmode="paste" aria-pressed="' + (PMODE === "paste") + '">Paste everything</button></div>'
+      + (PMODE === "paste"
+        ? '<small class="phint">Paste it all in one go. The first line becomes the title; a numbered list, a list under “Steps” or “To do”, or “STEP 1 – …” sections become tick boxes; lines with web links become Open and Copy buttons. If it doesn\'t pick out your steps, switch to Fill it in.</small><textarea id="pPaste" rows="12" placeholder="Kitchen redo&#10;&#10;Budget 5,000. Builder starts 3 Nov.&#10;&#10;Steps&#10;1. Pick the worktop&#10;2. Order the units&#10;3. Book the electrician"></textarea>'
+        : '<label for="nTitle">Title</label><input id="nTitle" maxlength="120" placeholder="e.g. Kitchen redo">'
+          + '<label for="nDesc">Description <small>– optional: what it\'s about, numbers to hand. Start a line with “- ” for a bullet.</small></label><textarea id="nDesc" rows="5" placeholder="Budget 5,000. Builder starts 3 Nov."></textarea>'
+          + '<label for="nSteps">Steps <small>– one per line; each becomes a tick box. A line with a web link becomes an Open button.</small></label><textarea id="nSteps" rows="7" placeholder="Pick the worktop&#10;Order the units&#10;Book the electrician"></textarea>')
+      + '<details class="aitip"><summary>Got a long message? Let your AI sort it first</summary><p>Copy this into ChatGPT, Claude or any AI, with your message under it. Then tap <b>Paste everything</b> above and paste in what it gives you.</p><p class="aiprompt" id="aiPrompt">' + esc(AIPROMPT) + '</p><button type="button" class="btn" data-copyprompt="1">Copy this</button></details>'
       + groupField("") + '<div class="row"><button type="button" class="btn primary" data-pmake="1">Create it</button><button type="button" class="link quiet" data-pdel="1">Cancel</button></div></div>';
     if(PEDIT) return '<div class="pedit"><label for="pTitle">Title</label><input id="pTitle" maxlength="120" value="' + esc(S.title) + '" placeholder="e.g. Overdue occupancy tax"><label for="pNotes">Notes <small>– what it\'s about, who\'s who, numbers to hand. Start a line with "- " for a bullet.</small></label><textarea id="pNotes" rows="10">' + esc(S.notes) + '</textarea>' + (TABS.active !== "today" ? (S.kind === "links" ? '<label for="pItems">Links <small>– one per line: a name, then the link</small></label><textarea id="pItems" rows="6">' + esc(S.own.map(function(o){ return o.n + " – " + (o.url || ""); }).join("\n")) + "</textarea>"
         : '<label for="pItems">Steps <small>– one per line. Change, add, delete or move lines; ticks stay on steps you keep.</small></label><textarea id="pItems" rows="8">' + esc(S.own.map(function(o){ return o.n; }).join("\n")) + "</textarea>") : "")
@@ -908,6 +922,14 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   var MV = '<span class="mv" role="button" title="Change when" aria-label="Change when"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5h11M10 2.5l3 3-3 3"/><path d="M14 10.5H3M6 7.5l-3 3 3 3"/></svg></span>';
   var DAYB = '<span class="dayb" role="button" title="Move to another day"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span class="lbl">Another day</span></span>';
   var MYDAYB = '<span class="dayb myday" role="button" title="Put this step on your own to-do list"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg><span class="lbl">To my to-do list</span></span>';
+  // the Fill it in boxes; if the steps box is empty but the description holds a list, the steps are picked out of it
+  var NEWDRAFT = {};
+  function keepNew(){ ["nTitle","nDesc","nSteps","pPaste"].forEach(function(id){ if($(id)) NEWDRAFT[id] = $(id).value; }); }
+  function fromFields(){ var t = ($("nTitle").value || "").trim(), d = ($("nDesc").value || "").replace(/\s+$/, ""), st = $("nSteps").value || "";
+    if(!st.trim() && d){ var pr = parsePaste((t ? "" : "") + d, true); return {title:t || pr.title, notes:pr.notes, after:pr.after, steps:pr.steps, links:pr.links, details:pr.details}; }
+    var lines = splitSteps(st), lk = lines.map(linkOf).filter(Boolean);
+    if(lines.length && lk.length === lines.length) return {title:t, notes:d, after:"", steps:[], links:lk, details:{}};
+    return {title:t, notes:d, after:"", steps:lines, links:[], details:{}}; }
   function addStep(){ var el = $("stepIn"); if(!el) return; var ps = splitSteps(el.value), n = 0; ps.forEach(function(x){ if(!S.own.some(function(o){ return o.n === x; })){ S.own.push({n:x, a:"other", b:"any", got:false}); n++; } });
     if(!n) return; save(); render(); toast(n === 1 ? "Step added" : n + " steps added"); var ni = $("stepIn"); if(ni) ni.focus(); }
   function toMyDay(n, d){ var title = S.title; withToday(function(T){ if(d <= iso()){ if(!T.own.some(function(o){ return norm(o.n) === norm(n); })) T.own.push({n:n, a:"other", b:"any", got:false}); } else T.later.push({id:lid(), n:n, d:d, a:"other", b:"any"}); });
@@ -1208,7 +1230,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(e.target.closest("[data-px]")){ e.stopPropagation(); PEDIT = false; render(); return; }
     if(e.target.closest("[data-pdel]")){ e.stopPropagation(); if(PEDIT === "new" && !S.title && !nPicked()){ dropProject(); return; } deleteProject(); return; }
     var gp = e.target.closest("[data-gpick]"); if(gp){ e.stopPropagation(); $("pGroup").value = gp.dataset.gpick; return; }
-    if(e.target.closest("[data-pmake]")){ e.stopPropagation(); curTab().group = ($("pGroup").value || "").trim(); saveTabs(); var pr = parsePaste($("pPaste").value); if(!pr.title && !pr.notes && !pr.steps.length){ toast("Paste or type something first"); return; }
+    var pm = e.target.closest("[data-pmode]"); if(pm){ e.stopPropagation(); keepNew(); PMODE = pm.dataset.pmode; render(); return; }
+    if(e.target.closest("[data-copyprompt]")){ e.stopPropagation(); (navigator.clipboard ? navigator.clipboard.writeText(AIPROMPT) : Promise.reject()).then(function(){ toast("Copied – paste it into your AI, then your message"); }, function(){ prompt("Copy this:", AIPROMPT); }); return; }
+    if(e.target.closest("[data-pmake]")){ e.stopPropagation(); curTab().group = ($("pGroup").value || "").trim(); saveTabs(); var pr = PMODE === "paste" ? parsePaste($("pPaste").value) : fromFields(); if(!pr.title && !pr.notes && !pr.steps.length){ toast("Paste or type something first"); return; }
       S.title = pr.title || "Untitled page"; S.notes = pr.notes; S.after = pr.steps.length ? pr.after : ""; if(!pr.steps.length && pr.after) S.notes = (S.notes + "\n\n" + pr.after).trim(); S.keep = true; S.day = today();
       if(pr.links.length){ S.kind = "links"; S.own = pr.links.map(function(l){ return {n:l.n, url:l.url, a:"other", b:"any", got:false}; }); }
       else S.own = pr.steps.map(function(n){ var d = (pr.details || {})[n]; return d && d.length ? {n:n, d:d, a:"other", b:"any", got:false} : {n:n, a:"other", b:"any", got:false}; });
