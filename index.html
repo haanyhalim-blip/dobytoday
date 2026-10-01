@@ -289,6 +289,7 @@ h2.aisle{margin:0}
 .it[aria-pressed="true"] .box::after{content:"";position:absolute;left:5px;top:1px;width:4px;height:9px;border:solid #fff;border-width:0 2.5px 2.5px 0;transform:rotate(43deg)}
 .it[aria-pressed="true"] .nm{font-weight:700}
 .it.got .nm{text-decoration:line-through;color:var(--muted)}
+.qrow .it.got .nm{text-decoration:none;color:var(--ink)}.qrow .it.got .nm::after{content:"answered"}
 .it.got .nm::after{content:attr(data-done);display:inline-block;margin-left:7px;font-size:.7rem;font-weight:700;color:#fff;background:var(--main);border-radius:99px;padding:1px 7px;vertical-align:middle}
 .it.own{border-style:dashed}
 #shopBox .it:not([aria-pressed="true"]),#shopBox .addrow,#mine .mctl .qc{background:#fff}
@@ -546,6 +547,8 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
 .pastday{padding:6px 0;border-top:1px solid var(--line);font-size:.9rem}
 .pastday b{color:var(--ink)}
 .sharetop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 10px}.sharetop b{color:var(--muted)}#shareX{white-space:nowrap}
+.ansbox{display:block;width:calc(100% - 44px);margin:4px 0 10px 44px;padding:8px 10px;font:inherit;font-size:.95rem;border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);resize:vertical;box-sizing:border-box}
+.ansbox:focus{outline:none;border-color:var(--main)}
 .sharedone{display:flex;justify-content:flex-end;margin-top:12px}
 .shared .shon{display:block;font-size:.85rem;color:var(--muted);margin:8px 0 4px}
 </style>
@@ -628,7 +631,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v70</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v71</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -934,7 +937,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
         ? '<small class="phint">Paste it all in one go. The first line becomes the title; a numbered list, a list under “Steps” or “To do”, or “STEP 1 – …” sections become tick boxes; lines with web links become Open and Copy buttons. If it doesn\'t pick out your steps, switch to Fill it in.</small><textarea id="pPaste" rows="12" placeholder="Kitchen redo&#10;&#10;Budget 5,000. Builder starts 3 Nov.&#10;&#10;Steps&#10;1. Pick the worktop&#10;2. Order the units&#10;3. Book the electrician"></textarea>'
         : '<label for="nTitle">Title</label><input id="nTitle" maxlength="120" placeholder="e.g. Kitchen redo">'
           + '<label for="nDesc">Description <small>– optional: what it\'s about, numbers to hand. Start a line with “- ” for a bullet.</small></label><textarea id="nDesc" rows="5" placeholder="Budget 5,000. Builder starts 3 Nov."></textarea>'
-          + '<label for="nSteps">Steps <small>– one per line; each becomes a tick box. A line with a web link becomes an Open button.</small></label><textarea id="nSteps" rows="7" placeholder="Pick the worktop&#10;Order the units&#10;Book the electrician"></textarea>')
+          + '<label for="nSteps">Steps <small>– one per line; each becomes a tick box. End a line with ? and it gets a box to write the answer in. A line with a web link becomes an Open button.</small></label><textarea id="nSteps" rows="7" placeholder="Pick the worktop&#10;Order the units&#10;Book the electrician"></textarea>')
       + '<details class="aitip"><summary>Got a long message? Let your AI sort it first</summary><p>Copy this into ChatGPT, Claude or any AI, with your message under it. Then tap <b>Paste everything</b> above and paste in what it gives you.</p><p class="aiprompt" id="aiPrompt">' + esc(AIPROMPT) + '</p><button type="button" class="btn" data-copyprompt="1">Copy this</button></details>'
       + groupField("") + '<div class="row"><button type="button" class="btn primary" data-pmake="1">Create it</button><button type="button" class="link quiet" data-pdel="1">Cancel</button></div></div>';
     if(PEDIT) return '<div class="pedit"><label for="pTitle">Title</label><input id="pTitle" maxlength="120" value="' + esc(S.title) + '" placeholder="e.g. Overdue occupancy tax"><label for="pNotes">Notes <small>– what it\'s about, who\'s who, numbers to hand. Start a line with "- " for a bullet.</small></label><textarea id="pNotes" rows="10">' + esc(S.notes) + '</textarea>' + (TABS.active !== "today" ? (S.kind === "links" ? '<label for="pItems">Links <small>– one per line: a name, then the link</small></label><textarea id="pItems" rows="6">' + esc(S.own.map(function(o){ return o.n + " – " + (o.url || ""); }).join("\n")) + "</textarea>"
@@ -948,7 +951,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var lines = []; if(S.title) lines.push(S.title.toUpperCase(), "");
     if(S.keep){   // a page: its steps (or links) in order, with any details under each
       if(S.kind === "links") S.own.forEach(function(o){ lines.push(o.n + ": " + (o.url || "")); });
-      else S.own.forEach(function(o, k){ lines.push((o.got ? "☑ " : "☐ ") + (k + 1) + ". " + o.n); (o.d || []).forEach(function(x){ lines.push("     – " + x); }); });
+      else S.own.forEach(function(o, k){ lines.push((o.got ? "☑ " : "☐ ") + (k + 1) + ". " + o.n); (o.d || []).forEach(function(x){ lines.push("     – " + x); }); if(o.ans) lines.push("     Answer: " + o.ans); });
       return lines.join("\n").trim(); }
     chosen().forEach(function(g){ lines.push(g.label.toUpperCase() + (g.sub ? " – " + g.sub : "")); g.rows.forEach(function(r){ var c = (S.note || {})[r.n]; lines.push((r.got ? "☑ " : "☐ ") + r.n + (c ? " – " + c : "")); }); lines.push(""); });
     return lines.join("\n").trim();
@@ -984,9 +987,13 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function mineBtn(it){ return mineRow(it.n, 'data-n="'+esc(it.n)+'"', !!S.got[it.n], '', bagOf(it)); }
   function mineOwn(o, i){ var r = mineRow(o.n, 'data-own="'+i+'"', !!o.got, ' own', o.b, o.link);
     if(o.d && o.d.length && S.keep) r = r.replace(/<\/div>$/, '<ul class="sdet">' + o.d.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>");
+    if(isQ(o)) r = r.replace(/^<div class="mrow/, '<div class="mrow qrow').replace(/<\/div>$/, '<textarea class="ansbox" data-ans="' + i + '" rows="2" placeholder="Write your answer here" aria-label="Answer">' + esc(o.ans || "") + "</textarea></div>");
     return r; }
+  // a step on a page that ends with a question mark gets a box to write the answer in
+  function isQ(o){ return !!(S.keep && TABS.active !== "today" && S.kind !== "links" && /\?\s*$/.test(o.n || "")); }
   function moreSet(k){ MOREN = k; document.querySelectorAll("#mine .mrow").forEach(function(r){ var b = r.querySelector(".more"), on = !!b && b.dataset.more === k; r.classList.toggle("open", on); if(b) b.setAttribute("aria-expanded", String(on)); }); }
   $("ltabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.tab){ if(PEDIT === "new" && !S.title && !nPicked()){ dropProject(); return; } BACKTOP = true; LASTPG = TABS.active; switchTo(b.dataset.tab); } });
+  $("mine").addEventListener("click", function(e){ if(e.target.closest(".ansbox")) e.stopPropagation(); }, true);
   $("mine").addEventListener("click", function(e){ var b = e.target.closest(".more"); if(!b) return; e.stopPropagation(); moreSet(MOREN === b.dataset.more ? "" : b.dataset.more); }, true);
   document.addEventListener("click", function(e){ if(MOREN && !e.target.closest(".mrow.open")) moreSet(""); });
   function ctlKey(c){ return c.dataset.own !== undefined ? ((S.own[+c.dataset.own] || {}).n || "") : c.dataset.n; }
@@ -1085,7 +1092,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   }
   function openMine(){ var mx = $("mineBody"); if(mx.hidden){ mx.hidden = false; $("mineBtn").setAttribute("aria-expanded", "true"); } var t = $("listSec").getBoundingClientRect().top + window.pageYOffset - 80; window.scrollTo({top: Math.max(0, t), behavior:"smooth"}); }
   function closeMine(){}
-  function render(){
+  function render(){ var fa = document.activeElement, fi = fa && fa.classList && fa.classList.contains("ansbox") ? {i:fa.dataset.ans, s:fa.selectionStart, e:fa.selectionEnd} : null;
+    if(fi && S.own[+fi.i]) S.own[+fi.i].ans = fa.value;
     drawTabs();
     $("mine").innerHTML = draw(true);
     $("out").innerHTML = draw(false);
@@ -1095,6 +1103,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     $("clear").hidden = !p;
     $("paper").textContent = p ? asText() : "Nothing on the list yet";
     $("shareHead").textContent = TABS.active === "today" ? "Share today's list." : "Share this page.";
+    if(fi){ var nb = document.querySelector('#mine .ansbox[data-ans="' + fi.i + '"]'); if(nb){ nb.focus(); try{ nb.setSelectionRange(fi.s, fi.e); }catch(er){} } }
   }
   function unpark(n){ S.removed = S.removed.filter(function(x){ return norm(x.n) !== norm(n); }); }
   function park(r){ S.removed = []; } // removed items are no longer kept – the red symbol removes for good (Undo is in the pop-up)
@@ -1327,6 +1336,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   }
   $("out").addEventListener("click", onListClick); $("mine").addEventListener("click", onListClick);
   $("mine").addEventListener("input", function(e){ var i = e.target.closest(".qc"); if(!i) return; var n = ctlKey(i.closest(".mctl")); if(!n) return; S.note = S.note || {}; var v = i.value.trim(); if(v) S.note[n] = v; else delete S.note[n]; save(); $("paper").textContent = nPicked() ? asText() : "Nothing on the list yet"; });
+  $("mine").addEventListener("input", function(e){ var a = e.target.closest(".ansbox"); if(!a) return; var o = S.own[+a.dataset.ans]; if(!o) return;
+    o.ans = a.value; o.got = !!a.value.trim(); var row = a.closest(".mrow"), it = row && row.querySelector(".it"); if(it){ it.classList.toggle("got", o.got); it.setAttribute("aria-pressed", String(o.got)); } save(); });
   $("mine").addEventListener("keydown", function(e){ if(e.target.closest(".qc") && e.key === "Enter"){ e.preventDefault(); e.target.blur(); } });
   $("q").addEventListener("input", function(){ var was = !!query.trim(), now = !!this.value.trim(); query = this.value; $("qClear").hidden = !now; document.body.classList.toggle("searching", now); render(); if(now && !was){ var st = document.querySelector(".sticky"); window.scrollTo({top: st.offsetTop, behavior: "auto"}); } });
   window.addEventListener("scroll", function(){ $("toTop").hidden = window.pageYOffset < 320; }, {passive:true});
@@ -1380,7 +1391,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function newCode(){ var a = "abcdefghjkmnpqrstuvwxyz23456789", o = "", c = new Uint32Array(12); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(c) : c.forEach(function(_, i){ c[i] = Math.random() * 1e9; }); for(var i = 0; i < 12; i++) o += a[c[i] % a.length]; return "t" + o.slice(1); }
   function shareUrl(){ return "https://dobytoday.com/" + (TABS.active === "today" ? "#l=" + CODE : "#page=" + CODE + (SAVED === CODE ? "" : "&d=" + packPage())); }
   // a page's link also carries the page itself, so it still opens if the online copy hasn't arrived yet
-  function packPage(){ try{ var j = JSON.stringify({title:S.title || "", notes:S.notes || "", after:S.after || "", kind:S.kind || "", keep:true, day:S.day, own:S.own.map(function(o){ var x = {n:o.n, a:"other", b:"any", got:!!o.got}; if(o.d && o.d.length) x.d = o.d; if(o.url) x.url = o.url; return x; })});
+  function packPage(){ try{ var j = JSON.stringify({title:S.title || "", notes:S.notes || "", after:S.after || "", kind:S.kind || "", keep:true, day:S.day, own:S.own.map(function(o){ var x = {n:o.n, a:"other", b:"any", got:!!o.got}; if(o.d && o.d.length) x.d = o.d; if(o.url) x.url = o.url; if(o.ans) x.ans = o.ans; return x; })});
     return btoa(unescape(encodeURIComponent(j))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }catch(e){ return ""; } }
   function unpackPage(){ var m = location.hash.match(/[#&]d=([A-Za-z0-9_-]+)/); if(!m) return null;
     try{ var d = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, "+").replace(/_/g, "/"))))); return d && typeof d === "object" ? d : null; }catch(e){ return null; } }
@@ -1398,6 +1409,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var j = JSON.stringify({picked:d.picked || {}, got:d.got || {}, own:d.own || [], bag:d.bag || {}, removed:d.removed || [], note:d.note || {}, day:d.day || "", later:d.later || [], past:d.past || [], title:d.title || "", notes:d.notes || "", after:d.after || "", keep:!!d.keep, kind:d.kind || ""}); if(j === snapshot()) return;
     var before = snapshot(), lost = here - there;
     try{ localStorage.setItem(BKEY, before); }catch(e){}
+    var fa = document.activeElement, typing = fa && fa.classList && fa.classList.contains("ansbox") ? {n:(S.own[+fa.dataset.ans] || {}).n, v:fa.value} : null;
+    if(typing) (d.own || []).forEach(function(o){ if(o.n === typing.n){ o.ans = typing.v; o.got = !!typing.v.trim(); } });
     applying = true; S.picked = d.picked || {}; S.got = d.got || {}; S.own = d.own || []; S.bag = d.bag || {}; S.removed = d.removed || []; S.note = d.note || {}; S.day = d.day || ""; S.later = d.later || []; S.past = d.past || []; S.title = d.title || ""; S.notes = d.notes || ""; S.after = d.after || ""; S.keep = !!d.keep; S.kind = d.kind || ""; if(d.t) lastT = d.t; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} lastSent = snapshot(); render(); applying = false;
     if(merged){ lastSent = ""; syncPush(true); }
     if(!viaJoin && lost > 0){ toast("List updated from the shared link (" + lost + " fewer)", function(){ try{ var b = JSON.parse(before); applying = true; S.picked = b.picked || {}; S.got = b.got || {}; S.own = b.own || []; S.bag = b.bag || {}; S.removed = b.removed || []; S.note = b.note || {}; S.day = b.day || ""; S.later = b.later || []; S.past = b.past || []; S.title = b.title || ""; S.notes = b.notes || ""; S.after = b.after || ""; S.keep = !!b.keep; S.kind = b.kind || ""; applying = false; save(); render(); lastSent = ""; syncPush(true); }catch(e){} }); } }
