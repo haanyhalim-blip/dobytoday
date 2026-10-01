@@ -424,6 +424,12 @@ h2.dsec .sub{text-transform:none;letter-spacing:0;font-weight:400}
 .jlink{font-size:.85rem;white-space:nowrap;color:var(--main);font-weight:700}
 #mine .rowlink{flex:none;align-self:center;margin:0 4px}
 .past{margin:18px 0 6px;color:var(--muted)}
+.ltabs{display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;padding:2px 0 10px}
+.ltabs::-webkit-scrollbar{display:none}
+.ltabs button{flex:none;border:1.5px solid var(--main);color:var(--main);background:var(--card);border-radius:999px;padding:6px 14px;font:inherit;font-weight:700;font-size:.9rem;white-space:nowrap;max-width:70vw;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.ltabs button[aria-current]{background:var(--main);color:#fff}
+.ltabs .tnew{border-color:var(--line);color:var(--muted)}
+.pedit .danger{color:#c0392b;margin-left:auto}
 .proj{margin:4px 0 14px;padding:14px 16px;border:1px solid var(--line);border-left:5px solid var(--main);border-radius:12px;background:var(--card)}
 .ptitle{margin:0 0 6px;font-size:1.15rem;line-height:1.3}
 .pnotes summary{cursor:pointer;font-weight:800;font-size:.8rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
@@ -484,6 +490,7 @@ h2.dsec .sub{text-transform:none;letter-spacing:0;font-weight:400}
 </div>
 
 <section id="listSec">
+    <nav class="ltabs" id="ltabs" aria-label="My lists"></nav>
     <div class="lhead">
       <div class="ltwrap"><h2 class="ltitle"><button class="sect mine" id="mineBtn" type="button" aria-expanded="true" aria-controls="mineBody"><span class="c"></span>My list</button></h2><span class="htally" id="htally"></span></div>
       <button class="hic hshare" id="mineShare" type="button" aria-expanded="false" aria-controls="shareBox" title="Share this list"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg><span class="cap"></span></button>
@@ -549,7 +556,7 @@ h2.dsec .sub{text-transform:none;letter-spacing:0;font-weight:400}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v49</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v50</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -587,7 +594,20 @@ var RULES = [
 var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, guests in. The whole turnaround in order, from stripping the beds to the check-in message.","items":["Reply to guest messages","Strip the beds","Wash the linen","Empty all the bins","Check for damage","Check the fridge is empty","Clean the bathroom (guest)","Wipe the kitchen (guest)","Vacuum and mop (guest)","Make up the beds","Fresh towels out","Restock toilet roll","Restock toiletries","Restock tea, coffee and milk","Replace anything missing","Plump the cushions","Open the windows for 10 minutes","Check the wifi card is there","Check the smoke alarm","Set the heating","Put out the welcome basket","Take photos of the rooms","Leave the keys in the lockbox","Send the check-in message","Write the guest review"],"slug":"airbnb-changeover"},{"id":"schoolday","name":"School day","blurb":"The morning scramble and the evening reset, so tomorrow morning is calmer than today's.","items":["Make the packed lunches","Fill the water bottles","Pack the school bags","Pack PE kit","School run","Check the school app","Reply to the school email","Pick up from club","Homework","Cook a proper dinner","Reading with the kids","Sign the reading record","Bath and bed","Lay out tomorrow's uniform","Load the dishwasher","Early night"],"slug":"school-day"},{"id":"sunday","name":"Sunday reset","blurb":"An hour or two that makes the whole week easier. Nothing heroic – just the basics done.","items":["Change the bedsheets","Put a wash on","Hang the washing out","Vacuum","Clean the bathroom","Wipe the kitchen surfaces","Clean the fridge out","Food shop","Prep tomorrow's lunch","Plan the week","Check the calendar for the week","Sort the post","Water the plants","Take the bins out","Lay out tomorrow's uniform","Call Dad","Early night"],"slug":"sunday-reset"},{"id":"wfh","name":"Working from home","blurb":"A work day at the kitchen table, with the house jobs slotted around it instead of eating it.","items":["Put a wash on","Plan the week","Clear the inbox","Reply to emails","Prepare for tomorrow's meeting","Update the tracker","Send the invoice","20 minutes' walk","Drink more water","Bring the washing in","Empty the dishwasher","Cook a proper dinner","Tidy the desk","No phone after 9"],"slug":"working-from-home"},{"id":"dinner","name":"Guests for dinner","blurb":"Friends coming round tonight. Everything done before the doorbell, not during.","items":["Food shop","Get cash out","Buy a birthday card","Clean the bathroom","Clean the loo","Vacuum","Tidy the living room","Wipe the kitchen surfaces","Plump the cushions","Empty the dishwasher","Take the bins out","Cook a proper dinner","Load the dishwasher","Send the photos"],"slug":"guests-for-dinner"},{"id":"backhome","name":"First day back from holiday","blurb":"Suitcases in the hall, empty fridge, 400 emails. The order that gets you back to normal by tonight.","items":["Put a wash on","Top-up shop","Empty the car","Water the plants","Sort the post","Check the bank","Pay a bill","Clear the inbox","Check the calendar for the week","Empty the dishwasher","Hang the washing out","Cook a proper dinner","Lay out tomorrow's uniform","Early night","Back up the phone"],"slug":"first-day-back-from-holiday"},{"id":"sahara","named":true,"name":"Sahara’s chores","blurb":"Sahara’s jobs for the day: bed, teeth, table, bedroom, reading and exercise.","items":["Make your bed","Brush teeth (morning)","Have a shower and get ready on your own","Brush teeth (evening)","Set the dining table","Clear the dining table","Get your bag and clothes ready for school","Put your laundry in the washing machine","Tidy your bedroom","Reading","Exercise"],"slug":"saharas-chores"},{"id":"sedona","named":true,"name":"Sedona’s chores","blurb":"Sedona’s jobs for the day: bed, teeth, table, bedroom, school bag, reading and exercise.","items":["Make your bed","Brush teeth (morning)","Have a shower and get ready on your own","Brush teeth (evening)","Set the dining table","Clear the dining table","Get your bag and clothes ready for school","Get your prep planner signed","Put your laundry in the washing machine","Tidy your bedroom","Clean your bedroom","Reading","Exercise"],"slug":"sedonas-chores"},{"id":"sedonamon","named":true,"name":"Sedona’s Monday after school","blurb":"Unpack, spelling practice, TTRS and reading. Choir tomorrow – uniform and spelling folder.","items":["Unpack your school bag","Empty your snack box","Spelling practice","TTRS (Times Tables Rock Stars)","Reading","Pack your bag for tomorrow"],"slug":"sedonas-monday-after-school"},{"id":"sedonatue","named":true,"name":"Sedona’s Tuesday after school","blurb":"Unpack, maths prep, TTRS and reading. Tomorrow is sports kit, hockey and gym (Tween the Lines).","items":["Unpack your school bag","Empty your snack box","Maths prep","TTRS (Times Tables Rock Stars)","Reading","Pack your bag for tomorrow"],"slug":"sedonas-tuesday-after-school"},{"id":"sedonawed","named":true,"name":"Sedona’s Wednesday after school","blurb":"Unpack, english prep, TTRS and reading. Tomorrow is sports kit, with uniform packed to change into.","items":["Unpack your school bag","Empty your snack box","English prep","TTRS (Times Tables Rock Stars)","Reading","Pack your bag for tomorrow"],"slug":"sedonas-wednesday-after-school"},{"id":"sedonathu","named":true,"name":"Sedona’s Thursday after school","blurb":"Unpack, reasoning prep, TTRS and reading. Tomorrow is uniform, no club.","items":["Unpack your school bag","Empty your snack box","Reasoning prep","TTRS (Times Tables Rock Stars)","Reading","Pack your bag for tomorrow"],"slug":"sedonas-thursday-after-school"},{"id":"sedonafri","named":true,"name":"Sedona’s Friday after school","blurb":"Unpack, spelling practice, TTRS and reading. Weekend next – no packing tonight.","items":["Unpack your school bag","Empty your snack box","Spelling practice","TTRS (Times Tables Rock Stars)","Reading"],"slug":"sedonas-friday-after-school"},{"id":"sundaynight","named":true,"name":"Sahara & Sedona – Sunday night","blurb":"Ready for Monday: Sahara’s swimming kit, Sedona’s sports shirt and trainers for netball, and both bags packed.","items":["Pack your swimming kit","Pack your sports shirt and trainers","Pack your bag for tomorrow","Lay out tomorrow's uniform"],"slug":"sahara-and-sedona-sunday-night"},{"id":"haany","named":true,"name":"Haany’s evening jobs","blurb":"Getting the house ready for the morning: kids’ desks, prep planners and the breakfast table.","items":["Prep the kids’ desks","Sign the prep planner","Prep the breakfast table","Wipe the dining table"],"slug":"haanys-evening-jobs"}];
 
 (function(){
-  var KEY = "dobytoday-v1";
+  // ---------- Several lists: "Today" plus your projects, each kept (and shared) separately ----------
+  var LKEY = "dobytoday-tabs", TABS = {active:"today", lists:[{id:"today", name:"Today"}]};
+  try{ var tj = JSON.parse(localStorage.getItem(LKEY) || "null"); if(tj && tj.lists && tj.lists.length) TABS = tj; }catch(e){}
+  if(!TABS.lists.some(function(l){ return l.id === "today"; })) TABS.lists.unshift({id:"today", name:"Today"});
+  if(!TABS.lists.some(function(l){ return l.id === TABS.active; })) TABS.active = "today";
+  function keyOf(id){ return id === "today" ? "dobytoday-v1" : "dobytoday-v1:" + id; }
+  function ckeyOf(id){ return id === "today" ? "dobytoday-code-v1" : "dobytoday-code-v1:" + id; }
+  function saveTabs(){ try{ localStorage.setItem(LKEY, JSON.stringify(TABS)); }catch(e){} }
+  function freshS(){ return {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}, day:"", later:[], past:[], seen:[], title:"", notes:"", keep:false}; }
+  function readList(id){ var d; try{ d = JSON.parse(localStorage.getItem(keyOf(id)) || "{}") || {}; }catch(e){ d = {}; } var f = freshS(); Object.keys(f).forEach(function(k){ if(d[k] == null) d[k] = f[k]; }); return d; }
+  // Do something to the Today list even while a project is open
+  function withToday(fn){ if(TABS.active === "today"){ fn(S); save(); render(); return; }
+    var d = readList("today"); fn(d); try{ localStorage.setItem(keyOf("today"), JSON.stringify(d)); }catch(e){} if(typeof acctPush === "function") acctPush(); render(); }
+  var KEY = keyOf(TABS.active);
   var S = {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}, day:"", later:[], past:[], seen:[], title:"", notes:"", keep:false};
   function today(){ var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
   var query = "";
@@ -657,7 +677,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function takeIn(x, d){ if(!x || !x.n) return; d = d || x.d || iso(); markSeen(x.i);
     if(d <= iso()){ if(!S.own.some(function(o){ return norm(o.n) === norm(x.n); })) S.own.push({n:x.n, a:"other", b:"any", got:false, link:x.l || undefined}); }
     else addLater(x.n, d, {a:"other", b:"any", link:x.l || undefined}); }
-  function inboxFromLink(){ var m = location.hash.match(/^#add=([A-Za-z0-9_-]+)/); if(!m) return;
+  function inboxFromLink(){ var m = location.hash.match(/^#add=([A-Za-z0-9_-]+)/); if(!m) return; if(TABS.active !== "today") switchTo("today");
     var x; try{ x = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, "+").replace(/_/g, "/"))))); }catch(e){ x = null; }
     history.replaceState(null, "", location.pathname + location.search); if(!x || !x.n) return;
     var b = $("dayBox"); if(seenIn(x.i)){ toast("Already on your list: " + x.n); return; }
@@ -675,14 +695,29 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function projFromLink(){ var m = location.hash.match(/^#proj=([A-Za-z0-9_-]+)/); if(!m) return;
     var x; try{ x = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, "+").replace(/_/g, "/"))))); }catch(e){ x = null; }
     history.replaceState(null, "", location.pathname + location.search); if(!x || !(x.t || (x.s || []).length)) return;
-    var start = function(){ try{ localStorage.setItem("dobytoday-backup-v1", JSON.stringify(S)); }catch(e){}
-      S = {picked:{}, got:{}, own:(x.s || []).map(function(n){ return {n:String(n), a:"other", b:"any", got:false}; }), bag:{}, removed:[], note:{}, day:today(), later:S.later || [], past:S.past || [], seen:S.seen || [], title:x.t || "", notes:x.n || "", keep:true};
+    var start = function(){ switchTo(newTab(x.t || "Project"));
+      S.own = (x.s || []).map(function(n){ return {n:String(n), a:"other", b:"any", got:false}; }); S.title = x.t || ""; S.notes = x.n || ""; S.keep = true; S.day = today();
       save(); render(); openMine(); toast("Project ready – tap the share symbol to share it"); };
-    if(!nPicked() && !S.title){ start(); return; }
+    if(true){ start(); return; }
     var b = $("dayBox"); b.innerHTML = '<b>Start “' + esc(x.t || "this project") + '”?</b> It takes the place of the list you have now. <button class="pillb" type="button" data-pjgo="1">Start it</button> <button class="link quiet" type="button" data-pjno="1">No thanks</button>';
     b.hidden = false; b.classList.add("inbox");
     b.querySelector("[data-pjgo]").addEventListener("click", function(){ b.hidden = true; b.classList.remove("inbox"); start(); });
     b.querySelector("[data-pjno]").addEventListener("click", function(){ b.hidden = true; b.classList.remove("inbox"); }); }
+  function switchTo(id, again){ if(id === TABS.active && !again) return;
+    if(chan){ try{ chan.unsubscribe(); }catch(e){} chan = null; } clearTimeout(pushT);
+    TABS.active = id; saveTabs(); KEY = keyOf(id); CKEY = ckeyOf(id); S = freshS(); MOREN = ""; PEDIT = false; LEFT = 0; CARRY = []; load();
+    try{ CODE = localStorage.getItem(CKEY) || ""; }catch(e){ CODE = ""; } lastSent = ""; lastT = 0;
+    history.replaceState(null, "", CODE ? "#l=" + CODE : location.pathname + location.search);
+    showShared(); render(); dayBanner();
+    if(CODE) rpc("get_list", {code:CODE}).then(function(d){ if(d) applyRemote(d); }).catch(function(){}).then(listen); }
+  function newTab(name){ var id = "p" + lid(); TABS.lists.push({id:id, name:name || "New project"}); saveTabs(); return id; }
+  function tabName(l){ if(l.id === TABS.active) return S.title || (l.id === "today" ? "Today" : l.name || "Untitled"); return l.name || (l.id === "today" ? "Today" : "Untitled"); }
+  function drawTabs(){ var el = $("ltabs"); if(!el) return; var cur = TABS.lists.filter(function(l){ return l.id === TABS.active; })[0];
+    if(cur && cur.id !== "today" && S.title && cur.name !== S.title){ cur.name = S.title; saveTabs(); }
+    el.innerHTML = TABS.lists.map(function(l){ return '<button type="button" data-tab="' + esc(l.id) + '"' + (l.id === TABS.active ? ' aria-current="page"' : "") + ">" + esc(tabName(l)) + "</button>"; }).join("") + '<button type="button" class="tnew" data-newproj="1">+ Project</button>'; }
+  function newProject(){ var id = newTab("New project"); switchTo(id); S.keep = true; PEDIT = true; save(); render(); var ti = $("pTitle"); if(ti) ti.focus(); }
+  function deleteProject(){ var id = TABS.active; if(id === "today") return; if(!confirm("Delete “" + (S.title || "this project") + "”" + (CODE ? " from this phone? The shared link keeps working for anyone else." : "?"))) return;
+    try{ localStorage.removeItem(keyOf(id)); localStorage.removeItem(ckeyOf(id)); }catch(e){} TABS.lists = TABS.lists.filter(function(l){ return l.id !== id; }); saveTabs(); switchTo("today"); if(typeof acctPush === "function") acctPush(); toast("Project deleted"); }
   function dayBanner(){ var b = $("dayBox"); if(!LEFT){ b.hidden = true; return; }
     b.innerHTML = '<b>New day.</b> ' + LEFT + ' job' + (LEFT === 1 ? '' : 's') + ' from yesterday ' + (LEFT === 1 ? 'was not' : 'were not') + ' done. <button class="link" id="dayKeep" type="button">Keep them on today</button> · <button class="link quiet" id="dayDrop" type="button">Let them go</button>'; b.hidden = false;
     $("dayKeep").addEventListener("click", function(){ LEFT = 0; b.hidden = true; toast("Carried over to today"); });
@@ -714,7 +749,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function projHTML(){ var has = S.title || S.notes;
     if(PEDIT) return '<div class="pedit"><label for="pTitle">Title</label><input id="pTitle" maxlength="120" value="' + esc(S.title) + '" placeholder="e.g. Overdue occupancy tax"><label for="pNotes">Notes <small>– what it\'s about, who\'s who, numbers to hand. Start a line with "- " for a bullet.</small></label><textarea id="pNotes" rows="10">' + esc(S.notes) + '</textarea>'
       + '<label class="pkeep"><input type="checkbox" id="pKeep"' + (S.keep || !has ? " checked" : "") + '> A project – steps stay in the order I add them, and ticked ones stay ticked until I clear the list</label>'
-      + '<div class="row"><button type="button" class="btn primary" data-psave="1">Save</button><button type="button" class="link quiet" data-px="1">Cancel</button></div></div>';
+      + '<div class="row"><button type="button" class="btn primary" data-psave="1">Save</button><button type="button" class="link quiet" data-px="1">Cancel</button>' + (TABS.active !== "today" ? '<button type="button" class="link danger" data-pdel="1">Delete this project</button>' : "") + '</div></div>';
     if(!has) return "";
     return '<div class="proj">' + (S.title ? '<h3 class="ptitle">' + esc(S.title) + "</h3>" : "") + (S.notes ? '<details class="pnotes"' + (NOPEN ? " open" : "") + '><summary>Notes</summary><div class="pbody">' + fmtNotes(S.notes) + "</div></details>" : "") + '<button type="button" class="link quiet pedb" data-pedit="1">✎ Edit title and notes</button></div>'; }
   function asText(){
@@ -730,8 +765,11 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
 
   var MV = '<span class="mv" role="button" title="Change when" aria-label="Change when"><svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M2 5.5h11M10 2.5l3 3-3 3"/><path d="M14 10.5H3M6 7.5l-3 3 3 3"/></svg></span>';
   var DAYB = '<span class="dayb" role="button" title="Move to another day"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2"/><path d="M3.5 10h17M8 3v4M16 3v4"/></svg><span class="lbl">Another day</span></span>';
+  var MYDAYB = '<span class="dayb myday" role="button" title="Put this step on your own to-do list"><svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg><span class="lbl">To my to-do list</span></span>';
+  function toMyDay(n, d){ var title = S.title; withToday(function(T){ if(d <= iso()){ if(!T.own.some(function(o){ return norm(o.n) === norm(n); })) T.own.push({n:n, a:"other", b:"any", got:false}); } else T.later.push({id:lid(), n:n, d:d, a:"other", b:"any"}); });
+    MOREN = ""; render(); toast("On your " + (d <= iso() ? "Today" : dayLabel(d)) + " list" + (title ? " (from " + title + ")" : "")); }
   function noteTag(n){ var c = (S.note || {})[n]; return c ? '<span class="qty">'+esc(c)+'</span>' : ''; }
-  function ctl(n, ref){ var c = (S.note || {})[n] || ""; return '<div class="mctl" '+ref+'><span class="cmt'+(c ? ' has' : '')+'" role="button" title="Add a comment" aria-label="Add a comment"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span><input class="qc" type="text" maxlength="60" value="'+esc(c)+'" aria-label="Comment" placeholder="Add a comment">'+MV.replace('</svg></span>', '</svg><span class="lbl">Change time</span></span>')+DAYB+RMV.replace('</svg></span>', '</svg><span class="lbl">Remove</span></span>')+'</div>'; }
+  function ctl(n, ref){ var c = (S.note || {})[n] || ""; return '<div class="mctl" '+ref+'><span class="cmt'+(c ? ' has' : '')+'" role="button" title="Add a comment" aria-label="Add a comment"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span><input class="qc" type="text" maxlength="60" value="'+esc(c)+'" aria-label="Comment" placeholder="Add a comment">'+MV.replace('</svg></span>', '</svg><span class="lbl">Change time</span></span>')+(S.keep && TABS.active !== "today" ? MYDAYB : DAYB)+RMV.replace('</svg></span>', '</svg><span class="lbl">Remove</span></span>')+'</div>'; }
   // One tidy row per item: the tick box, the name, and a "⋯" button that opens everything else
   var MOREN = "";
   function moreBtn(k){ return '<button type="button" class="more" data-more="'+esc(k)+'" aria-label="More options" aria-expanded="'+(MOREN === k)+'"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>'; }
@@ -739,6 +777,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function mineBtn(it){ return mineRow(it.n, 'data-n="'+esc(it.n)+'"', !!S.got[it.n], '', bagOf(it)); }
   function mineOwn(o, i){ return mineRow(o.n, 'data-own="'+i+'"', !!o.got, ' own', o.b, o.link); }
   function moreSet(k){ MOREN = k; document.querySelectorAll("#mine .mrow").forEach(function(r){ var b = r.querySelector(".more"), on = !!b && b.dataset.more === k; r.classList.toggle("open", on); if(b) b.setAttribute("aria-expanded", String(on)); }); }
+  $("ltabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.newproj){ newProject(); return; } if(b.dataset.tab) switchTo(b.dataset.tab); });
   $("mine").addEventListener("click", function(e){ var b = e.target.closest(".more"); if(!b) return; e.stopPropagation(); moreSet(MOREN === b.dataset.more ? "" : b.dataset.more); }, true);
   document.addEventListener("click", function(e){ if(MOREN && !e.target.closest(".mrow.open")) moreSet(""); });
   function ctlKey(c){ return c.dataset.own !== undefined ? ((S.own[+c.dataset.own] || {}).n || "") : c.dataset.n; }
@@ -805,6 +844,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function openMine(){ var mx = $("mineBody"); if(mx.hidden){ mx.hidden = false; $("mineBtn").setAttribute("aria-expanded", "true"); } var t = $("listSec").getBoundingClientRect().top + window.pageYOffset - 80; window.scrollTo({top: Math.max(0, t), behavior:"smooth"}); }
   function closeMine(){}
   function render(){
+    drawTabs();
     $("mine").innerHTML = draw(true);
     $("out").innerHTML = draw(false);
     var p = nPicked();
@@ -971,6 +1011,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       if(e.target.closest("[data-mvday]")){ moveLater(rb, isoIn(1)); return; }
       if(e.target.closest("[data-mvx]")){ render(); return; }
       if(e.target.closest(".dayin")) return;
+      if(e.target.closest("[data-myday]")){ toMyDay(ctlKey(mc), e.target.closest("[data-myday]").dataset.myday); return; }
+      if(e.target.closest(".myday")){ mc.classList.add("asking"); mc.innerHTML = '<span class="dayask">To my to-do list for <button type="button" class="pillb" data-myday="' + iso() + '">Today</button><button type="button" class="pillb" data-myday="' + isoIn(1) + '">Tomorrow</button><input type="date" class="dayin" min="' + isoIn(1) + '" aria-label="Pick a day"><button type="button" class="link quiet" data-mvx="1">Cancel</button></span>';
+        var nm2 = ctlKey(mc); mc.querySelector(".dayin").addEventListener("change", function(){ if(this.value) toMyDay(nm2, this.value); }); return; }
       if(e.target.closest(".dayb")){ mc.classList.add("asking"); mc.innerHTML = '<span class="dayask">Move to <button type="button" class="pillb" data-mvday="1">Tomorrow</button><input type="date" class="dayin" min="' + isoIn(1) + '" aria-label="Pick a day"><button type="button" class="link quiet" data-mvx="1">Cancel</button></span>';
         mc.querySelector(".dayin").addEventListener("change", function(){ moveLater(rb, this.value); }); return; }
       if(e.target.closest(".mv")){ var mn = ctlKey(mc); if(mn){ askBag([mn], true); $("sortbox").scrollIntoView({block:"center"}); } return; }
@@ -983,6 +1026,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(e.target.closest(".jlink") || e.target.closest(".past")) return;
     if(e.target.closest("[data-pedit]")){ e.stopPropagation(); PEDIT = true; render(); var ti = $("pTitle"); if(ti) ti.focus(); return; }
     if(e.target.closest("[data-px]")){ e.stopPropagation(); PEDIT = false; render(); return; }
+    if(e.target.closest("[data-pdel]")){ e.stopPropagation(); deleteProject(); return; }
     if(e.target.closest("[data-psave]")){ e.stopPropagation(); S.title = $("pTitle").value.trim(); S.notes = $("pNotes").value.replace(/\s+$/, ""); var kp = $("pKeep").checked;
       if(kp && !S.keep){ S.keep = true; S.got = S.got || {}; } else if(!kp) S.keep = false; PEDIT = false; save(); render(); toast("Saved"); return; }
     if(e.target.closest(".pnotes summary")){ setTimeout(function(){ var dn = document.querySelector("#mine .pnotes"); NOPEN = !!(dn && dn.open); }, 0); return; }
@@ -1056,7 +1100,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   // packing codes and shopping codes never collide, so the two sites can share one table.
   var SB_URL = "https://nlbeqaoffratriysazrx.supabase.co";
   var SB_KEY = "sb_publishable_HjyFCCwqTjqeAIV1bh28ww_li-Rw7CZ";
-  var CKEY = "dobytoday-code-v1", CODE = "", chan = null, pushT = null, lastSent = "", applying = false;
+  var CKEY = ckeyOf(TABS.active), CODE = "", chan = null, pushT = null, lastSent = "", applying = false;
   function sbHeaders(){ return {"Content-Type":"application/json", "apikey":SB_KEY, "Authorization":"Bearer " + SB_KEY}; }
   function rpc(fn, body){ return fetch(SB_URL + "/rest/v1/rpc/" + fn, {method:"POST", headers:sbHeaders(), body:JSON.stringify(body)}).then(function(r){ if(!r.ok) throw new Error("rpc " + r.status); return r.text(); }).then(function(t){ return t ? JSON.parse(t) : null; }); }
   function newCode(){ var a = "abcdefghjkmnpqrstuvwxyz23456789", o = "", c = new Uint32Array(12); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(c) : c.forEach(function(_, i){ c[i] = Math.random() * 1e9; }); for(var i = 0; i < 12; i++) o += a[c[i] % a.length]; return "t" + o.slice(1); }
@@ -1102,12 +1146,20 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   window.addEventListener("focus", syncPull);
   // While the page is open on a shared list, check for the other person's changes every few seconds
   setInterval(function(){ if(CODE && !document.hidden) syncPull(); }, 4000);
-  (function initShare(){
-    var m = location.hash.match(/[#&]l=([a-z0-9]{10,14})/); if(m){ CODE = m[1]; try{ localStorage.setItem(CKEY, CODE); }catch(e){} }
+  function joinFromHash(later){
+    var m = location.hash.match(/[#&]l=([a-z0-9]{10,14})/); if(later && (!m || m[1] === CODE)) return;
+    if(m){ var code = m[1], have = null; TABS.lists.forEach(function(l){ try{ if(localStorage.getItem(ckeyOf(l.id)) === code) have = l.id; }catch(e){} });
+      if(have && have !== TABS.active){ switchTo(have); return; }
+      if(!have){ rpc("get_list", {code:code}).then(function(d){ var t0 = readList("today"), todayFree = !countOf(t0) && !(function(){ try{ return localStorage.getItem(ckeyOf("today")); }catch(e){ return ""; } })();
+          if(d && (d.keep || d.title) || !todayFree){ switchTo(newTab((d && d.title) || "Shared list")); } else if(TABS.active !== "today") switchTo("today");
+          CODE = code; try{ localStorage.setItem(CKEY, CODE); }catch(e){} history.replaceState(null, "", "#l=" + CODE); showShared();
+          if(d) applyRemote(d, true); listen(); render(); }).catch(function(){}); return; }
+      CODE = code; }
     else { try{ CODE = localStorage.getItem(CKEY) || ""; }catch(e){} }
     if(!CODE) return; showShared();
     rpc("get_list", {code:CODE}).then(function(d){ if(d) applyRemote(d, !!m); else if(countOf(S)){ lastSent = ""; syncPush(true); } }).catch(function(){}).then(function(){ listen(); });
-  })();
+  }
+  joinFromHash(); window.addEventListener("hashchange", function(){ joinFromHash(true); });
 
   // Feedback and suggestions go to the same Formspree form as ListbyAisle; the page URL says which site it came from.
   var FEEDBACK_URL = "https://formspree.io/f/meaqbeqq";
@@ -1226,21 +1278,25 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function setLocalT(t){ try{ localStorage.setItem(ATKEY, String(t)); }catch(e){} }
   function acctState(t){ var el = $("acState"); if(el) el.textContent = t; }
   function acctPush(){ if(aApplying) return; setLocalT(Date.now()); if(!AUSER || !asb) return; clearTimeout(apushT); apushT = setTimeout(function(){
-    var raw; try{ raw = JSON.parse(localStorage.getItem(KEY) || "{}"); }catch(e){ raw = {}; }
-    acctState("Saving…"); asb.rpc("hlt_save", {p_site:SITE, p_data:{s:raw, t:localT(), m:myLoad()}}).then(function(res){ acctState(res.error ? "Saved on this phone – it'll save to your account when you're connected" : "✓ Saved to your account"); }); }, 1500); }
+    var raw = readList("today"), L = TABS.lists.filter(function(l){ return l.id !== "today"; }).map(function(l){ var c = ""; try{ c = localStorage.getItem(ckeyOf(l.id)) || ""; }catch(e){} return {id:l.id, name:l.name, s:readList(l.id), c:c}; });
+    acctState("Saving…"); asb.rpc("hlt_save", {p_site:SITE, p_data:{s:raw, L:L, t:localT(), m:myLoad()}}).then(function(res){ acctState(res.error ? "Saved on this phone – it'll save to your account when you're connected" : "✓ Saved to your account"); }); }, 1500); }
   function acctPull(first){ if(!AUSER || !asb) return;
     asb.rpc("hlt_get", {p_site:SITE}).then(function(res){ if(res.error) return acctState("Saved on this phone – it'll save to your account when you're connected");
       var d = res.data, lt = localT();
-      var blank = !nPicked() && !(typeof myLoad === "function" && myLoad().length); // a new phone with nothing on it never overwrites your account
+      var blank = !nPicked() && TABS.lists.length === 1 && !(typeof myLoad === "function" && myLoad().length); // a new phone with nothing on it never overwrites your account
       if(d && d.s && (first || (blank && !(S.later || []).length) || (d.t || 0) > lt)){ // just signed in: the list saved in your account wins
-        aApplying = true; try{ localStorage.setItem(KEY, JSON.stringify(d.s)); }catch(e){}
-        if(d.m){ var mine0 = myLoad(), ids = {}; d.m.forEach(function(x){ ids[x.id] = 1; }); MYL = first ? d.m.concat(mine0.filter(function(x){ return !ids[x.id]; })) : d.m; try{ localStorage.setItem(MKEY, JSON.stringify(MYL)); }catch(e){} drawMy(); } setLocalT(d.t || Date.now()); load(); render(); aApplying = false; acctState("✓ Saved to your account"); }
+        aApplying = true; try{ localStorage.setItem(keyOf("today"), JSON.stringify(d.s)); }catch(e){}
+        (d.L || []).forEach(function(l){ if(!l || !l.id) return; try{ localStorage.setItem(keyOf(l.id), JSON.stringify(l.s || {})); if(l.c) localStorage.setItem(ckeyOf(l.id), l.c); }catch(e){}
+          var have = TABS.lists.filter(function(x){ return x.id === l.id; })[0]; if(have) have.name = l.name || have.name; else TABS.lists.push({id:l.id, name:l.name || "Project"}); }); saveTabs();
+        if(d.m){ var mine0 = myLoad(), ids = {}; d.m.forEach(function(x){ ids[x.id] = 1; }); MYL = first ? d.m.concat(mine0.filter(function(x){ return !ids[x.id]; })) : d.m; try{ localStorage.setItem(MKEY, JSON.stringify(MYL)); }catch(e){} drawMy(); } setLocalT(d.t || Date.now()); switchTo(TABS.active, true); aApplying = false; acctState("✓ Saved to your account"); }
       else if(!d || lt > (d.t || 0)){ acctPush(); }
       else acctState("✓ Saved to your account"); inboxFromSites(); }); }
   function inboxFromSites(){ if(!AUSER || !asb) return; [["listbyaisle","ListbyAisle"],["packbybag","PackbyBag"]].forEach(function(st){
     asb.rpc("hlt_get", {p_site:st[0]}).then(function(res){ var o = res && res.data && res.data.o; if(!Array.isArray(o)) return; var got = [];
-      o.forEach(function(x){ if(x && x.i && x.n && !seenIn(x.i)){ takeIn(x); got.push(x.n); } });
-      if(got.length){ save(); render(); toast("From " + st[1] + ": " + got.join(", ")); } }); }); }
+      withToday(function(T){ o.forEach(function(x){ if(x && x.i && x.n && (T.seen || []).indexOf(x.i) < 0){ T.seen = [x.i].concat(T.seen || []).slice(0, 200); var dd = x.d && x.d > iso() ? x.d : iso();
+          if(dd <= iso()){ if(!T.own.some(function(o2){ return norm(o2.n) === norm(x.n); })) T.own.push({n:x.n, a:"other", b:"any", got:false, link:x.l || undefined}); }
+          else T.later.push({id:lid(), n:x.n, d:dd, a:"other", b:"any", link:x.l || undefined}); got.push(x.n); } }); });
+      if(got.length) toast("From " + st[1] + ": " + got.join(", ")); }); }); }
   function acctUI(){ var b = $("acctBtn"); b.textContent = AUSER ? "✓ Signed in" : "Sign in"; b.classList.toggle("on", !!AUSER);
     $("acOut").hidden = !!AUSER; $("acIn").hidden = !AUSER; if(AUSER) $("acWho").textContent = AUSER.email || ""; }
   function acctOpen(){ $("acct").hidden = false; $("acStep1").hidden = false; $("acStep2").hidden = true; acctUI(); if(!AUSER) setTimeout(function(){ $("acEmail").focus(); }, 50); }
