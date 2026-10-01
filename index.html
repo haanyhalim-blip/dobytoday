@@ -547,6 +547,15 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
 .pastday{padding:6px 0;border-top:1px solid var(--line);font-size:.9rem}
 .pastday b{color:var(--ink)}
 .sharetop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 10px}.sharetop b{color:var(--muted)}#shareX{white-space:nowrap}
+.upds{list-style:none;margin:4px 0 6px 44px;padding:0}
+.upds li{margin:0 0 6px;padding:7px 10px;background:#f6efe9;border-left:3px solid var(--main);border-radius:6px;font-size:.92rem;line-height:1.4}
+.upds .upd,.uprow .upd{color:var(--muted);font-size:.85rem}
+.updel{border:0;background:none;color:var(--faint);font-size:1.05rem;cursor:pointer;float:right;padding:0 2px;line-height:1}
+.upadd{display:block;margin:0 0 8px 44px;border:0;background:none;padding:2px 0;color:var(--main);font:inherit;font-size:.88rem;font-weight:600;cursor:pointer}
+.upform{margin:4px 0 10px 44px}.uprow{display:flex;gap:10px;align-items:center;margin-bottom:6px}
+.upname{flex:0 1 160px;padding:6px 9px;font:inherit;font-size:.92rem;border:1.5px solid var(--line);border-radius:8px}
+.upin{display:block;width:100%;box-sizing:border-box;padding:8px 10px;font:inherit;font-size:.95rem;border:1.5px solid var(--line);border-radius:8px;resize:vertical}
+.upname:focus,.upin:focus{outline:none;border-color:var(--main)}
 .ansbox{display:block;width:calc(100% - 44px);margin:4px 0 10px 44px;padding:8px 10px;font:inherit;font-size:.95rem;border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink);resize:vertical;box-sizing:border-box}
 .ansbox:focus{outline:none;border-color:var(--main)}
 .sharedone{display:flex;justify-content:flex-end;margin-top:12px}
@@ -631,7 +640,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v71</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v72</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -951,7 +960,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var lines = []; if(S.title) lines.push(S.title.toUpperCase(), "");
     if(S.keep){   // a page: its steps (or links) in order, with any details under each
       if(S.kind === "links") S.own.forEach(function(o){ lines.push(o.n + ": " + (o.url || "")); });
-      else S.own.forEach(function(o, k){ lines.push((o.got ? "☑ " : "☐ ") + (k + 1) + ". " + o.n); (o.d || []).forEach(function(x){ lines.push("     – " + x); }); if(o.ans) lines.push("     Answer: " + o.ans); });
+      else S.own.forEach(function(o, k){ lines.push((o.got ? "☑ " : "☐ ") + (k + 1) + ". " + o.n); (o.d || []).forEach(function(x){ lines.push("     – " + x); }); if(o.ans) lines.push("     Answer: " + o.ans); (o.up || []).forEach(function(u){ lines.push("     Update – " + (u.w ? u.w + ", " : "") + upDate(u.d) + ": " + u.t); }); });
       return lines.join("\n").trim(); }
     chosen().forEach(function(g){ lines.push(g.label.toUpperCase() + (g.sub ? " – " + g.sub : "")); g.rows.forEach(function(r){ var c = (S.note || {})[r.n]; lines.push((r.got ? "☑ " : "☐ ") + r.n + (c ? " – " + c : "")); }); lines.push(""); });
     return lines.join("\n").trim();
@@ -987,13 +996,31 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function mineBtn(it){ return mineRow(it.n, 'data-n="'+esc(it.n)+'"', !!S.got[it.n], '', bagOf(it)); }
   function mineOwn(o, i){ var r = mineRow(o.n, 'data-own="'+i+'"', !!o.got, ' own', o.b, o.link);
     if(o.d && o.d.length && S.keep) r = r.replace(/<\/div>$/, '<ul class="sdet">' + o.d.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>");
+    if(S.keep && TABS.active !== "today" && S.kind !== "links") r = r.replace(/<\/div>$/, updHTML(o, i) + "</div>");
     if(isQ(o)) r = r.replace(/^<div class="mrow/, '<div class="mrow qrow').replace(/<\/div>$/, '<textarea class="ansbox" data-ans="' + i + '" rows="2" placeholder="Write your answer here" aria-label="Answer">' + esc(o.ans || "") + "</textarea></div>");
     return r; }
+  // Updates on a step: who, when, and what's happened – kept on the card for everyone it's shared with
+  var UPDN = null, UPDDRAFT = "";
+  function myName(){ try{ return localStorage.getItem("dobytoday-name") || ""; }catch(e){ return ""; } }
+  function upDate(d){ var x = new Date(d + "T12:00:00"), m = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][x.getMonth()]; return x.getDate() + " " + m + (x.getFullYear() !== new Date().getFullYear() ? " " + x.getFullYear() : ""); }
+  function updHTML(o, i){ var h = "";
+    if(o.up && o.up.length) h += '<ul class="upds">' + o.up.map(function(u, k){ return '<li><b>' + esc(u.w || "Someone") + "</b> <span class=\"upd\">· " + esc(upDate(u.d)) + '</span> <button type="button" class="updel" data-updel="' + i + ":" + k + '" aria-label="Delete this update">×</button><br>' + esc(u.t) + "</li>"; }).join("") + "</ul>";
+    if(UPDN === o.n) h += '<div class="upform"><div class="uprow"><input class="upname" maxlength="30" placeholder="Your name" value="' + esc(myName()) + '" aria-label="Your name"><span class="upd">' + esc(upDate(iso())) + '</span></div><textarea class="upin" rows="3" placeholder="What\'s happened?" aria-label="Update">' + esc(UPDDRAFT) + '</textarea><div class="row"><button type="button" class="btn primary" data-upsave="' + i + '">Save update</button><button type="button" class="link quiet" data-upx="1">Cancel</button></div></div>';
+    else h += '<button type="button" class="upadd" data-upadd="' + i + '">+ Add update</button>';
+    return h; }
   // a step on a page that ends with a question mark gets a box to write the answer in
   function isQ(o){ return !!(S.keep && TABS.active !== "today" && S.kind !== "links" && /\?\s*$/.test(o.n || "")); }
   function moreSet(k){ MOREN = k; document.querySelectorAll("#mine .mrow").forEach(function(r){ var b = r.querySelector(".more"), on = !!b && b.dataset.more === k; r.classList.toggle("open", on); if(b) b.setAttribute("aria-expanded", String(on)); }); }
   $("ltabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.tab){ if(PEDIT === "new" && !S.title && !nPicked()){ dropProject(); return; } BACKTOP = true; LASTPG = TABS.active; switchTo(b.dataset.tab); } });
-  $("mine").addEventListener("click", function(e){ if(e.target.closest(".ansbox")) e.stopPropagation(); }, true);
+  $("mine").addEventListener("click", function(e){ if(e.target.closest(".ansbox") || e.target.closest(".upform input, .upform textarea")){ e.stopPropagation(); return; }
+    var ua = e.target.closest("[data-upadd]"); if(ua){ e.stopPropagation(); var o = S.own[+ua.dataset.upadd]; if(!o) return; UPDN = o.n; UPDDRAFT = ""; render(); var f = document.querySelector("#mine .upform " + (myName() ? ".upin" : ".upname")); if(f) f.focus(); return; }
+    if(e.target.closest("[data-upx]")){ e.stopPropagation(); UPDN = null; UPDDRAFT = ""; render(); return; }
+    var us = e.target.closest("[data-upsave]"); if(us){ e.stopPropagation(); var o2 = S.own[+us.dataset.upsave], t = (document.querySelector("#mine .upin") || {}).value || "", w = ((document.querySelector("#mine .upname") || {}).value || "").trim();
+      if(!o2) return; if(!t.trim()){ toast("Type the update first"); return; } try{ if(w) localStorage.setItem("dobytoday-name", w); }catch(er){}
+      o2.up = (o2.up || []).concat([{w:w, d:iso(), t:t.trim()}]); UPDN = null; UPDDRAFT = ""; save(); render(); toast("Update added"); return; }
+    var ud = e.target.closest("[data-updel]"); if(ud){ e.stopPropagation(); var pr = ud.dataset.updel.split(":"), o3 = S.own[+pr[0]]; if(!o3 || !o3.up) return; var u = o3.up[+pr[1]]; if(!u || !confirm("Delete this update?")) return;
+      o3.up.splice(+pr[1], 1); save(); render(); toast("Update deleted", function(){ o3.up.splice(+pr[1], 0, u); save(); render(); }); return; } }, true);
+  $("mine").addEventListener("input", function(e){ if(e.target.classList.contains("upin")) UPDDRAFT = e.target.value; });
   $("mine").addEventListener("click", function(e){ var b = e.target.closest(".more"); if(!b) return; e.stopPropagation(); moreSet(MOREN === b.dataset.more ? "" : b.dataset.more); }, true);
   document.addEventListener("click", function(e){ if(MOREN && !e.target.closest(".mrow.open")) moreSet(""); });
   function ctlKey(c){ return c.dataset.own !== undefined ? ((S.own[+c.dataset.own] || {}).n || "") : c.dataset.n; }
@@ -1093,6 +1120,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function openMine(){ var mx = $("mineBody"); if(mx.hidden){ mx.hidden = false; $("mineBtn").setAttribute("aria-expanded", "true"); } var t = $("listSec").getBoundingClientRect().top + window.pageYOffset - 80; window.scrollTo({top: Math.max(0, t), behavior:"smooth"}); }
   function closeMine(){}
   function render(){ var fa = document.activeElement, fi = fa && fa.classList && fa.classList.contains("ansbox") ? {i:fa.dataset.ans, s:fa.selectionStart, e:fa.selectionEnd} : null;
+    var fu = fa && fa.classList && (fa.classList.contains("upin") || fa.classList.contains("upname")) ? {c:fa.className, v:fa.value, s:fa.selectionStart, e:fa.selectionEnd} : null;
     if(fi && S.own[+fi.i]) S.own[+fi.i].ans = fa.value;
     drawTabs();
     $("mine").innerHTML = draw(true);
@@ -1103,6 +1131,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     $("clear").hidden = !p;
     $("paper").textContent = p ? asText() : "Nothing on the list yet";
     $("shareHead").textContent = TABS.active === "today" ? "Share today's list." : "Share this page.";
+    if(fu){ var ub = document.querySelector("#mine .upform ." + fu.c.split(" ")[0]); if(ub){ ub.value = fu.v; ub.focus(); try{ ub.setSelectionRange(fu.s, fu.e); }catch(er){} } }
     if(fi){ var nb = document.querySelector('#mine .ansbox[data-ans="' + fi.i + '"]'); if(nb){ nb.focus(); try{ nb.setSelectionRange(fi.s, fi.e); }catch(er){} } }
   }
   function unpark(n){ S.removed = S.removed.filter(function(x){ return norm(x.n) !== norm(n); }); }
@@ -1391,7 +1420,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function newCode(){ var a = "abcdefghjkmnpqrstuvwxyz23456789", o = "", c = new Uint32Array(12); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(c) : c.forEach(function(_, i){ c[i] = Math.random() * 1e9; }); for(var i = 0; i < 12; i++) o += a[c[i] % a.length]; return "t" + o.slice(1); }
   function shareUrl(){ return "https://dobytoday.com/" + (TABS.active === "today" ? "#l=" + CODE : "#page=" + CODE + (SAVED === CODE ? "" : "&d=" + packPage())); }
   // a page's link also carries the page itself, so it still opens if the online copy hasn't arrived yet
-  function packPage(){ try{ var j = JSON.stringify({title:S.title || "", notes:S.notes || "", after:S.after || "", kind:S.kind || "", keep:true, day:S.day, own:S.own.map(function(o){ var x = {n:o.n, a:"other", b:"any", got:!!o.got}; if(o.d && o.d.length) x.d = o.d; if(o.url) x.url = o.url; if(o.ans) x.ans = o.ans; return x; })});
+  function packPage(){ try{ var j = JSON.stringify({title:S.title || "", notes:S.notes || "", after:S.after || "", kind:S.kind || "", keep:true, day:S.day, own:S.own.map(function(o){ var x = {n:o.n, a:"other", b:"any", got:!!o.got}; if(o.d && o.d.length) x.d = o.d; if(o.url) x.url = o.url; if(o.ans) x.ans = o.ans; if(o.up && o.up.length) x.up = o.up; return x; })});
     return btoa(unescape(encodeURIComponent(j))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }catch(e){ return ""; } }
   function unpackPage(){ var m = location.hash.match(/[#&]d=([A-Za-z0-9_-]+)/); if(!m) return null;
     try{ var d = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, "+").replace(/_/g, "/"))))); return d && typeof d === "object" ? d : null; }catch(e){ return null; } }
