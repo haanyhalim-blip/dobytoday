@@ -497,7 +497,7 @@ header{position:relative}header>*{position:relative;z-index:1}header::after{cont
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v46</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v47</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -933,6 +933,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   $("shareStop").addEventListener("click", stopShare);
   document.addEventListener("visibilitychange", function(){ if(!document.hidden) syncPull(); });
   window.addEventListener("focus", syncPull);
+  // While the page is open on a shared list, check for the other person's changes every few seconds
+  setInterval(function(){ if(CODE && !document.hidden) syncPull(); }, 4000);
   (function initShare(){
     var m = location.hash.match(/[#&]l=([a-z0-9]{10,14})/); if(m){ CODE = m[1]; try{ localStorage.setItem(CKEY, CODE); }catch(e){} }
     else { try{ CODE = localStorage.getItem(CKEY) || ""; }catch(e){} }
@@ -983,7 +985,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function mySave(){ try{ localStorage.setItem(MKEY, JSON.stringify(MYL)); }catch(e){} if(typeof acctPush === "function") acctPush(); }
   function snapCount(d){ return Object.keys(d.picked || {}).length + (d.own || []).length; }
   function snapNames(d){ return Object.keys(d.picked || {}).concat((d.own || []).map(function(o){ return (o.w ? o.w + ": " : "") + o.n; })); }
-  function snapshot(){ var d; try{ d = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; }catch(e){ d = {}; } d.got = {}; d.removed = []; (d.own || []).forEach(function(o){ o.got = false; }); return d; }
+  function mySnap(){ var d; try{ d = JSON.parse(localStorage.getItem(KEY) || "{}") || {}; }catch(e){ d = {}; } d.got = {}; d.removed = []; (d.own || []).forEach(function(o){ o.got = false; }); return d; }
   function drawMy(){ var el = $("myl"); if(!el || !MYL) return; var has = nPicked() > 0, h = "";
     $("mylSaveLink").hidden = !has; mkCard(has);
     // "My Lists" only shows once something has been saved (or while you're naming the first one)
@@ -1006,7 +1008,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(nPicked()){ MFORM = true; MOPEN = ""; drawMy(); setTimeout(function(){ $("myl").scrollIntoView({behavior:"smooth", block:"start"}); var i = $("mylName"); if(i) i.focus({preventScroll:true}); }, 60); }
     else { toast("Add a few things to your list first, then tap here to save it"); var q = $("q"); if(q){ window.scrollTo({top: 0, behavior: "smooth"}); setTimeout(function(){ q.focus(); }, 300); } } }, true);
   function showMine(){ if(typeof openMine === "function") openMine(); else { var t = $("mineBtn"); if(t) t.scrollIntoView({behavior:"smooth", block:"start"}); } }
-  function applyMy(m, replace){ var d = JSON.parse(JSON.stringify(m.s)), cur = snapshot(), n = 0;
+  function applyMy(m, replace){ var d = JSON.parse(JSON.stringify(m.s)), cur = mySnap(), n = 0;
     if(replace){ if("day" in S) d.day = S.day; n = snapCount(d); }
     else { var keys = {}; (cur.own || []).forEach(function(o){ keys[(o.w || "") + "|" + o.n.toLowerCase()] = 1; });
       Object.keys(d.picked || {}).forEach(function(k){ if(!(cur.picked || {})[k]){ cur.picked = cur.picked || {}; cur.picked[k] = 1; n++; } });
@@ -1025,7 +1027,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(b.dataset.myadd){ var n = applyMy(m, false); MOPEN = ""; drawMy(); showMine(); toast(n ? m.name + ": " + n + " added" : "All of those are on your list already"); return; }
     if(b.dataset.myrep){ if(nPicked() && !confirm("Replace your current list with “" + m.name + "”?")) return; var before = localStorage.getItem(KEY); applyMy(m, true); MOPEN = ""; drawMy(); showMine();
       toast("Now using “" + m.name + "”", function(){ try{ localStorage.setItem(KEY, before); }catch(x){} load(); save(); render(); }); return; }
-    if(b.dataset.myupd){ m.s = snapshot(); m.t = Date.now(); mySave(); drawMy(); toast("“" + m.name + "” updated"); return; }
+    if(b.dataset.myupd){ m.s = mySnap(); m.t = Date.now(); mySave(); drawMy(); toast("“" + m.name + "” updated"); return; }
     if(b.dataset.mydel){ var i = MYL.indexOf(m); MYL.splice(i, 1); MOPEN = ""; mySave(); drawMy(); toast("“" + m.name + "” deleted", function(){ MYL.splice(i, 0, m); mySave(); drawMy(); }); } });
   // A saved list as a tick-off page of its own (/my-list#…): the whole list travels in the link, so it opens on any phone you send it to
   function snapGroups(snap){ var keep = JSON.stringify(S), g = [];
@@ -1038,8 +1040,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     return "/my-list#" + btoa(unescape(encodeURIComponent(j))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }
   function mySaveNew(){ var i = $("mylName"), nm = (i && i.value || "").replace(/\s+/g, " ").trim(); if(!nm){ toast("Give the list a name"); if(i) i.focus(); return; }
     var same = MYL.filter(function(x){ return x.name.toLowerCase() === nm.toLowerCase(); })[0];
-    if(same){ if(!confirm("You already have “" + same.name + "”. Replace it with your current list?")) return; same.s = snapshot(); same.t = Date.now(); }
-    else MYL.unshift({id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: nm, s: snapshot(), t: Date.now()});
+    if(same){ if(!confirm("You already have “" + same.name + "”. Replace it with your current list?")) return; same.s = mySnap(); same.t = Date.now(); }
+    else MYL.unshift({id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: nm, s: mySnap(), t: Date.now()});
     MFORM = false; mySave(); drawMy(); toast("Saved to My Lists: " + nm); }
   $("myl").addEventListener("keydown", function(e){ if(e.key === "Enter" && e.target.id === "mylName"){ e.preventDefault(); mySaveNew(); } });
   $("mylSaveLink").addEventListener("click", function(){ var bx = $("tripBox"); if(bx.hidden){ var t = document.querySelector('[aria-controls="tripBox"]'); if(t) t.click(); } MFORM = true; MOPEN = ""; drawMy();
