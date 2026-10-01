@@ -354,7 +354,7 @@ h2.aisle.rm .ah{color:var(--muted)}
 #myl{margin:0 0 14px}
 #myl .mylh{display:flex;align-items:baseline;gap:10px;margin:0 0 8px;font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--second, var(--purple))}
 #myl .mylh small{letter-spacing:0;text-transform:none;font-weight:400;color:var(--muted)}
-#myl .mylgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px}
+#myl .mylgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
 #myl .trip.mine{border-color:var(--second, var(--purple));background:var(--second-wash, #f4f4f4)}
 .trip.mkcard{border:2px dashed #2f7d55}
 .trip.mkcard b,.trip.mkcard .n{color:#2f7d55}
@@ -440,14 +440,14 @@ h2.dsec .sub{text-transform:none;letter-spacing:0;font-weight:400}
 .tcat .tin{padding:0 10px 10px}
 .pgrp{border:1px solid var(--line);border-radius:10px;background:var(--card);margin:8px 0}
 .pgrp .plist,.pgrp .mylgrid{padding:0 10px 10px}
-.plist{display:flex;flex-direction:column;gap:6px;margin:8px 0}
-.prow{display:flex;align-items:center;justify-content:space-between;gap:12px;width:100%;text-align:left;padding:12px 14px;border:1px solid var(--line);border-left:4px solid var(--main);border-radius:10px;background:var(--card);font:inherit;cursor:pointer}
-.prow .pn{font-weight:700;min-width:0;overflow:hidden;text-overflow:ellipsis}
-.prow .pc{flex:none;display:flex;flex-direction:column;align-items:flex-end;gap:4px;font-size:.82rem;color:var(--muted)}
-.prow .pbar{display:block;width:60px;height:4px;border-radius:2px;background:var(--line)}
+.plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px;margin:8px 0}
+.prow{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:8px;width:100%;min-height:92px;text-align:left;padding:12px 13px;border:1.5px solid var(--line);border-left:5px solid var(--main);border-radius:10px;background:var(--card);font:inherit;cursor:pointer}
+.prow .pn{font-weight:700;line-height:1.3;overflow-wrap:anywhere}
+.prow .pc{width:100%;display:flex;flex-direction:column;align-items:flex-start;gap:5px;font-size:.82rem;color:var(--muted)}
+.prow .pbar{display:block;width:100%;height:5px;border-radius:2px;background:var(--line)}
 .prow .pbar i{display:block;height:100%;border-radius:2px;background:var(--main)}
 .prow .ppin{font-style:normal;font-size:.85em}
-.prow.pnew{border:2px dashed var(--main);border-left-width:2px;background:transparent;margin:0 0 8px}
+.prow.pnew{border:2px dashed var(--main);border-left-width:2px;background:transparent}
 .prow.pnew .pn{color:var(--main)}
 .gchips{display:flex;flex-wrap:wrap;gap:6px}
 #mylHome #myl{margin:0}
@@ -589,7 +589,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v55</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v56</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -764,8 +764,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(LASTPG){ ps.forEach(function(p){ if(p.l.id !== LASTPG || p.l.pin) return; OPEN["pg:" + (p.done ? "done" : "g:" + (p.l.group || "").trim())] = 1; }); LASTPG = ""; saveOpen(); }   // coming back from a page: its group is open
     var live = ps.filter(function(p){ return !p.done; }), done = ps.filter(function(p){ return p.done; });
     var has0 = TABS.active === "today" ? nPicked() > 0 : !!countOf(readList("today"));
-    var h = '<button type="button" class="prow pnew" id="mylCreate"><span class="pn">+ Create your own list</span><span class="pc">' + (has0 ? "save today's list to use again" : "add jobs above, then save them here") + '</span></button>'
-      + '<button type="button" class="prow pnew" data-newproj="1"><span class="pn">+ New page</span><span class="pc">notes and steps to tick</span></button>';
+    var h = '<div class="plist">' + '<button type="button" class="prow pnew" id="mylCreate"><span class="pn">+ Create your own list</span><span class="pc">' + (has0 ? "save today's list to use again" : "add jobs above, then save them here") + '</span></button>'
+      + '<button type="button" class="prow pnew" data-newproj="1"><span class="pn">+ New page</span><span class="pc">notes and steps to tick</span></button></div>';
     var pinned = live.filter(function(p){ return p.l.pin; }); if(pinned.length) h += '<div class="plist">' + pinned.map(prow).join("") + "</div>";
     var rest = live.filter(function(p){ return !p.l.pin; }), gs = [], by = {};
     rest.forEach(function(p){ var g = (p.l.group || "").trim(); if(!g) return; if(!by[g]){ by[g] = []; gs.push(g); } by[g].push(p); });
