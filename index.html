@@ -457,6 +457,9 @@ h2.dsec .sub{text-transform:none;letter-spacing:0;font-weight:400}
 .aitip p{margin:8px 0}
 .aiprompt{background:var(--wash);border-radius:6px;padding:8px 10px;font-size:.85rem;line-height:1.45}
 .pafter{margin-top:18px}
+.pdelrow{margin:22px 0 4px;text-align:right}
+.pdelrow .danger{color:#c0392b;font-size:.88rem}
+.ptitle.untitled{color:var(--muted)}
 #mine .steps .mrow{flex-wrap:wrap}
 .sdet{flex-basis:100%;margin:2px 0 6px 2.4em;padding:0 0 0 1em;font-size:.88rem;color:var(--muted);line-height:1.45}
 .sdet li{margin:2px 0}
@@ -620,7 +623,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v63</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v64</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -671,6 +674,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   // Do something to the Today list even while a project is open
   function withToday(fn){ if(TABS.active === "today"){ fn(S); save(); render(); return; }
     var d = readList("today"); fn(d); try{ localStorage.setItem(keyOf("today"), JSON.stringify(d)); }catch(e){} if(typeof acctPush === "function") acctPush(); render(); }
+  (function(){ var gone = 0; TABS.lists = TABS.lists.filter(function(l){ if(l.id === "today") return true; var d; try{ d = JSON.parse(localStorage.getItem(keyOf(l.id)) || "null"); }catch(e){ d = null; }
+      var empty = !d || (!d.title && !d.notes && !(d.own || []).length && !Object.keys(d.picked || {}).length); var shared = false; try{ shared = !!localStorage.getItem(ckeyOf(l.id)); }catch(e){}
+      if(empty && !shared){ try{ localStorage.removeItem(keyOf(l.id)); }catch(e){} gone++; return false; } return true; }); if(!TABS.lists.some(function(l){ return l.id === TABS.active; })) TABS.active = "today"; if(gone) saveTabs(); })();   // pages left before anything was typed
   var KEY = keyOf(TABS.active);
   var S = {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}, day:"", later:[], past:[], seen:[], title:"", notes:"", keep:false};
   function today(){ var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
@@ -906,8 +912,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       + (TABS.active !== "today" ? groupField(curTab().group || "") + '<label for="pAfter">Notes after the steps <small>– optional</small></label><textarea id="pAfter" rows="5">' + esc(S.after || "") + '</textarea><label class="pkeep"><input type="checkbox" id="pPin"' + (curTab().pin ? " checked" : "") + '> Pin it to the top of Projects</label>' : "")
       + (TABS.active === "today" ? '<label class="pkeep"><input type="checkbox" id="pKeep"' + (S.keep ? " checked" : "") + '> Keep ticked jobs and the order I add them (like a project)</label>' : "")
       + '<div class="row"><button type="button" class="btn primary" data-psave="1">Save</button><button type="button" class="link quiet" data-px="1">Cancel</button>' + (TABS.active !== "today" ? '<button type="button" class="link danger" data-pdel="1">Delete this page</button>' : "") + '</div></div>';
-    if(!has) return "";
-    return '<div class="proj"><div class="phead">' + (S.title ? '<h3 class="ptitle">' + esc(S.title) + "</h3>" : "<span></span>") + '<button type="button" class="btn pedb" data-pedit="1">✎ Edit</button></div>' + (S.notes ? '<details class="pnotes"' + (NOPEN ? " open" : "") + '><summary>Notes</summary><div class="pbody">' + fmtNotes(S.notes) + "</div></details>" : "") + "</div>"; }
+    if(!has && TABS.active === "today") return "";
+    return '<div class="proj"><div class="phead">' + (S.title ? '<h3 class="ptitle">' + esc(S.title) + "</h3>" : TABS.active !== "today" ? '<h3 class="ptitle untitled">Untitled page</h3>' : "<span></span>") + '<button type="button" class="btn pedb" data-pedit="1">✎ Edit</button></div>' + (S.notes ? '<details class="pnotes"' + (NOPEN ? " open" : "") + '><summary>Notes</summary><div class="pbody">' + fmtNotes(S.notes) + "</div></details>" : "") + "</div>"; }
   function asText(){
     var lines = []; if(S.title) lines.push(S.title.toUpperCase(), "");
     chosen().forEach(function(g){ lines.push(g.label.toUpperCase() + (g.sub ? " – " + g.sub : "")); g.rows.forEach(function(r){ var c = (S.note || {})[r.n]; lines.push((r.got ? "☑ " : "☐ ") + r.n + (c ? " – " + c : "")); }); lines.push(""); });
@@ -973,6 +979,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(mine && S.keep && S.kind === "links"){
       html = projHTML(); if(PEDIT === "new") return html;
       html += '<h2 class="aisle dsec"><span class="c"></span>Links</h2><div class="links">' + S.own.map(function(o, i){ return '<div class="lcard"><b>' + esc(o.n) + '</b><small>' + esc(hostOf(o.url || "")) + '</small><div class="lact"><a class="btn primary" href="' + esc(o.url || "#") + '" target="_blank" rel="noopener">Open</a><button type="button" class="btn" data-lcopy="' + i + '">Copy link</button><button type="button" class="x" data-ldelk="' + i + '" aria-label="Remove">×</button></div></div>'; }).join("") + "</div>";
+      html += '<p class="pdelrow" style="order:9"><button type="button" class="link danger" data-pdel="1">Delete this page</button></p>';
       html += '<div class="linkadd"><input id="lkName" maxlength="60" placeholder="Name, e.g. Maths with Mr Lee"><input id="lkUrl" type="url" inputmode="url" placeholder="Paste the meeting link"><button type="button" class="btn" data-addlink="1">Add</button></div>';
       return html; }
     if(mine && S.keep){
@@ -982,6 +989,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       else html += '<h2 class="aisle dsec"><span class="c"></span>Steps</h2><p class="small">No steps yet.</p>';
       html += '<div class="stepadd"><textarea id="stepIn" rows="1" placeholder="Add a step (paste several, one per line)"></textarea><button type="button" class="btn" data-addstep="1">Add</button></div>';
       if(S.after) html += '<div class="proj pafter"><div class="pbody">' + fmtNotes(S.after) + "</div></div>";
+      html += '<p class="pdelrow"><button type="button" class="link danger" data-pdel="1">Delete this page</button></p>';
       return html + laterHTML() + pastHTML(); }
     if(mine){
       html = projHTML();
