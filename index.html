@@ -628,7 +628,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v68</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v69</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -864,7 +864,24 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function titleCase(t){ return /[a-z]/.test(t) ? t : t.split(/(\s+)/).map(function(w, i){ return /\s/.test(w) ? w : caseWord(w, i === 0, true); }).join(""); }
   function niceCase(t){ return /[a-z]/.test(t) ? t : t.split(/(\s+)/).map(function(w, i){ return /\s/.test(w) ? w : caseWord(w, i === 0, false); }).join(""); }
   function capsHead(x){ return x.length <= 70 && /[A-Z]{2}/.test(x) && !/[a-z]/.test(x) && !/^(?:[-*•]|\d+[.)\]])\s/.test(x); }
-  function parsePaste(t, hasTitle){ learnProper(t); var lines = String(t || "").replace(/\r/g, "").split("\n"), title = "", steps = [], keep = [], i = 0, inSteps = false, headSeen = false, lastStep = false;
+  // Numbered steps: a line starting 1. 2. 3. (or "Step 1 -") in order starts a step; the lines under it are its details until the next number
+  var NUMRE = /^\s*(?:step\s*)?(\d{1,2})\s*(?:[.):]|\s[-–—])\s*(.+)$/i;
+  function numbered(t){ var lines = String(t || "").replace(/\r/g, "").split("\n"), pre = [], post = [], steps = [], details = {}, want = 0, cur = null, gap = false;
+    lines.forEach(function(l){ var x = l.trim(), m = x.match(NUMRE), k = m ? +m[1] : -1;
+      if(m && (want === 0 ? k === 1 : k === want)){ var n = m[2].trim().replace(/^[-–—:]\s*/, ""); if(capsHead(n)) n = niceCase(n); while(details[n]) n += " "; cur = n; steps.push(n); details[n] = []; want = k + 1; gap = false; return; }
+      if(!cur){ pre.push(l); return; }
+      if(!x){ gap = true; return; }
+      if(post.length || (gap && (capsHead(x) || (x.length <= 40 && !/[.!?,;]$/.test(x) && !/^[-*•]/.test(x))))){ post.push(l); return; }   // a new section after the last step
+      details[cur].push(x.replace(/^[-*•\u2610\u2611]\s*/, "")); });
+    if(steps.length < 2) return null;
+    steps.forEach(function(n){ details[n] = joinWrap(details[n]); });
+    return {pre:pre, steps:steps, details:details, post:post}; }
+  function parsePaste(t, hasTitle){ learnProper(t);
+    var nb = numbered(t); if(nb){ var tl = "", pr = nb.pre.slice(); while(pr.length && !pr[0].trim()) pr.shift();
+      if(!hasTitle && pr.length){ var f0 = pr[0].trim(); if(f0.length <= 90 && !/[.!?:]$/.test(f0)){ tl = titleCase(f0); pr.shift(); } }
+      pr = pr.filter(function(l){ return !STEPHEAD.test(l.trim()); });
+      var lk0 = nb.steps.map(linkOf).filter(Boolean);
+      if(!(lk0.length >= nb.steps.length / 2)) return {title:tl, notes:pr.join("\n").replace(/\n{3,}/g, "\n\n").trim(), after:nb.post.join("\n").trim(), steps:nb.steps, links:[], details:nb.details}; } var lines = String(t || "").replace(/\r/g, "").split("\n"), title = "", steps = [], keep = [], i = 0, inSteps = false, headSeen = false, lastStep = false;
     var LI = /^(?:[-*•\u2610\u2611]|\d+[.)\]])\s+(.*)$/;
     while(i < lines.length && !lines[i].trim()) i++;
     if(!hasTitle && i < lines.length){ var f = lines[i].trim(); if(f.length <= 90 && !LI.test(f) && !/[.!?:]$/.test(f) && !STEPHEAD.test(f)){ title = titleCase(f); i++; } }
@@ -950,6 +967,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function keepNew(){ ["nTitle","nDesc","nSteps","pPaste"].forEach(function(id){ if($(id)) NEWDRAFT[id] = $(id).value; }); }
   function fromFields(){ var t = ($("nTitle").value || "").trim(), d = ($("nDesc").value || "").replace(/\s+$/, ""), st = $("nSteps").value || "";
     if(!st.trim() && d){ var pr = parsePaste((t ? "" : "") + d, true); return {title:t || pr.title, notes:pr.notes, after:pr.after, steps:pr.steps, links:pr.links, details:pr.details}; }
+    learnProper(d + "\n" + st); var nb = numbered(st); if(nb && !(nb.steps.map(linkOf).filter(Boolean).length >= nb.steps.length / 2)){ var pre = nb.pre.join("\n").trim(); return {title:t, notes:(d + (d && pre ? "\n\n" : "") + pre).trim(), after:nb.post.join("\n").trim(), steps:nb.steps, links:[], details:nb.details}; }
     var lines = splitSteps(st), lk = lines.map(linkOf).filter(Boolean);
     if(lines.length && lk.length === lines.length) return {title:t, notes:d, after:"", steps:[], links:lk, details:{}};
     return {title:t, notes:d, after:"", steps:lines, links:[], details:{}}; }
