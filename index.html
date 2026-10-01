@@ -126,7 +126,7 @@ body.searching .jumps{display:none}
 .pick .it[aria-pressed="false"] .nm{text-decoration:line-through;font-weight:400}
 .pick .prow{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .pick .prow .link{margin-left:auto}
-.trips{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:9px}
+.trips{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px}
 .trip{font:inherit;text-align:left;cursor:pointer;border:1.5px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:12px 13px;display:flex;flex-direction:column;gap:4px}
 .trip:hover{border-color:var(--main)}
 .trip.on{border-color:var(--main);background:var(--wash)}
@@ -450,6 +450,11 @@ h2.dsec .sub{text-transform:none;letter-spacing:0;font-weight:400}
 .prow.pnew{border:2px dashed var(--main);border-left-width:2px;background:transparent}
 .prow.pnew .pn{color:var(--main)}
 .gchips{display:flex;flex-wrap:wrap;gap:6px}
+@media (max-width:520px){#trips .trip small{display:none}#trips .trip{min-height:84px;justify-content:space-between}}
+.filt{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px}
+.fchip{border:1.5px solid var(--main);background:var(--card);color:var(--main-deep);border-radius:999px;padding:6px 13px;font:inherit;font-size:.88rem;font-weight:700;cursor:pointer}
+.fchip[aria-pressed="true"]{background:var(--main);color:#fff}
+#projSec .psh,#myl .psh{margin:14px 0 6px;font-size:.78rem;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .phead{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
 .phead .pedb{flex:none;padding:6px 14px;font-size:.9rem;margin-top:4px}
 body.pagemode .phead{margin-top:22px}
@@ -542,7 +547,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
     <div class="qwrap"><input id="q" placeholder="Type or paste your jobs – put a wash on, call Dad…" autocomplete="off" autocapitalize="off" enterkeyhint="search"><button id="qClear" type="button" aria-label="Clear search" hidden>×</button></div>
     <button class="btn totop" id="toTop" type="button" hidden>↑ Top</button>
   </div>
-  <p class="jumps"><a class="jump" data-to="tripBtn" href="#">Ready-made days</a> · <a class="jump" data-to="projBtn" href="#">My days</a> · <a class="jump" data-to="shopBtn" href="#">Browse by task</a></p>
+  <p class="jumps"><a class="jump" data-to="tripBtn" href="#">Ready-made days</a> · <a class="jump" data-to="projBtn" href="#">Projects</a> · <a class="jump" data-to="shopBtn" href="#">Browse by task</a></p>
 </div>
 
 <div class="paste sortbox" id="sortbox" hidden>
@@ -556,7 +561,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
     <div class="lhead">
       <div class="ltwrap"><h2 class="ltitle"><button class="sect mine" id="mineBtn" type="button" aria-expanded="true" aria-controls="mineBody"><span class="c"></span>My list</button></h2><span class="htally" id="htally"></span></div>
       <button class="hic hshare" id="mineShare" type="button" aria-expanded="false" aria-controls="shareBox" title="Share this list"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg><span class="cap"></span></button>
-      <button class="hic" id="mylSaveLink" type="button" hidden title="Save to My days"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span class="cap">Save</span></button>
+      <button class="hic" id="mylSaveLink" type="button" hidden title="Save to Projects"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span class="cap">Save</span></button>
       <button class="hic clearic" id="clear" type="button" hidden title="Clear the whole list"><svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="3.7" y1="3.7" x2="12.3" y2="12.3" stroke="currentColor" stroke-width="1.7"/></svg><span class="cap">Clear</span></button>
     </div>
   <div id="mineBody">
@@ -579,7 +584,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-<div class="sectabs" role="group" aria-label="Ready-made days, my days or browse by task"><button class="sect" id="tripBtn" type="button" aria-expanded="false" aria-controls="tripBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h3"/></svg><span class="tl">Ready-made days</span></button><button class="sect" id="projBtn" type="button" aria-expanded="false" aria-controls="projBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M8 13l2.5 2.5L16 10"/></svg><span class="tl">My days</span></button><button class="sect" id="shopBtn" type="button" aria-expanded="false" aria-controls="shopBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg><span class="tl">Browse by task</span></button></div>
+<div class="sectabs" role="group" aria-label="Ready-made days, projects or browse by task"><button class="sect" id="tripBtn" type="button" aria-expanded="false" aria-controls="tripBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h3"/></svg><span class="tl">Ready-made days</span></button><button class="sect" id="projBtn" type="button" aria-expanded="false" aria-controls="projBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M8 13l2.5 2.5L16 10"/></svg><span class="tl">Projects</span></button><button class="sect" id="shopBtn" type="button" aria-expanded="false" aria-controls="shopBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg><span class="tl">Browse by task</span></button></div>
 <div id="tripBox" hidden>
   <div id="myl"></div>
   <div class="trips" id="trips"></div>
@@ -604,7 +609,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v58</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v59</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -747,7 +752,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function projFromLink(){ var m = location.hash.match(/^#proj=([A-Za-z0-9_-]+)/); if(!m) return;
     var x; try{ x = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, "+").replace(/_/g, "/"))))); }catch(e){ x = null; }
     history.replaceState(null, "", location.pathname + location.search); if(!x) return;
-    if(Array.isArray(x.p)){ var made = x.p.map(function(pg){ return makePageFrom(pg); }); switchTo("today"); made.forEach(function(id){ var t = TABS.lists.filter(function(l){ return l.id === id; })[0]; if(t && t.group) OPEN["pg:g:" + t.group] = 1; }); saveOpen(); render(); if($("projBox").hidden) $("projBtn").click(); setTimeout(function(){ $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 50); toast(x.p.length + " pages added to My days"); return; }
+    if(Array.isArray(x.p)){ var made = x.p.map(function(pg){ return makePageFrom(pg); }); switchTo("today"); made.forEach(function(id){ var t = TABS.lists.filter(function(l){ return l.id === id; })[0]; if(t && t.group) OPEN["pg:g:" + t.group] = 1; }); saveOpen(); render(); if($("projBox").hidden) $("projBtn").click(); setTimeout(function(){ $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 50); toast(x.p.length + " pages added to Projects"); return; }
     if(!(x.t || (x.s || []).length)) return;
     var start = function(){ switchTo(newTab(x.t || "Project"));
       S.own = (x.s || []).map(function(n){ return {n:String(n), a:"other", b:"any", got:false}; }); S.title = x.t || ""; S.notes = x.n || ""; S.keep = true; S.day = today();
@@ -768,34 +773,32 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function tabName(l){ if(l.id === TABS.active) return S.title || (l.id === "today" ? "Today" : l.name || "Untitled"); return l.name || (l.id === "today" ? "Today" : "Untitled"); }
   function drawTabs(){ var el = $("ltabs"); if(!el) return; var page = TABS.active !== "today"; document.body.classList.toggle("pagemode", page); el.hidden = !page; projCards();
     if(page){ var cur0 = TABS.lists.filter(function(l){ return l.id === TABS.active; })[0]; if(cur0 && S.title && cur0.name !== S.title){ cur0.name = S.title; saveTabs(); }
-      el.innerHTML = '<button type="button" class="pback" data-tab="today">← My list &amp; days</button>'; return; }
+      el.innerHTML = '<button type="button" class="pback" data-tab="today">← My list &amp; projects</button>'; return; }
     if(BACKTOP){ BACKTOP = false; setTimeout(function(){ if($("projBox").hidden) $("projBtn").click(); $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 0); }
     el.innerHTML = ""; }
   function newProject(){ var id = newTab("New project"); switchTo(id); S.keep = true; PEDIT = "new"; render(); window.scrollTo(0, 0); var ti = $("pPaste"); if(ti) ti.focus(); }
   function dropProject(){ var id = TABS.active; try{ localStorage.removeItem(keyOf(id)); localStorage.removeItem(ckeyOf(id)); }catch(e){} TABS.lists = TABS.lists.filter(function(l){ return l.id !== id; }); saveTabs(); switchTo("today"); }
   // Every project has its own address: a share code made when the page is made
   function ensurePage(){ if(CODE) return; CODE = newCode(); try{ localStorage.setItem(CKEY, CODE); }catch(e){} history.replaceState(null, "", "#page=" + CODE); lastSent = ""; syncPush(true); listen(); showShared(); }
-  // My days: everything you've made or kept – pinned first, then your groups, ready-made days you starred, saved lists, and finished pages folded away
+  // Projects: everything you've made or kept – pinned first, then your groups, ready-made days you starred, saved lists, and finished pages folded away
   function pageInfo(l){ var d = l.id === TABS.active ? S : readList(l.id), n = (d.own || []).length + Object.keys(d.picked || {}).length, g = (d.own || []).filter(function(o){ return o.got; }).length + Object.keys(d.got || {}).filter(function(k){ return (d.picked || {})[k]; }).length;
     return {l:l, title:d.title || l.name || "Untitled", n:n, g:g, done:d.kind !== "links" && n > 0 && g === n, links:d.kind === "links"}; }
   function prow(p){ return '<button type="button" class="prow" data-proj="' + esc(p.l.id) + '"><span class="pn">' + (p.l.pin ? '<i class="ppin" aria-label="Pinned">📌</i> ' : "") + esc(p.title) + '</span><span class="pc">' + (p.links ? p.n + (p.n === 1 ? " link" : " links") : p.n ? p.g + " of " + p.n : "–") + (p.n && !p.links ? '<i class="pbar"><i style="width:' + Math.round(p.g / p.n * 100) + '%"></i></i>' : "") + "</span></button>"; }
   function pfold(key, label, n, inner){ var o = !!OPEN["pg:" + key]; return '<details class="pgrp" data-pg="' + esc(key) + '"' + (o ? " open" : "") + '><summary>' + esc(label) + " <small>" + n + "</small></summary>" + inner + "</details>"; }
   function projCards(){ var el = $("projSec"); if(!el) return;
     var ps = TABS.lists.filter(function(l){ return l.id !== "today"; }).map(pageInfo);
-    if(LASTPG){ ps.forEach(function(p){ if(p.l.id !== LASTPG || p.l.pin) return; OPEN["pg:" + (p.done ? "done" : "g:" + (p.l.group || "").trim())] = 1; }); LASTPG = ""; saveOpen(); }   // coming back from a page: its group is open
-    var live = ps.filter(function(p){ return !p.done; }), done = ps.filter(function(p){ return p.done; });
-    var has0 = TABS.active === "today" ? nPicked() > 0 : !!countOf(readList("today"));
-    var h = '<div class="plist"><button type="button" class="prow pnew" data-newproj="1"><span class="pn">+ Create your own</span><span class="pc">a list, a project or a day plan – paste or type it</span></button></div>';
-    var pinned = live.filter(function(p){ return p.l.pin; }); if(pinned.length) h += '<div class="plist">' + pinned.map(prow).join("") + "</div>";
-    var rest = live.filter(function(p){ return !p.l.pin; }), gs = [], by = {};
-    rest.forEach(function(p){ var g = (p.l.group || "").trim(); if(!g) return; if(!by[g]){ by[g] = []; gs.push(g); } by[g].push(p); });
-    gs.sort(function(a, b){ return a.localeCompare(b); }).forEach(function(g){ h += pfold("g:" + g, g, by[g].length, '<div class="plist">' + by[g].map(prow).join("") + "</div>"); });
-    var loose = rest.filter(function(p){ return !(p.l.group || "").trim(); }); if(loose.length) h += (gs.length ? pfold("g:", "Not in a group", loose.length, '<div class="plist">' + loose.map(prow).join("") + "</div>") : '<div class="plist">' + loose.map(prow).join("") + "</div>");
-    var fv = favs().map(function(id){ return TRIPS.filter(function(t){ return t.id === id; })[0]; }).filter(Boolean);
-    if(fv.length) h += pfold("fav", "★ Ready-made days I starred", fv.length, '<div class="plist">' + fv.map(function(t){ return '<button type="button" class="prow" data-favgo="' + esc(t.id) + '"><span class="pn">' + esc(t.name) + '</span><span class="pc">' + t.items.length + " jobs</span></button>"; }).join("") + "</div>");
-    if(done.length) h += pfold("done", "✓ Done", done.length, '<div class="plist">' + done.map(prow).join("") + "</div>");
+    if(LASTPG){ ps.forEach(function(p){ if(p.l.id !== LASTPG) return; var want = p.done ? "done" : (p.l.group || "").trim() ? "g:" + p.l.group.trim() : "all"; if(OPEN.pf && OPEN.pf !== "all" && OPEN.pf !== want) OPEN.pf = want; }); LASTPG = ""; saveOpen(); }   // coming back from a page: you can see it
+    var live = ps.filter(function(p){ return !p.done; }), done = ps.filter(function(p){ return p.done; }), gs = [];
+    live.forEach(function(p){ var g = (p.l.group || "").trim(); if(g && gs.indexOf(g) < 0) gs.push(g); }); gs.sort(function(a, b){ return a.localeCompare(b); });
+    var saved = (MYL || []).length, f = OPEN.pf || "all";
+    var chips = [["all", "All"]].concat(gs.map(function(g){ return ["g:" + g, g]; })).concat(saved ? [["saved", "Saved lists"]] : []).concat(done.length ? [["done", "✓ Done"]] : []);
+    if(!chips.some(function(c){ return c[0] === f; })) f = "all"; PF = f;
+    var h = chips.length > 1 ? '<div class="filt" role="group" aria-label="Show">' + chips.map(function(c){ return '<button type="button" class="fchip" data-pf="' + esc(c[0]) + '" aria-pressed="' + (f === c[0]) + '">' + esc(c[1]) + "</button>"; }).join("") + "</div>" : "";
+    var show = f === "all" ? live.slice().sort(function(a, b){ return (b.l.pin ? 1 : 0) - (a.l.pin ? 1 : 0); }) : f === "done" ? done : f === "saved" ? [] : live.filter(function(p){ return "g:" + (p.l.group || "").trim() === f; });
+    h += '<div class="plist">' + (f === "done" || f === "saved" ? "" : '<button type="button" class="prow pnew" data-newproj="1"><span class="pn">+ Create your own</span><span class="pc">a list, a project or a day plan – paste or type it</span></button>') + show.map(prow).join("") + "</div>";
+    if(f === "done" && !done.length) h += '<p class="small">Nothing finished yet.</p>';
     el.innerHTML = h; drawMy(); }
-  $("projSec").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.newproj){ newProject(); return; } if(b.dataset.proj){ switchTo(b.dataset.proj); window.scrollTo(0, 0); return; }
+  $("projSec").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.pf){ OPEN.pf = b.dataset.pf; saveOpen(); projCards(); return; } if(b.dataset.newproj){ newProject(); return; } if(b.dataset.proj){ switchTo(b.dataset.proj); window.scrollTo(0, 0); return; }
     if(b.dataset.favgo){ var t = TRIPS.filter(function(x){ return x.id === b.dataset.favgo; })[0]; if(!t) return; if(t.slug){ try{ sessionStorage.setItem("dobytoday-back", t.id); }catch(x){} location.href = "/lists/" + t.slug; } else { if($("tripBox").hidden) $("tripBtn").click(); openPick(t.id); } } });
   $("projBox").addEventListener("toggle", function(e){ var d = e.target; if(!d.classList || !d.classList.contains("pgrp")) return; if(d.open) OPEN["pg:" + d.dataset.pg] = 1; else delete OPEN["pg:" + d.dataset.pg]; saveOpen(); }, true);
   function deleteProject(){ var id = TABS.active; if(id === "today") return; if(!confirm("Delete “" + (S.title || "this page") + "”" + (CODE ? " from this phone? The shared link keeps working for anyone else." : "?"))) return;
@@ -851,7 +854,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       flush(); var head = x.length < 70 && !/[.!?:]$/.test(x) && /^([-*•]|\d+[.)])\s/.test(nx);
       h += head ? "<h4>" + esc(x) + "</h4>" : "<p>" + esc(x) + "</p>"; });
     flush(); return h; }
-  var NOPEN = true, PEDIT = false, BACKTOP = false, LASTPG = "";
+  var NOPEN = true, PEDIT = false, BACKTOP = false, LASTPG = "", PF = "all";
   function curTab(){ return TABS.lists.filter(function(l){ return l.id === TABS.active; })[0] || {}; }
   function groupField(v){ var gs = []; TABS.lists.forEach(function(l){ var g = (l.group || "").trim(); if(g && gs.indexOf(g) < 0) gs.push(g); });
     return '<label for="pGroup">Group <small>– optional, e.g. Kids, House, Money</small></label><input id="pGroup" maxlength="30" list="pGroups" value="' + esc(v) + '" placeholder="No group"><datalist id="pGroups">' + gs.map(function(g){ return '<option value="' + esc(g) + '">'; }).join("") + "</datalist>"
@@ -861,7 +864,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       + groupField("") + '<div class="row"><button type="button" class="btn primary" data-pmake="1">Create it</button><button type="button" class="link quiet" data-pdel="1">Cancel</button></div></div>';
     if(PEDIT) return '<div class="pedit"><label for="pTitle">Title</label><input id="pTitle" maxlength="120" value="' + esc(S.title) + '" placeholder="e.g. Overdue occupancy tax"><label for="pNotes">Notes <small>– what it\'s about, who\'s who, numbers to hand. Start a line with "- " for a bullet.</small></label><textarea id="pNotes" rows="10">' + esc(S.notes) + '</textarea>' + (TABS.active !== "today" ? (S.kind === "links" ? '<label for="pItems">Links <small>– one per line: a name, then the link</small></label><textarea id="pItems" rows="6">' + esc(S.own.map(function(o){ return o.n + " – " + (o.url || ""); }).join("\n")) + "</textarea>"
         : '<label for="pItems">Steps <small>– one per line. Change, add, delete or move lines; ticks stay on steps you keep.</small></label><textarea id="pItems" rows="8">' + esc(S.own.map(function(o){ return o.n; }).join("\n")) + "</textarea>") : "")
-      + (TABS.active !== "today" ? groupField(curTab().group || "") + '<label class="pkeep"><input type="checkbox" id="pPin"' + (curTab().pin ? " checked" : "") + '> Pin it to the top of My days</label>' : "")
+      + (TABS.active !== "today" ? groupField(curTab().group || "") + '<label class="pkeep"><input type="checkbox" id="pPin"' + (curTab().pin ? " checked" : "") + '> Pin it to the top of Projects</label>' : "")
       + (TABS.active === "today" ? '<label class="pkeep"><input type="checkbox" id="pKeep"' + (S.keep ? " checked" : "") + '> Keep ticked jobs and the order I add them (like a project)</label>' : "")
       + '<div class="row"><button type="button" class="btn primary" data-psave="1">Save</button><button type="button" class="link quiet" data-px="1">Cancel</button>' + (TABS.active !== "today" ? '<button type="button" class="link danger" data-pdel="1">Delete this page</button>' : "") + '</div></div>';
     if(!has) return "";
@@ -965,19 +968,27 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function kept(id){ return (Array.isArray(MYL) ? MYL : []).filter(function(m){ return m && m.from === id; })[0]; }   // My Lists load later on; until then nothing shows as kept
   function tripSnap(t){ var d = {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}};
     t.items.forEach(function(nm){ var it = byNorm[norm(nm)]; if(it){ d.picked[it.n] = 1; if(t.force && it.b === "hold") d.bag[it.n] = t.force; } else d.own.push({n:nm, a:classify(nm), b:"any", got:false}); }); return d; }
-  function keepTrip(id, quiet){ var t = TRIPS.filter(function(x){ return x.id === id || x.slug === id; })[0]; if(!t) return false; myLoad(); if(kept(t.id)){ if(!quiet) toast("Already in My days: " + t.name); return true; }
-    MYL.unshift({id:Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name:t.name, s:tripSnap(t), t:Date.now(), from:t.id}); mySave(); drawTrips(); render(); if(!quiet) toast("★ " + t.name + " – your own copy is in My days"); return true; }
+  function keepTrip(id, quiet){ var t = TRIPS.filter(function(x){ return x.id === id || x.slug === id; })[0]; if(!t) return false; myLoad(); if(kept(t.id)){ if(!quiet) toast("Already in Projects: " + t.name); return true; }
+    MYL.unshift({id:Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name:t.name, s:tripSnap(t), t:Date.now(), from:t.id}); mySave(); drawTrips(); render(); if(!quiet) toast("★ " + t.name + " – your own copy is in Projects"); return true; }
   function keepFromLink(){ var m = location.hash.match(/^#keep=([a-z0-9-]+)/); if(!m) return; history.replaceState(null, "", location.pathname + location.search);
-    if(keepTrip(m[1])){ OPEN["pg:saved"] = 1; saveOpen(); drawMy(); if($("projBox").hidden) $("projBtn").click(); setTimeout(function(){ $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 50); } }
+    if(keepTrip(m[1])){ OPEN.pf = "saved"; saveOpen(); projCards(); if($("projBox").hidden) $("projBtn").click(); setTimeout(function(){ $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 50); } }
   function personOf(t){ var m = t.name.match(/^(.+?)(?:’s|'s| –| -)/); return m ? m[1] : t.name; }
   function drawTrips(){
-    var card = function(t){ var on = !!kept(t.id); return '<div class="tripw"><button class="trip" type="button" data-trip="'+t.id+'"><b>'+esc(t.name)+'</b><small>'+esc(t.blurb)+'</small><span class="n">'+t.items.length+' jobs · tap to open</span></button><button type="button" class="tfav'+(on ? ' on' : '')+'" data-fav="'+t.id+'" aria-pressed="'+on+'" title="'+(on ? 'Your copy is in My days' : 'Save a copy to My days')+'" aria-label="Save to My days">'+(on ? '★' : '☆')+'</button></div>'; };
+    var card = function(t){ var on = !!kept(t.id); return '<div class="tripw"><button class="trip" type="button" data-trip="'+t.id+'"><b>'+esc(t.name)+'</b><small>'+esc(t.blurb)+'</small><span class="n">'+t.items.length+' jobs</span></button><button type="button" class="tfav'+(on ? ' on' : '')+'" data-fav="'+t.id+'" aria-pressed="'+on+'" title="'+(on ? 'Your copy is in Projects' : 'Save a copy to Projects')+'" aria-label="Save to Projects">'+(on ? '★' : '☆')+'</button></div>'; };
     var used = {}, groups = [];
     TCATS.forEach(function(c){ var ts = TRIPS.filter(function(t){ return !t.named && c[2].indexOf(t.id) > -1; }); ts.forEach(function(t){ used[t.id] = 1; }); if(ts.length) groups.push([c[0], c[1], ts]); });
     var rest = TRIPS.filter(function(t){ return !t.named && !used[t.id]; }); if(rest.length) groups.push(["more", "More days", rest]);
     var people = {}, porder = []; TRIPS.filter(function(t){ return t.named; }).forEach(function(t){ var k = personOf(t); if(!people[k]){ people[k] = []; porder.push(k); } people[k].push(t); });
     var fold = function(g){ var k = "cat:" + g[0], o = !!OPEN[k]; return '<details class="tcat" data-cat="'+esc(k)+'"'+(o ? ' open' : '')+'><summary>'+esc(g[1])+' <small>'+g[2].length+'</small></summary><div class="trips tin">'+g[2].map(card).join("")+'</div></details>'; };
-    $("trips").innerHTML = groups.map(fold).join("") + (porder.length ? '<p class="tgrp">Lists for particular people</p>' + porder.map(function(k){ return fold(["p-" + k, k, people[k]]); }).join("") : "");
+    var fam = TRIPS.filter(function(t){ return t.named; }), f = OPEN.tf || "all";
+    if(f !== "all" && f !== "chores" && !groups.some(function(g){ return g[0] === f; })) f = "all";
+    var chips = [["all", "All"]].concat(groups.map(function(g){ return [g[0], g[1]]; })).concat(fam.length ? [["chores", "Family chores"]] : []);
+    var h = '<div class="filt" role="group" aria-label="Show">' + chips.map(function(c){ return '<button type="button" class="fchip" data-tf="' + c[0] + '" aria-pressed="' + (f === c[0]) + '">' + esc(c[1]) + "</button>"; }).join("") + "</div>";
+    if(f === "all"){ h += groups.map(function(g){ return g[2].map(card).join(""); }).join("");
+      if(fam.length){ var fo = !!OPEN["cat:chores"]; h += '<details class="tcat" data-cat="cat:chores"' + (fo ? " open" : "") + '><summary>Family chores <small>' + fam.length + '</small></summary><div class="trips tin">' + fam.map(card).join("") + "</div></details>"; } }
+    else if(f === "chores") h += fam.map(card).join("");
+    else h += groups.filter(function(g){ return g[0] === f; })[0][2].map(card).join("");
+    $("trips").innerHTML = h;
   }
   function openMine(){ var mx = $("mineBody"); if(mx.hidden){ mx.hidden = false; $("mineBtn").setAttribute("aria-expanded", "true"); } var t = $("listSec").getBoundingClientRect().top + window.pageYOffset - 80; window.scrollTo({top: Math.max(0, t), behavior:"smooth"}); }
   function closeMine(){}
@@ -1123,7 +1134,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       toast(n2 ? t.name + ": " + n2 + " added" : "All of those are on your list already"); } });
   // A ready-made list opens as a page of its own (dobytoday.com/lists/…) that works as a tick-off checklist; its "Add to my list" comes back here
   $("trips").addEventListener("toggle", function(e){ var d = e.target; if(!d.classList || !d.classList.contains("tcat")) return; if(d.open) OPEN[d.dataset.cat] = 1; else delete OPEN[d.dataset.cat]; saveOpen(); }, true);
-  $("trips").addEventListener("click", function(e){ var f = e.target.closest(".tfav"); if(f){ e.stopPropagation(); keepTrip(f.dataset.fav); return; }
+  $("trips").addEventListener("click", function(e){ var fc = e.target.closest("[data-tf]"); if(fc){ e.stopPropagation(); OPEN.tf = fc.dataset.tf; saveOpen(); drawTrips(); return; }
+    var f = e.target.closest(".tfav"); if(f){ e.stopPropagation(); keepTrip(f.dataset.fav); return; }
     var b = e.target.closest(".trip"); if(!b) return; var t = TRIPS.filter(function(x){ return x.id === b.dataset.trip; })[0];
     if(!t || !t.slug){ openPick(b.dataset.trip); return; } try{ sessionStorage.setItem("dobytoday-back", t.id); }catch(x){} location.href = "/lists/" + t.slug; });
   $("tripSuggest").addEventListener("click", function(){ var fx = $("feedback"); fx.hidden = false; $("fbBtn").setAttribute("aria-expanded", "true"); if(!$("fbtext").value) $("fbtext").value = "For the ready-made day \"" + "…" + "\" I'd add: "; fx.scrollIntoView({block:"start", behavior:"smooth"}); setTimeout(function(){ $("fbtext").focus(); }, 300); });
@@ -1370,20 +1382,21 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     $("mylSaveLink").hidden = !has; mkCard(has);
     // "My Lists" only shows once something has been saved (or while you're naming the first one)
     if(!MYL.length && !MFORM){ el.innerHTML = ""; el.hidden = true; return; } el.hidden = false;
-    var mo = !!OPEN["pg:saved"] || MFORM || !!MOPEN; h += '<details class="pgrp" data-pg="saved"' + (mo ? " open" : "") + '><summary>Saved lists <small>' + MYL.length + '</small></summary><div class="mylgrid">';
-    if(MFORM) h += '<div class="mylform"><label for="mylName">Save to My days – give it a name</label><input id="mylName" maxlength="40" placeholder="e.g. Weekly shop" autocomplete="off" enterkeyhint="done"><button class="btn primary" type="button" data-mylok="1">Save</button><button class="link quiet" type="button" data-mylx="1">Cancel</button></div>';
+    if(!MFORM && PF !== "all" && PF !== "saved"){ el.innerHTML = ""; el.hidden = true; return; }
+    h += (PF === "all" ? '<p class="psh">Saved lists</p>' : "") + '<div class="mylgrid">';
+    if(MFORM) h += '<div class="mylform"><label for="mylName">Save to Projects – give it a name</label><input id="mylName" maxlength="40" placeholder="e.g. Weekly shop" autocomplete="off" enterkeyhint="done"><button class="btn primary" type="button" data-mylok="1">Save</button><button class="link quiet" type="button" data-mylx="1">Cancel</button></div>';
     MYL.forEach(function(m){ h += '<button class="trip mine" type="button" data-myl="' + esc(m.id) + '"><b>' + (m.from ? "★ " : "") + esc(m.name) + '</b><span class="n">' + snapCount(m.s) + ' ' + (snapCount(m.s) === 1 ? 'job' : 'jobs') + ' · tap to use it</span></button>'; });
     var m = MYL.filter(function(x){ return x.id === MOPEN; })[0];
     if(m){ var nm = snapNames(m.s); h += '<div class="mylopen"><b>' + esc(m.name) + '</b><p>' + esc(nm.slice(0, 12).join(", ")) + (nm.length > 12 ? " and " + (nm.length - 12) + " more" : "") + '</p><div class="row"><button class="btn primary" type="button" data-myadd="1">Add to today</button><button class="btn" type="button" data-mypage="1">Tick-off page</button><button class="link quiet del" type="button" data-mydel="1">Delete</button><button class="link quiet" type="button" data-mymore="1">More</button></div><div class="row mymore"' + (MMORE ? "" : " hidden") + '><button class="link quiet" type="button" data-myrep="1">Replace today\'s list with it</button>'
       + (has ? '<button class="link quiet" type="button" data-myupd="1">Update it with today\'s list</button>' : '') + '<button class="link quiet" type="button" data-myx="1">Close</button></div></div>'; }
-    el.innerHTML = h + '</div></details>'; }
+    el.innerHTML = h + '</div>'; }
   // "+ Create your own list" is the first box among the ready-made lists, same size as the rest
   function mkCard(has){ var c = $("mylCreate"); if(c && c.classList.contains("prow")){ var sp = c.querySelector(".pc"); if(sp) sp.textContent = has ? "save today's list to use again" : "add jobs above, then save them here"; } return;
     var g = $("trips"); if(!g) return;
     if(!c){ c = document.createElement("button"); c.type = "button"; c.id = "mylCreate"; c.className = "trip mkcard"; }
     var kids = [].filter.call(g.children, function(x){ return x !== c; }), at = kids[0] && kids[0].classList.contains("tgrp") ? kids[1] : kids[0];
     if(c.parentNode !== g || c.nextElementSibling !== (at || null)) g.insertBefore(c, at || null);
-    c.innerHTML = '<b>+ Create your own list</b><small>' + (has ? 'Keep the list you’ve made, to use again any time.' : 'Make your list, then save it here to use again any time.') + '</small><span class="n">' + (has ? 'Tap to save it to My days' : 'Start by adding things above') + '</span>'; }
+    c.innerHTML = '<b>+ Create your own list</b><small>' + (has ? 'Keep the list you’ve made, to use again any time.' : 'Make your list, then save it here to use again any time.') + '</small><span class="n">' + (has ? 'Tap to save it to Projects' : 'Start by adding things above') + '</span>'; }
 
   document.addEventListener("click", function(e){ if(!e.target.closest("#mylCreate")) return; e.stopPropagation();
     if(nPicked()){ if($("projBox").hidden) $("projBtn").click(); MFORM = true; MOPEN = ""; drawMy(); setTimeout(function(){ $("myl").scrollIntoView({behavior:"smooth", block:"start"}); var i = $("mylName"); if(i) i.focus({preventScroll:true}); }, 60); }
@@ -1424,9 +1437,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var same = MYL.filter(function(x){ return x.name.toLowerCase() === nm.toLowerCase(); })[0];
     if(same){ if(!confirm("You already have “" + same.name + "”. Replace it with your current list?")) return; same.s = mySnap(); same.t = Date.now(); }
     else MYL.unshift({id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: nm, s: mySnap(), t: Date.now()});
-    MFORM = false; mySave(); drawMy(); toast("Saved to My days: " + nm); }
+    MFORM = false; mySave(); drawMy(); toast("Saved to Projects: " + nm); }
   $("myl").addEventListener("keydown", function(e){ if(e.key === "Enter" && e.target.id === "mylName"){ e.preventDefault(); mySaveNew(); } });
-  $("mylSaveLink").addEventListener("click", function(){ var bx = $("projBox"); if(bx.hidden){ var t = $("projBtn"); if(t) t.click(); } MFORM = true; MOPEN = ""; drawMy();
+  $("mylSaveLink").addEventListener("click", function(){ OPEN.pf = "saved"; saveOpen(); var bx = $("projBox"); if(bx.hidden){ var t = $("projBtn"); if(t) t.click(); } MFORM = true; MOPEN = ""; drawMy();
     setTimeout(function(){ $("myl").scrollIntoView({behavior:"smooth", block:"start"}); var i = $("mylName"); if(i) i.focus({preventScroll:true}); }, 60); });
   myLoad(); drawMy(); drawTrips();
 
