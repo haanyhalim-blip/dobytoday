@@ -552,6 +552,11 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
 .upds .upd,.uprow .upd{color:var(--muted);font-size:.85rem}
 .updel{border:0;background:none;color:var(--faint);font-size:1.05rem;cursor:pointer;float:right;padding:0 2px;line-height:1}
 .upadd{display:block;margin:0 0 8px 44px;border:0;background:none;padding:2px 0;color:var(--main);font:inherit;font-size:.88rem;font-weight:600;cursor:pointer}
+.uplinks{display:flex;gap:16px;margin:0 0 8px 44px}.uplinks .upadd{margin:0}
+.upl{display:block;font-size:.85rem;font-weight:600;color:var(--muted);margin:4px 0 3px}.upl small{font-weight:400}
+.stname{display:block;width:100%;box-sizing:border-box;padding:7px 10px;font:inherit;font-size:.95rem;border:1.5px solid var(--line);border-radius:8px}
+.stdet{display:block;width:100%;box-sizing:border-box;padding:8px 10px;font:inherit;font-size:.92rem;border:1.5px solid var(--line);border-radius:8px;resize:vertical}
+.stname:focus,.stdet:focus{outline:none;border-color:var(--main)}
 .upform{margin:4px 0 10px 44px}.uprow{display:flex;gap:10px;align-items:center;margin-bottom:6px}
 .upname{flex:0 1 160px;padding:6px 9px;font:inherit;font-size:.92rem;border:1.5px solid var(--line);border-radius:8px}
 .upin{display:block;width:100%;box-sizing:border-box;padding:8px 10px;font:inherit;font-size:.95rem;border:1.5px solid var(--line);border-radius:8px;resize:vertical}
@@ -640,7 +645,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v72</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v73</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -798,7 +803,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     b.querySelector("[data-pjno]").addEventListener("click", function(){ b.hidden = true; b.classList.remove("inbox"); }); }
   function switchTo(id, again){ if(id === TABS.active && !again) return;
     if(chan){ try{ chan.unsubscribe(); }catch(e){} chan = null; } clearTimeout(pushT);
-    TABS.active = id; saveTabs(); KEY = keyOf(id); CKEY = ckeyOf(id); S = freshS(); MOREN = ""; PEDIT = false; LEFT = 0; CARRY = []; load();
+    TABS.active = id; saveTabs(); KEY = keyOf(id); CKEY = ckeyOf(id); S = freshS(); MOREN = ""; PEDIT = false; STEPED = -1; UPDN = null; LEFT = 0; CARRY = []; load();
     try{ CODE = localStorage.getItem(CKEY) || ""; }catch(e){ CODE = ""; } lastSent = ""; lastT = 0;
     history.replaceState(null, "", CODE ? (id === "today" ? "#l=" : "#page=") + CODE : location.pathname + location.search);
     showShared(); render(); dayBanner();
@@ -1006,14 +1011,23 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function updHTML(o, i){ var h = "";
     if(o.up && o.up.length) h += '<ul class="upds">' + o.up.map(function(u, k){ return '<li><b>' + esc(u.w || "Someone") + "</b> <span class=\"upd\">· " + esc(upDate(u.d)) + '</span> <button type="button" class="updel" data-updel="' + i + ":" + k + '" aria-label="Delete this update">×</button><br>' + esc(u.t) + "</li>"; }).join("") + "</ul>";
     if(UPDN === o.n) h += '<div class="upform"><div class="uprow"><input class="upname" maxlength="30" placeholder="Your name" value="' + esc(myName()) + '" aria-label="Your name"><span class="upd">' + esc(upDate(iso())) + '</span></div><textarea class="upin" rows="3" placeholder="What\'s happened?" aria-label="Update">' + esc(UPDDRAFT) + '</textarea><div class="row"><button type="button" class="btn primary" data-upsave="' + i + '">Save update</button><button type="button" class="link quiet" data-upx="1">Cancel</button></div></div>';
-    else h += '<button type="button" class="upadd" data-upadd="' + i + '">+ Add update</button>';
+    else if(STEPED === i) h += '<div class="upform"><label class="upl">Step</label><input class="stname" maxlength="200" value="' + esc(o.n) + '" aria-label="Step"><label class="upl">Details <small>– optional, one per line</small></label><textarea class="stdet" rows="3" aria-label="Details">' + esc((o.d || []).join("\n")) + '</textarea><div class="row"><button type="button" class="btn primary" data-stsave="' + i + '">Save</button><button type="button" class="link quiet" data-stx="1">Cancel</button></div></div>';
+    else h += '<div class="uplinks"><button type="button" class="upadd" data-upadd="' + i + '">+ Add update</button><button type="button" class="upadd" data-sted="' + i + '">✎ Edit step</button></div>';
     return h; }
+  var STEPED = -1;
   // a step on a page that ends with a question mark gets a box to write the answer in
   function isQ(o){ return !!(S.keep && TABS.active !== "today" && S.kind !== "links" && /\?\s*$/.test(o.n || "")); }
   function moreSet(k){ MOREN = k; document.querySelectorAll("#mine .mrow").forEach(function(r){ var b = r.querySelector(".more"), on = !!b && b.dataset.more === k; r.classList.toggle("open", on); if(b) b.setAttribute("aria-expanded", String(on)); }); }
   $("ltabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.tab){ if(PEDIT === "new" && !S.title && !nPicked()){ dropProject(); return; } BACKTOP = true; LASTPG = TABS.active; switchTo(b.dataset.tab); } });
-  $("mine").addEventListener("click", function(e){ if(e.target.closest(".ansbox") || e.target.closest(".upform input, .upform textarea")){ e.stopPropagation(); return; }
-    var ua = e.target.closest("[data-upadd]"); if(ua){ e.stopPropagation(); var o = S.own[+ua.dataset.upadd]; if(!o) return; UPDN = o.n; UPDDRAFT = ""; render(); var f = document.querySelector("#mine .upform " + (myName() ? ".upin" : ".upname")); if(f) f.focus(); return; }
+  $("mine").addEventListener("click", function(e){ if(e.target.closest(".ansbox") || e.target.closest(".upform input, .upform textarea, .upform label")){ e.stopPropagation(); return; }
+    var se = e.target.closest("[data-sted]"); if(se){ e.stopPropagation(); STEPED = +se.dataset.sted; UPDN = null; render(); var sf = document.querySelector("#mine .stname"); if(sf){ sf.focus(); sf.setSelectionRange(sf.value.length, sf.value.length); } return; }
+    if(e.target.closest("[data-stx]")){ e.stopPropagation(); STEPED = -1; render(); return; }
+    var ss = e.target.closest("[data-stsave]"); if(ss){ e.stopPropagation(); var os = S.own[+ss.dataset.stsave]; if(!os) return; var nn = ((document.querySelector("#mine .stname") || {}).value || "").trim();
+      if(!nn){ toast("The step needs some words"); return; } if(nn !== os.n && S.own.some(function(x){ return x !== os && x.n === nn; })){ toast("There's already a step called that"); return; }
+      if(nn !== os.n && S.note && S.note[os.n] != null){ S.note[nn] = S.note[os.n]; delete S.note[os.n]; }
+      os.n = nn; var dl = ((document.querySelector("#mine .stdet") || {}).value || "").split("\n").map(function(x){ return x.replace(/^[-*•]\s*/, "").trim(); }).filter(Boolean); if(dl.length) os.d = dl; else delete os.d;
+      STEPED = -1; save(); render(); toast("Step saved"); return; }
+    var ua = e.target.closest("[data-upadd]"); if(ua){ e.stopPropagation(); var o = S.own[+ua.dataset.upadd]; if(!o) return; STEPED = -1; UPDN = o.n; UPDDRAFT = ""; render(); var f = document.querySelector("#mine .upform " + (myName() ? ".upin" : ".upname")); if(f) f.focus(); return; }
     if(e.target.closest("[data-upx]")){ e.stopPropagation(); UPDN = null; UPDDRAFT = ""; render(); return; }
     var us = e.target.closest("[data-upsave]"); if(us){ e.stopPropagation(); var o2 = S.own[+us.dataset.upsave], t = (document.querySelector("#mine .upin") || {}).value || "", w = ((document.querySelector("#mine .upname") || {}).value || "").trim();
       if(!o2) return; if(!t.trim()){ toast("Type the update first"); return; } try{ if(w) localStorage.setItem("dobytoday-name", w); }catch(er){}
@@ -1120,7 +1134,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function openMine(){ var mx = $("mineBody"); if(mx.hidden){ mx.hidden = false; $("mineBtn").setAttribute("aria-expanded", "true"); } var t = $("listSec").getBoundingClientRect().top + window.pageYOffset - 80; window.scrollTo({top: Math.max(0, t), behavior:"smooth"}); }
   function closeMine(){}
   function render(){ var fa = document.activeElement, fi = fa && fa.classList && fa.classList.contains("ansbox") ? {i:fa.dataset.ans, s:fa.selectionStart, e:fa.selectionEnd} : null;
-    var fu = fa && fa.classList && (fa.classList.contains("upin") || fa.classList.contains("upname")) ? {c:fa.className, v:fa.value, s:fa.selectionStart, e:fa.selectionEnd} : null;
+    var fu = fa && fa.classList && (fa.classList.contains("upin") || fa.classList.contains("upname") || fa.classList.contains("stname") || fa.classList.contains("stdet")) ? {c:fa.className, v:fa.value, s:fa.selectionStart, e:fa.selectionEnd} : null;
     if(fi && S.own[+fi.i]) S.own[+fi.i].ans = fa.value;
     drawTabs();
     $("mine").innerHTML = draw(true);
