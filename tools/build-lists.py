@@ -168,7 +168,7 @@ for t in TRIPS:
     assert sum(len(i) for _, i in groups) == len(t["items"]), t["name"]
     link = f'{SITE}/lists/{t["slug"]}'
     body = [f'<h1>{e(t["name"])}</h1><p class="lead">{e(t["blurb"])}</p>']
-    body.append(f'<p class="acts2"><a class="add" href="/#list={e(t["slug"])}">＋ Add to my list</a><a class="add keepb" href="/#keep={e(t["slug"])}">★ Save to My days</a><button type="button" data-share="{e(link)}">Share</button><button type="button" onclick="print()">Print</button></p>')
+    body.append(f'<p class="acts2"><a class="add" href="/#list={e(t["slug"])}">＋ Add to my list</a><a class="add keepb" href="/#keep={e(t["slug"])}">★ Save to Projects</a><button type="button" data-share="{e(link)}">Share</button><button type="button" onclick="print()">Print</button></p>')
     body.append(f'<div class="prog" id="prog" data-slug="{e(t["slug"])}" data-daily="1"><div class="pbar"><i></i></div><div class="pt"><span class="pn">0 done</span><button type="button" data-again="1" hidden>Start again</button></div></div>')
     body.append('<div class="card">')
     tk = lambda n: f'<li><button class="tk" type="button" data-n="{e(n)}" aria-pressed="false">{e(n)}</button></li>'
