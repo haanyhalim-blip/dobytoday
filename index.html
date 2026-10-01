@@ -463,6 +463,11 @@ h2.dsec .sub{text-transform:none;letter-spacing:0;font-weight:400}
 .pdelrow .danger{color:#c0392b;font-size:.88rem}
 .ptitle.untitled{color:var(--muted)}
 #mine .steps .mrow{flex-wrap:wrap}
+.sdetw{flex-basis:100%;margin:0 0 4px 44px}
+.sdetw summary{cursor:pointer;font-size:.85rem;font-weight:600;color:var(--muted);padding:2px 0;list-style:none}
+.sdetw summary::-webkit-details-marker{display:none}
+.sdetw summary::before{content:"▸ ";display:inline-block;width:1em}.sdetw[open] summary::before{content:"▾ "}
+.sdetw .sdet{margin-left:1.2em}
 .sdet{flex-basis:100%;margin:2px 0 6px 2.4em;padding:0 0 0 1em;font-size:.88rem;color:var(--muted);line-height:1.45}
 .sdet li{margin:2px 0}
 .mrow.got .sdet{opacity:.6}
@@ -547,7 +552,10 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
 .pastday{padding:6px 0;border-top:1px solid var(--line);font-size:.9rem}
 .pastday b{color:var(--ink)}
 .sharetop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 10px}.sharetop b{color:var(--muted)}#shareX{white-space:nowrap}
-.upds{list-style:none;margin:4px 0 6px 44px;padding:0}
+#mine .mrow.hasx{flex-wrap:wrap}#mine .mrow.hasx>.it{flex:1 1 0}
+.mrow>.uphead,.mrow>.upds,.mrow>.uplinks,.mrow>.upform,.mrow>.sdetw,.mrow>.ansbox{flex:0 0 calc(100% - 44px);box-sizing:border-box}
+.uphead{margin:6px 0 4px 44px;font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.upds{list-style:none;margin:0 0 6px 44px;padding:0}
 .upds li{margin:0 0 6px;padding:7px 10px;background:#f6efe9;border-left:3px solid var(--main);border-radius:6px;font-size:.92rem;line-height:1.4}
 .upds .upd,.uprow .upd{color:var(--muted);font-size:.85rem}
 .updel{border:0;background:none;color:var(--faint);font-size:1.05rem;cursor:pointer;float:right;padding:0 2px;line-height:1}
@@ -645,7 +653,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v73</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v74</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1000,8 +1008,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function mineRow(n, ref, got, cls, b, link){ var mk = cls + "|" + n; return '<div class="mrow'+(got?" got":"")+(!got && MOREN === mk ? " open" : "")+'"><button class="it'+cls+(got?" got":"")+'" '+ref+' aria-pressed="'+got+'"><span class="box"></span><span><span class="nm" data-done="'+doneWord(b)+'">'+esc(n)+'</span>'+(got ? noteTag(n) : ''+((S.note || {})[n] ? '<small class="cnote">'+esc((S.note || {})[n])+'</small>' : '')+'')+'</span></button>'+(link ? '<a class="jlink rowlink" href="'+esc(link)+'" target="_blank" rel="noopener">Open list ↗</a>' : '')+(got ? '' : moreBtn(mk) + ctl(n, ref))+'</div>'; }
   function mineBtn(it){ return mineRow(it.n, 'data-n="'+esc(it.n)+'"', !!S.got[it.n], '', bagOf(it)); }
   function mineOwn(o, i){ var r = mineRow(o.n, 'data-own="'+i+'"', !!o.got, ' own', o.b, o.link);
-    if(o.d && o.d.length && S.keep) r = r.replace(/<\/div>$/, '<ul class="sdet">' + o.d.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>");
-    if(S.keep && TABS.active !== "today" && S.kind !== "links") r = r.replace(/<\/div>$/, updHTML(o, i) + "</div>");
+    if(o.d && o.d.length && S.keep) r = r.replace(/<\/div>$/, '<details class="sdetw" data-det="' + esc(o.n) + '"' + (DETOPEN[o.n] ? " open" : "") + '><summary>Details <small>(' + o.d.length + ')</small></summary><ul class="sdet">' + o.d.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></details></div>");
+    if(S.keep && TABS.active !== "today" && S.kind !== "links") r = r.replace(/^<div class="mrow/, '<div class="mrow hasx').replace(/<\/div>$/, updHTML(o, i) + "</div>");
     if(isQ(o)) r = r.replace(/^<div class="mrow/, '<div class="mrow qrow').replace(/<\/div>$/, '<textarea class="ansbox" data-ans="' + i + '" rows="2" placeholder="Write your answer here" aria-label="Answer">' + esc(o.ans || "") + "</textarea></div>");
     return r; }
   // Updates on a step: who, when, and what's happened – kept on the card for everyone it's shared with
@@ -1009,17 +1017,17 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function myName(){ try{ return localStorage.getItem("dobytoday-name") || ""; }catch(e){ return ""; } }
   function upDate(d){ var x = new Date(d + "T12:00:00"), m = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][x.getMonth()]; return x.getDate() + " " + m + (x.getFullYear() !== new Date().getFullYear() ? " " + x.getFullYear() : ""); }
   function updHTML(o, i){ var h = "";
-    if(o.up && o.up.length) h += '<ul class="upds">' + o.up.map(function(u, k){ return '<li><b>' + esc(u.w || "Someone") + "</b> <span class=\"upd\">· " + esc(upDate(u.d)) + '</span> <button type="button" class="updel" data-updel="' + i + ":" + k + '" aria-label="Delete this update">×</button><br>' + esc(u.t) + "</li>"; }).join("") + "</ul>";
+    if(o.up && o.up.length) h += '<div class="uphead">Updates</div><ul class="upds">' + o.up.map(function(u, k){ return '<li><b>' + esc(u.w || "Someone") + "</b> <span class=\"upd\">· " + esc(upDate(u.d)) + '</span> <button type="button" class="updel" data-updel="' + i + ":" + k + '" aria-label="Delete this update">×</button><br>' + esc(u.t) + "</li>"; }).join("") + "</ul>";
     if(UPDN === o.n) h += '<div class="upform"><div class="uprow"><input class="upname" maxlength="30" placeholder="Your name" value="' + esc(myName()) + '" aria-label="Your name"><span class="upd">' + esc(upDate(iso())) + '</span></div><textarea class="upin" rows="3" placeholder="What\'s happened?" aria-label="Update">' + esc(UPDDRAFT) + '</textarea><div class="row"><button type="button" class="btn primary" data-upsave="' + i + '">Save update</button><button type="button" class="link quiet" data-upx="1">Cancel</button></div></div>';
     else if(STEPED === i) h += '<div class="upform"><label class="upl">Step</label><input class="stname" maxlength="200" value="' + esc(o.n) + '" aria-label="Step"><label class="upl">Details <small>– optional, one per line</small></label><textarea class="stdet" rows="3" aria-label="Details">' + esc((o.d || []).join("\n")) + '</textarea><div class="row"><button type="button" class="btn primary" data-stsave="' + i + '">Save</button><button type="button" class="link quiet" data-stx="1">Cancel</button></div></div>';
     else h += '<div class="uplinks"><button type="button" class="upadd" data-upadd="' + i + '">+ Add update</button><button type="button" class="upadd" data-sted="' + i + '">✎ Edit step</button></div>';
     return h; }
-  var STEPED = -1;
+  var STEPED = -1, DETOPEN = {};   // details under a step are folded until tapped; remember which are open
   // a step on a page that ends with a question mark gets a box to write the answer in
   function isQ(o){ return !!(S.keep && TABS.active !== "today" && S.kind !== "links" && /\?\s*$/.test(o.n || "")); }
   function moreSet(k){ MOREN = k; document.querySelectorAll("#mine .mrow").forEach(function(r){ var b = r.querySelector(".more"), on = !!b && b.dataset.more === k; r.classList.toggle("open", on); if(b) b.setAttribute("aria-expanded", String(on)); }); }
   $("ltabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.tab){ if(PEDIT === "new" && !S.title && !nPicked()){ dropProject(); return; } BACKTOP = true; LASTPG = TABS.active; switchTo(b.dataset.tab); } });
-  $("mine").addEventListener("click", function(e){ if(e.target.closest(".ansbox") || e.target.closest(".upform input, .upform textarea, .upform label")){ e.stopPropagation(); return; }
+  $("mine").addEventListener("click", function(e){ if(e.target.closest(".ansbox") || e.target.closest(".upform input, .upform textarea, .upform label, .sdetw")){ e.stopPropagation(); return; }
     var se = e.target.closest("[data-sted]"); if(se){ e.stopPropagation(); STEPED = +se.dataset.sted; UPDN = null; render(); var sf = document.querySelector("#mine .stname"); if(sf){ sf.focus(); sf.setSelectionRange(sf.value.length, sf.value.length); } return; }
     if(e.target.closest("[data-stx]")){ e.stopPropagation(); STEPED = -1; render(); return; }
     var ss = e.target.closest("[data-stsave]"); if(ss){ e.stopPropagation(); var os = S.own[+ss.dataset.stsave]; if(!os) return; var nn = ((document.querySelector("#mine .stname") || {}).value || "").trim();
@@ -1034,6 +1042,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       o2.up = (o2.up || []).concat([{w:w, d:iso(), t:t.trim()}]); UPDN = null; UPDDRAFT = ""; save(); render(); toast("Update added"); return; }
     var ud = e.target.closest("[data-updel]"); if(ud){ e.stopPropagation(); var pr = ud.dataset.updel.split(":"), o3 = S.own[+pr[0]]; if(!o3 || !o3.up) return; var u = o3.up[+pr[1]]; if(!u || !confirm("Delete this update?")) return;
       o3.up.splice(+pr[1], 1); save(); render(); toast("Update deleted", function(){ o3.up.splice(+pr[1], 0, u); save(); render(); }); return; } }, true);
+  $("mine").addEventListener("toggle", function(e){ var d = e.target; if(d.classList && d.classList.contains("sdetw")){ if(d.open) DETOPEN[d.dataset.det] = 1; else delete DETOPEN[d.dataset.det]; } }, true);
   $("mine").addEventListener("input", function(e){ if(e.target.classList.contains("upin")) UPDDRAFT = e.target.value; });
   $("mine").addEventListener("click", function(e){ var b = e.target.closest(".more"); if(!b) return; e.stopPropagation(); moreSet(MOREN === b.dataset.more ? "" : b.dataset.more); }, true);
   document.addEventListener("click", function(e){ if(MOREN && !e.target.closest(".mrow.open")) moreSet(""); });
