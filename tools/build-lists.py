@@ -70,6 +70,7 @@ footer a{color:var(--main-deep)}
 .acts2{display:flex;gap:8px;flex-wrap:wrap;margin:0 0 14px}
 .acts2 a,.acts2 button{font:inherit;font-size:.9rem;font-weight:700;color:var(--main-deep);background:var(--card);border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;text-decoration:none;cursor:pointer}
 .acts2 .add{background:var(--main);border-color:var(--main);color:#fff}
+.acts2 .keepb{background:#fff;color:var(--main-deep);border-color:var(--main)}
 .prog{position:sticky;top:0;z-index:3;background:var(--bg);padding:10px 0 10px;margin:0 0 4px}
 .pbar{height:12px;border-radius:99px;background:var(--wash);overflow:hidden}
 .prog.all .pbar i{background:linear-gradient(90deg,#e6be55,#c9971f)}
@@ -167,7 +168,7 @@ for t in TRIPS:
     assert sum(len(i) for _, i in groups) == len(t["items"]), t["name"]
     link = f'{SITE}/lists/{t["slug"]}'
     body = [f'<h1>{e(t["name"])}</h1><p class="lead">{e(t["blurb"])}</p>']
-    body.append(f'<p class="acts2"><a class="add" href="/#list={e(t["slug"])}">＋ Add to my list</a><button type="button" data-share="{e(link)}">Share</button><button type="button" onclick="print()">Print</button></p>')
+    body.append(f'<p class="acts2"><a class="add" href="/#list={e(t["slug"])}">＋ Add to my list</a><a class="add keepb" href="/#keep={e(t["slug"])}">★ Save to My days</a><button type="button" data-share="{e(link)}">Share</button><button type="button" onclick="print()">Print</button></p>')
     body.append(f'<div class="prog" id="prog" data-slug="{e(t["slug"])}" data-daily="1"><div class="pbar"><i></i></div><div class="pt"><span class="pn">0 done</span><button type="button" data-again="1" hidden>Start again</button></div></div>')
     body.append('<div class="card">')
     tk = lambda n: f'<li><button class="tk" type="button" data-n="{e(n)}" aria-pressed="false">{e(n)}</button></li>'
