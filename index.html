@@ -609,7 +609,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v59</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v60</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -827,12 +827,15 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var LI = /^(?:[-*•\u2610\u2611]|\d+[.)\]])\s+(.*)$/;
     while(i < lines.length && !lines[i].trim()) i++;
     if(!hasTitle && i < lines.length){ var f = lines[i].trim(); if(f.length <= 90 && !LI.test(f) && !/[.!?:]$/.test(f) && !STEPHEAD.test(f)){ title = titleCase(f); i++; } }
+    // a heading: a short line on its own (blank line before, text straight after), not ending like a sentence
+    var isHead = function(k){ var x = lines[k].trim(); return x.length > 0 && x.length <= 50 && !/[.!?:,;]$/.test(x) && !LI.test(x) && (k === 0 || !lines[k - 1].trim()) && k + 1 < lines.length && !!lines[k + 1].trim(); };
     for(; i < lines.length; i++){ var x = lines[i].trim(), li = x.match(LI);
       if(STEPHEAD.test(x)){ inSteps = true; headSeen = true; lastStep = false; continue; }
-      if(inSteps){ if(li){ steps.push(li[1].trim()); lastStep = true; continue; }
-        if(!x){ lastStep = false; continue; }
-        if(lastStep){ steps[steps.length - 1] += " " + x; continue; }   // a step that ran onto a second line
-        inSteps = false; }
+      if(inSteps){ if(!x){ lastStep = false; continue; }
+        if(isHead(i) && steps.length){ inSteps = false; keep.push(lines[i]); continue; }   // the next section starts
+        if(li){ steps.push(li[1].trim()); lastStep = true; continue; }
+        if(lastStep && /^[a-z(]/.test(x)){ steps[steps.length - 1] += " " + x; continue; }   // a step that ran onto a second line
+        steps.push(x); lastStep = true; continue; }   // copied without its number or bullet – still a step
       keep.push(lines[i]); }
     if(!headSeen){ // no "Steps" heading: if there's one numbered list, those are the steps
       var blocks = [], cur = null; keep.forEach(function(l, k){ var m = l.trim().match(/^\d+[.)\]]\s+(.*)$/); if(m){ if(!cur){ cur = {from:k, items:[]}; blocks.push(cur); } cur.items.push(m[1].trim()); cur.to = k; } else if(l.trim()) cur = null; });
@@ -851,7 +854,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       if(!x){ flush(); return; }
       var bu = x.match(/^[-*•]\s+(.*)$/), nu = x.match(/^\d+[.)]\s+(.*)$/);
       if(bu || nu){ var tag = nu ? "<ol>" : "<ul>"; if(list && list.indexOf(tag) !== 0) flush(); if(!list) list = tag; list += "<li>" + esc((bu || nu)[1]) + "</li>"; return; }
-      flush(); var head = x.length < 70 && !/[.!?:]$/.test(x) && /^([-*•]|\d+[.)])\s/.test(nx);
+      var prevBlank = i === 0 || !lines[i - 1].trim(), nextNow = i + 1 < lines.length && !!lines[i + 1].trim();
+      flush(); var head = x.length < 70 && !/[.!?:,;]$/.test(x) && (/^([-*•]|\d+[.)])\s/.test(nx) || (x.length <= 50 && prevBlank && nextNow));
       h += head ? "<h4>" + esc(x) + "</h4>" : "<p>" + esc(x) + "</p>"; });
     flush(); return h; }
   var NOPEN = true, PEDIT = false, BACKTOP = false, LASTPG = "", PF = "all";
