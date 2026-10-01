@@ -450,6 +450,11 @@ h2.dsec .sub{text-transform:none;letter-spacing:0;font-weight:400}
 .prow.pnew{border:2px dashed var(--main);border-left-width:2px;background:transparent}
 .prow.pnew .pn{color:var(--main)}
 .gchips{display:flex;flex-wrap:wrap;gap:6px}
+.pafter{margin-top:18px}
+#mine .steps .mrow{flex-wrap:wrap}
+.sdet{flex-basis:100%;margin:2px 0 6px 2.4em;padding:0 0 0 1em;font-size:.88rem;color:var(--muted);line-height:1.45}
+.sdet li{margin:2px 0}
+.mrow.got .sdet{opacity:.6}
 @media (max-width:520px){#trips .trip small{display:none}#trips .trip{min-height:84px;justify-content:space-between}}
 .filt{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:6px;margin:0 0 4px}
 .fchip{border:1.5px solid var(--ink);background:var(--card);color:var(--ink);border-radius:999px;padding:6px 13px;font:inherit;font-size:.88rem;font-weight:700;cursor:pointer}
@@ -609,7 +614,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v61</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v62</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -655,7 +660,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function keyOf(id){ return id === "today" ? "dobytoday-v1" : "dobytoday-v1:" + id; }
   function ckeyOf(id){ return id === "today" ? "dobytoday-code-v1" : "dobytoday-code-v1:" + id; }
   function saveTabs(){ try{ localStorage.setItem(LKEY, JSON.stringify(TABS)); }catch(e){} }
-  function freshS(){ return {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}, day:"", later:[], past:[], seen:[], title:"", notes:"", keep:false, kind:""}; }
+  function freshS(){ return {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}, day:"", later:[], past:[], seen:[], title:"", notes:"", after:"", keep:false, kind:""}; }
   function readList(id){ var d; try{ d = JSON.parse(localStorage.getItem(keyOf(id)) || "{}") || {}; }catch(e){ d = {}; } var f = freshS(); Object.keys(f).forEach(function(k){ if(d[k] == null) d[k] = f[k]; }); return d; }
   // Do something to the Today list even while a project is open
   function withToday(fn){ if(TABS.active === "today"){ fn(S); save(); render(); return; }
@@ -681,7 +686,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function doneWord(b){ return "done"; }
 
   function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} if(typeof syncPush === "function") syncPush(); if(typeof acctPush === "function") acctPush(); }
-  function load(){ try{ var r = localStorage.getItem(KEY); if(r){ var v = JSON.parse(r); if(v && typeof v === "object"){ S.picked = v.picked || {}; S.got = v.got || {}; S.own = v.own || []; S.bag = v.bag || {}; S.removed = v.removed || []; S.note = v.note || {}; S.day = v.day || ""; S.later = v.later || []; S.past = v.past || []; S.seen = v.seen || []; S.title = v.title || ""; S.notes = v.notes || ""; S.keep = !!v.keep; S.kind = v.kind || ""; } } }catch(e){}
+  function load(){ try{ var r = localStorage.getItem(KEY); if(r){ var v = JSON.parse(r); if(v && typeof v === "object"){ S.picked = v.picked || {}; S.got = v.got || {}; S.own = v.own || []; S.bag = v.bag || {}; S.removed = v.removed || []; S.note = v.note || {}; S.day = v.day || ""; S.later = v.later || []; S.past = v.past || []; S.seen = v.seen || []; S.title = v.title || ""; S.notes = v.notes || ""; S.after = v.after || ""; S.keep = !!v.keep; S.kind = v.kind || ""; } } }catch(e){}
     newDay();
     try{ var o = localStorage.getItem(OKEY); if(o) OPEN = JSON.parse(o) || OPEN; }catch(e){}
     S.own.forEach(function(o){ if(!CATS.some(function(a){ return a[0] === o.a; })) o.a = classify(o.n); if(!bagLabel[o.b]) o.b = BAGOF[o.a] || "hold"; }); }
@@ -822,17 +827,31 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     return out;
   }
   var STEPHEAD = /^(?:#+\s*)?(?:the\s+)?(steps|next steps|steps to take|to ?do(?: list)?|to-dos?|tasks|action items|actions|checklist|what to do|plan)\s*:?\s*$/i;
-  function titleCase(t){ return /[a-z]/.test(t) ? t : t.toLowerCase().replace(/(^|[\s\-–(\/])([a-z])/g, function(m, a, b){ return a + b.toUpperCase(); }); }
-  function parsePaste(t, hasTitle){ var lines = String(t || "").replace(/\r/g, "").split("\n"), title = "", steps = [], keep = [], i = 0, inSteps = false, headSeen = false, lastStep = false;
+  var SMALLW = {a:1, an:1, the:1, of:1, to:1, and:1, in:1, on:1, for:1, at:1, by:1, or:1, nor:1, but:1, as:1, vs:1, via:1, per:1};
+  var ACRO = {us:1, uk:1, usa:1, eu:1, ein:1, ssn:1, cpa:1, va:1, pa:1, ny:1, ca:1, et:1, est:1, pst:1, gmt:1, bst:1, ach:1, po:1, pdf:1, id:1, irs:1, llc:1, ltd:1, plc:1, vat:1, nhs:1, hmrc:1, gp:1, tv:1, diy:1, atm:1, faq:1, asap:1, ok:1, uae:1, mot:1, dvla:1, ups:1, dhl:1, fbi:1, hr:1, ceo:1, pin:1, sms:1, url:1, wifi:1, ai:1};
+  function caseWord(w, first, title){ var core = w.replace(/[^A-Za-z0-9]/g, ""), lc = core.toLowerCase();
+    if(/\d/.test(core) || ACRO[lc] || (core.length >= 2 && !/[aeiouy]/i.test(core))) return w;   // Q2, US, EIN, CPA stay in capitals
+    var l = w.toLowerCase(); return first || PROPER[lc] || (title && !SMALLW[lc]) ? l.replace(/[a-z]/, function(c){ return c.toUpperCase(); }) : l; }
+  var PROPER = {};   // names written with a capital somewhere in what you pasted (Virginia, Red Awning) keep it in headings
+  function learnProper(t){ PROPER = {}; var low = {}; String(t || "").split("\n").forEach(function(l){ if(!/[a-z]/.test(l)) return; var ws = l.replace(/^[\s\-*•\d.)]*/, "").split(/\s+/);
+      ws.forEach(function(w, k){ var c = w.replace(/[^A-Za-z]/g, ""); if(/^[a-z]+$/.test(c)) low[c] = 1; else if(k > 0 && /^[A-Z][a-z]+$/.test(c) && !/[.!?:]$/.test(ws[k - 1])) PROPER[c.toLowerCase()] = 1; }); });
+    Object.keys(low).forEach(function(w){ delete PROPER[w]; }); }   // only words never written in lowercase count as names
+  function titleCase(t){ return /[a-z]/.test(t) ? t : t.split(/(\s+)/).map(function(w, i){ return /\s/.test(w) ? w : caseWord(w, i === 0, true); }).join(""); }
+  function niceCase(t){ return /[a-z]/.test(t) ? t : t.split(/(\s+)/).map(function(w, i){ return /\s/.test(w) ? w : caseWord(w, i === 0, false); }).join(""); }
+  function capsHead(x){ return x.length <= 70 && /[A-Z]{2}/.test(x) && !/[a-z]/.test(x) && !/^(?:[-*•]|\d+[.)\]])\s/.test(x); }
+  function parsePaste(t, hasTitle){ learnProper(t); var lines = String(t || "").replace(/\r/g, "").split("\n"), title = "", steps = [], keep = [], i = 0, inSteps = false, headSeen = false, lastStep = false;
     var LI = /^(?:[-*•\u2610\u2611]|\d+[.)\]])\s+(.*)$/;
     while(i < lines.length && !lines[i].trim()) i++;
     if(!hasTitle && i < lines.length){ var f = lines[i].trim(); if(f.length <= 90 && !LI.test(f) && !/[.!?:]$/.test(f) && !STEPHEAD.test(f)){ title = titleCase(f); i++; } }
     // a heading: a short line on its own (blank line before, text straight after), not ending like a sentence
     var isHead = function(k){ var x = lines[k].trim(); return x.length > 0 && x.length <= 50 && !/[.!?:,;]$/.test(x) && !LI.test(x) && (k === 0 || !lines[k - 1].trim()) && k + 1 < lines.length && !!lines[k + 1].trim(); };
-    for(; i < lines.length; i++){ var x = lines[i].trim(), li = x.match(LI);
-      if(STEPHEAD.test(x)){ inSteps = true; headSeen = true; lastStep = false; continue; }
+    var cut = -1, SL = /^(?:step|stage|phase)\s*\d+\s*[-–—:.)]\s*(.+)$/i, curStep = null, details = {};
+    for(; i < lines.length; i++){ var x = lines[i].trim(), li = x.match(LI), sl = x.match(SL);
+      if(sl){ curStep = niceCase(sl[1].trim()); steps.push(curStep); details[curStep] = []; headSeen = true; inSteps = false; if(cut < 0) cut = keep.length; continue; }
+      if(curStep){ if(!x) continue; if(capsHead(x) || isHead(i)){ curStep = null; } else { details[curStep].push(li ? li[1].trim() : x); continue; } }
+      if(STEPHEAD.test(x)){ inSteps = true; headSeen = true; lastStep = false; if(cut < 0) cut = keep.length; continue; }
       if(inSteps){ if(!x){ lastStep = false; continue; }
-        if(isHead(i) && steps.length){ inSteps = false; keep.push(lines[i]); continue; }   // the next section starts
+        if((isHead(i) || capsHead(x)) && steps.length){ inSteps = false; keep.push(lines[i]); continue; }   // the next section starts
         if(li){ steps.push(li[1].trim()); lastStep = true; continue; }
         if(lastStep && /^[a-z(]/.test(x)){ steps[steps.length - 1] += " " + x; continue; }   // a step that ran onto a second line
         steps.push(x); lastStep = true; continue; }   // copied without its number or bullet – still a step
@@ -840,7 +859,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(!headSeen){ // no "Steps" heading: if there's one numbered list, those are the steps
       var blocks = [], cur = null; keep.forEach(function(l, k){ var m = l.trim().match(/^\d+[.)\]]\s+(.*)$/); if(m){ if(!cur){ cur = {from:k, items:[]}; blocks.push(cur); } cur.items.push(m[1].trim()); cur.to = k; } else if(l.trim()) cur = null; });
       if(blocks.length === 1 && blocks[0].items.length > 1){ steps = blocks[0].items; keep.splice(blocks[0].from, blocks[0].to - blocks[0].from + 1); } }
-    var out = {title:title, notes:keep.join("\n").replace(/\n{3,}/g, "\n\n").trim(), steps:steps, links:[]};
+    var tidy = function(a){ return a.join("\n").replace(/\n{3,}/g, "\n\n").trim(); };
+    var out = {title:title, notes:tidy(cut < 0 ? keep : keep.slice(0, cut)), after:cut < 0 ? "" : tidy(keep.slice(cut)), steps:steps, links:[], details:details};
     var lk = (steps.length ? steps : out.notes.split("\n")).map(function(l){ return linkOf(l); }).filter(Boolean);
     if(lk.length && lk.length >= (steps.length || out.notes.split("\n").filter(function(l){ return l.trim(); }).length) / 2){ out.links = lk; if(!steps.length) out.notes = out.notes.split("\n").filter(function(l){ return !linkOf(l); }).join("\n").trim(); out.steps = []; }
     return out; }
@@ -856,7 +876,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       if(bu || nu){ var tag = nu ? "<ol>" : "<ul>"; if(list && list.indexOf(tag) !== 0) flush(); if(!list) list = tag; list += "<li>" + esc((bu || nu)[1]) + "</li>"; return; }
       var prevBlank = i === 0 || !lines[i - 1].trim(), nextNow = i + 1 < lines.length && !!lines[i + 1].trim();
       flush(); var head = x.length < 70 && !/[.!?:,;]$/.test(x) && (/^([-*•]|\d+[.)])\s/.test(nx) || (x.length <= 50 && prevBlank && nextNow));
-      h += head ? "<h4>" + esc(x) + "</h4>" : "<p>" + esc(x) + "</p>"; });
+      if(!head && capsHead(x)) head = true;
+      h += head ? "<h4>" + esc(niceCase(x)) + "</h4>" : "<p>" + esc(x) + "</p>"; });
     flush(); return h; }
   var NOPEN = true, PEDIT = false, BACKTOP = false, LASTPG = "", PF = "all";
   function curTab(){ return TABS.lists.filter(function(l){ return l.id === TABS.active; })[0] || {}; }
@@ -868,7 +889,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       + groupField("") + '<div class="row"><button type="button" class="btn primary" data-pmake="1">Create it</button><button type="button" class="link quiet" data-pdel="1">Cancel</button></div></div>';
     if(PEDIT) return '<div class="pedit"><label for="pTitle">Title</label><input id="pTitle" maxlength="120" value="' + esc(S.title) + '" placeholder="e.g. Overdue occupancy tax"><label for="pNotes">Notes <small>– what it\'s about, who\'s who, numbers to hand. Start a line with "- " for a bullet.</small></label><textarea id="pNotes" rows="10">' + esc(S.notes) + '</textarea>' + (TABS.active !== "today" ? (S.kind === "links" ? '<label for="pItems">Links <small>– one per line: a name, then the link</small></label><textarea id="pItems" rows="6">' + esc(S.own.map(function(o){ return o.n + " – " + (o.url || ""); }).join("\n")) + "</textarea>"
         : '<label for="pItems">Steps <small>– one per line. Change, add, delete or move lines; ticks stay on steps you keep.</small></label><textarea id="pItems" rows="8">' + esc(S.own.map(function(o){ return o.n; }).join("\n")) + "</textarea>") : "")
-      + (TABS.active !== "today" ? groupField(curTab().group || "") + '<label class="pkeep"><input type="checkbox" id="pPin"' + (curTab().pin ? " checked" : "") + '> Pin it to the top of Projects</label>' : "")
+      + (TABS.active !== "today" ? groupField(curTab().group || "") + '<label for="pAfter">Notes after the steps <small>– optional</small></label><textarea id="pAfter" rows="5">' + esc(S.after || "") + '</textarea><label class="pkeep"><input type="checkbox" id="pPin"' + (curTab().pin ? " checked" : "") + '> Pin it to the top of Projects</label>' : "")
       + (TABS.active === "today" ? '<label class="pkeep"><input type="checkbox" id="pKeep"' + (S.keep ? " checked" : "") + '> Keep ticked jobs and the order I add them (like a project)</label>' : "")
       + '<div class="row"><button type="button" class="btn primary" data-psave="1">Save</button><button type="button" class="link quiet" data-px="1">Cancel</button>' + (TABS.active !== "today" ? '<button type="button" class="link danger" data-pdel="1">Delete this page</button>' : "") + '</div></div>';
     if(!has) return "";
@@ -898,7 +919,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function moreBtn(k){ return '<button type="button" class="more" data-more="'+esc(k)+'" aria-label="More options" aria-expanded="'+(MOREN === k)+'"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>'; }
   function mineRow(n, ref, got, cls, b, link){ var mk = cls + "|" + n; return '<div class="mrow'+(got?" got":"")+(!got && MOREN === mk ? " open" : "")+'"><button class="it'+cls+(got?" got":"")+'" '+ref+' aria-pressed="'+got+'"><span class="box"></span><span><span class="nm" data-done="'+doneWord(b)+'">'+esc(n)+'</span>'+(got ? noteTag(n) : ''+((S.note || {})[n] ? '<small class="cnote">'+esc((S.note || {})[n])+'</small>' : '')+'')+'</span></button>'+(link ? '<a class="jlink rowlink" href="'+esc(link)+'" target="_blank" rel="noopener">Open list ↗</a>' : '')+(got ? '' : moreBtn(mk) + ctl(n, ref))+'</div>'; }
   function mineBtn(it){ return mineRow(it.n, 'data-n="'+esc(it.n)+'"', !!S.got[it.n], '', bagOf(it)); }
-  function mineOwn(o, i){ return mineRow(o.n, 'data-own="'+i+'"', !!o.got, ' own', o.b, o.link); }
+  function mineOwn(o, i){ var r = mineRow(o.n, 'data-own="'+i+'"', !!o.got, ' own', o.b, o.link);
+    if(o.d && o.d.length && S.keep) r = r.replace(/<\/div>$/, '<ul class="sdet">' + o.d.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></div>");
+    return r; }
   function moreSet(k){ MOREN = k; document.querySelectorAll("#mine .mrow").forEach(function(r){ var b = r.querySelector(".more"), on = !!b && b.dataset.more === k; r.classList.toggle("open", on); if(b) b.setAttribute("aria-expanded", String(on)); }); }
   $("ltabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.tab){ if(PEDIT === "new" && !S.title && !nPicked()){ dropProject(); return; } BACKTOP = true; LASTPG = TABS.active; switchTo(b.dataset.tab); } });
   $("mine").addEventListener("click", function(e){ var b = e.target.closest(".more"); if(!b) return; e.stopPropagation(); moreSet(MOREN === b.dataset.more ? "" : b.dataset.more); }, true);
@@ -936,6 +959,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       if(steps) html += '<h2 class="aisle dsec"><span class="c"></span>Steps <span class="sub">– ' + nGot() + " of " + nPicked() + ' done</span></h2><div class="grid steps">' + steps + "</div>";
       else html += '<h2 class="aisle dsec"><span class="c"></span>Steps</h2><p class="small">No steps yet.</p>';
       html += '<div class="stepadd"><textarea id="stepIn" rows="1" placeholder="Add a step (paste several, one per line)"></textarea><button type="button" class="btn" data-addstep="1">Add</button></div>';
+      if(S.after) html += '<div class="proj pafter"><div class="pbody">' + fmtNotes(S.after) + "</div></div>";
       return html + laterHTML() + pastHTML(); }
     if(mine){
       html = projHTML();
@@ -1185,12 +1209,12 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(e.target.closest("[data-pdel]")){ e.stopPropagation(); if(PEDIT === "new" && !S.title && !nPicked()){ dropProject(); return; } deleteProject(); return; }
     var gp = e.target.closest("[data-gpick]"); if(gp){ e.stopPropagation(); $("pGroup").value = gp.dataset.gpick; return; }
     if(e.target.closest("[data-pmake]")){ e.stopPropagation(); curTab().group = ($("pGroup").value || "").trim(); saveTabs(); var pr = parsePaste($("pPaste").value); if(!pr.title && !pr.notes && !pr.steps.length){ toast("Paste or type something first"); return; }
-      S.title = pr.title || "Untitled page"; S.notes = pr.notes; S.keep = true; S.day = today();
+      S.title = pr.title || "Untitled page"; S.notes = pr.notes; S.after = pr.steps.length ? pr.after : ""; if(!pr.steps.length && pr.after) S.notes = (S.notes + "\n\n" + pr.after).trim(); S.keep = true; S.day = today();
       if(pr.links.length){ S.kind = "links"; S.own = pr.links.map(function(l){ return {n:l.n, url:l.url, a:"other", b:"any", got:false}; }); }
-      else S.own = pr.steps.map(function(n){ return {n:n, a:"other", b:"any", got:false}; });
+      else S.own = pr.steps.map(function(n){ var d = (pr.details || {})[n]; return d && d.length ? {n:n, d:d, a:"other", b:"any", got:false} : {n:n, a:"other", b:"any", got:false}; });
       PEDIT = false; ensurePage(); save(); render(); window.scrollTo(0, 0); toast(pr.links.length ? pr.links.length + (pr.links.length === 1 ? " link" : " links") + " – tap Open or Copy" : pr.steps.length ? pr.steps.length + " steps found – tick them off as you go" : "Page made – add steps below"); return; }
     if(e.target.closest("[data-psave]")){ e.stopPropagation(); var tv = $("pTitle").value.trim(), pr2 = parsePaste($("pNotes").value, true), nAdd = 0;
-      S.title = tv; S.notes = pr2.notes;
+      S.title = tv; S.notes = pr2.notes; if($("pAfter")) S.after = $("pAfter").value.replace(/\s+$/, "");
       var pi = $("pItems"); if(pi){ var old = {}; S.own.forEach(function(o){ old[o.n] = o; });
         if(S.kind === "links") S.own = pi.value.split("\n").map(linkOf).filter(Boolean).map(function(l){ var was = old[l.n]; return {n:l.n, url:l.url, a:"other", b:"any", got:false}; });
         else S.own = splitSteps(pi.value).map(function(n){ var was = old[n]; return was ? was : {n:n, a:"other", b:"any", got:false}; }); }
@@ -1279,10 +1303,10 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function rpc(fn, body){ return fetch(SB_URL + "/rest/v1/rpc/" + fn, {method:"POST", headers:sbHeaders(), body:JSON.stringify(body)}).then(function(r){ if(!r.ok) throw new Error("rpc " + r.status); return r.text(); }).then(function(t){ return t ? JSON.parse(t) : null; }); }
   function newCode(){ var a = "abcdefghjkmnpqrstuvwxyz23456789", o = "", c = new Uint32Array(12); (window.crypto || {}).getRandomValues ? crypto.getRandomValues(c) : c.forEach(function(_, i){ c[i] = Math.random() * 1e9; }); for(var i = 0; i < 12; i++) o += a[c[i] % a.length]; return "t" + o.slice(1); }
   function shareUrl(){ return "https://dobytoday.com/" + (TABS.active === "today" ? "#l=" : "#page=") + CODE; }
-  function snapshot(){ return JSON.stringify({picked:S.picked, got:S.got, own:S.own, bag:S.bag, removed:S.removed, note:S.note || {}, day:S.day, later:S.later || [], past:S.past || [], title:S.title || "", notes:S.notes || "", keep:!!S.keep, kind:S.kind || ""}); }
+  function snapshot(){ return JSON.stringify({picked:S.picked, got:S.got, own:S.own, bag:S.bag, removed:S.removed, note:S.note || {}, day:S.day, later:S.later || [], past:S.past || [], title:S.title || "", notes:S.notes || "", after:S.after || "", keep:!!S.keep, kind:S.kind || ""}); }
   var lastT = 0, BKEY = "dobytoday-backup-v1";
   function countOf(d){ return Object.keys(d.picked || {}).length + (d.own || []).length + (d.later || []).length + (d.title || d.notes ? 1 : 0); }
-  function mergeInto(d){ var r = {picked:Object.assign({}, d.picked || {}, S.picked || {}), got:Object.assign({}, d.got || {}, S.got || {}), bag:Object.assign({}, d.bag || {}, S.bag || {}), note:Object.assign({}, d.note || {}, S.note || {}), own:(d.own || []).slice(), removed:(d.removed || []).slice(), day:S.day || d.day || "", title:S.title || d.title || "", notes:S.notes || d.notes || "", keep:!!(S.keep || d.keep), kind:S.kind || d.kind || "", later:(d.later || []).slice(), past:(d.past || []).slice()};
+  function mergeInto(d){ var r = {picked:Object.assign({}, d.picked || {}, S.picked || {}), got:Object.assign({}, d.got || {}, S.got || {}), bag:Object.assign({}, d.bag || {}, S.bag || {}), note:Object.assign({}, d.note || {}, S.note || {}), own:(d.own || []).slice(), removed:(d.removed || []).slice(), day:S.day || d.day || "", title:S.title || d.title || "", notes:S.notes || d.notes || "", after:S.after || d.after || "", keep:!!(S.keep || d.keep), kind:S.kind || d.kind || "", later:(d.later || []).slice(), past:(d.past || []).slice()};
     (S.later || []).forEach(function(j){ if(!r.later.some(function(x){ return x.id === j.id; })) r.later.push(j); });
     S.own.forEach(function(o){ if(!r.own.some(function(x){ return norm(x.n) === norm(o.n); })) r.own.push(o); }); return r; }
   function applyRemote(d, viaJoin){ if(!d || typeof d !== "object") return;
@@ -1290,12 +1314,12 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var here = countOf(S), there = countOf(d);
     if(!there && here){ lastSent = ""; syncPush(true); return; }
     var merged = false; if(viaJoin && here && there){ d = mergeInto(d); merged = true; }
-    var j = JSON.stringify({picked:d.picked || {}, got:d.got || {}, own:d.own || [], bag:d.bag || {}, removed:d.removed || [], note:d.note || {}, day:d.day || "", later:d.later || [], past:d.past || [], title:d.title || "", notes:d.notes || "", keep:!!d.keep, kind:d.kind || ""}); if(j === snapshot()) return;
+    var j = JSON.stringify({picked:d.picked || {}, got:d.got || {}, own:d.own || [], bag:d.bag || {}, removed:d.removed || [], note:d.note || {}, day:d.day || "", later:d.later || [], past:d.past || [], title:d.title || "", notes:d.notes || "", after:d.after || "", keep:!!d.keep, kind:d.kind || ""}); if(j === snapshot()) return;
     var before = snapshot(), lost = here - there;
     try{ localStorage.setItem(BKEY, before); }catch(e){}
-    applying = true; S.picked = d.picked || {}; S.got = d.got || {}; S.own = d.own || []; S.bag = d.bag || {}; S.removed = d.removed || []; S.note = d.note || {}; S.day = d.day || ""; S.later = d.later || []; S.past = d.past || []; S.title = d.title || ""; S.notes = d.notes || ""; S.keep = !!d.keep; S.kind = d.kind || ""; if(d.t) lastT = d.t; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} lastSent = snapshot(); render(); applying = false;
+    applying = true; S.picked = d.picked || {}; S.got = d.got || {}; S.own = d.own || []; S.bag = d.bag || {}; S.removed = d.removed || []; S.note = d.note || {}; S.day = d.day || ""; S.later = d.later || []; S.past = d.past || []; S.title = d.title || ""; S.notes = d.notes || ""; S.after = d.after || ""; S.keep = !!d.keep; S.kind = d.kind || ""; if(d.t) lastT = d.t; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} lastSent = snapshot(); render(); applying = false;
     if(merged){ lastSent = ""; syncPush(true); }
-    if(!viaJoin && lost > 0){ toast("List updated from the shared link (" + lost + " fewer)", function(){ try{ var b = JSON.parse(before); applying = true; S.picked = b.picked || {}; S.got = b.got || {}; S.own = b.own || []; S.bag = b.bag || {}; S.removed = b.removed || []; S.note = b.note || {}; S.day = b.day || ""; S.later = b.later || []; S.past = b.past || []; S.title = b.title || ""; S.notes = b.notes || ""; S.keep = !!b.keep; S.kind = b.kind || ""; applying = false; save(); render(); lastSent = ""; syncPush(true); }catch(e){} }); } }
+    if(!viaJoin && lost > 0){ toast("List updated from the shared link (" + lost + " fewer)", function(){ try{ var b = JSON.parse(before); applying = true; S.picked = b.picked || {}; S.got = b.got || {}; S.own = b.own || []; S.bag = b.bag || {}; S.removed = b.removed || []; S.note = b.note || {}; S.day = b.day || ""; S.later = b.later || []; S.past = b.past || []; S.title = b.title || ""; S.notes = b.notes || ""; S.after = b.after || ""; S.keep = !!b.keep; S.kind = b.kind || ""; applying = false; save(); render(); lastSent = ""; syncPush(true); }catch(e){} }); } }
   function syncPush(now){ if(!CODE || applying) return; clearTimeout(pushT); var go = function(){
     var j = snapshot(); if(j === lastSent) return; lastSent = j; lastT = Date.now(); var payload = JSON.parse(j); payload.t = lastT;
     rpc("save_list", {code:CODE, payload:payload}).catch(function(){ lastSent = ""; });
