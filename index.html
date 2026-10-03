@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v78 -->
+<!-- DoByToday v79 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -672,7 +672,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v78</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v79</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1021,6 +1021,10 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     MOREN = ""; render(); toast("On your " + (d <= iso() ? "Today" : dayLabel(d)) + " list" + (title ? " (from " + title + ")" : "")); }
   function noteTag(n){ var c = (S.note || {})[n]; return c ? '<span class="qty">'+esc(c)+'</span>' : ''; }
   // On a project, a step's ⋯ menu can move it up or down the list
+  // Undo for project steps: keep how the steps looked just before a change, and offer to put them back
+  function stepsNow(){ return JSON.parse(JSON.stringify(S.own)); }
+  function stepUndo(msg, before){ toast(msg, function(){ S.own = before; STEPED = -1; UPDN = null; save(); render(); toast("Undone"); }); }
+  function isProj(){ return S.keep && TABS.active !== "today" && S.kind !== "links"; }
   // Drag a step by its grip to a new place in the project
   var DRAG = null;
   function dragRows(){ return Array.prototype.slice.call(document.querySelectorAll("#mine .mrow.hasx")); }
@@ -1036,8 +1040,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   $("mine").addEventListener("pointermove", function(e){ if(!DRAG || e.pointerId !== DRAG.id) return; e.preventDefault(); dragMove(e.clientY); });
   function dragEnd(e){ if(!DRAG || (e && e.pointerId !== DRAG.id)) return; var d = DRAG; DRAG = null; clearInterval(d.tick);
     d.row.classList.remove("dragging"); d.row.style.transform = ""; dragRows().forEach(function(r){ r.classList.remove("dropb", "dropa"); });
-    if(d.to != null && d.to !== d.from && S.own[d.from]){ var o = S.own.splice(d.from, 1)[0]; S.own.splice(d.to, 0, o); STEPED = -1; save(); }
-    render(); }
+    var bd = null; if(d.to != null && d.to !== d.from && S.own[d.from]){ bd = stepsNow(); var o = S.own.splice(d.from, 1)[0]; S.own.splice(d.to, 0, o); STEPED = -1; save(); }
+    render(); if(bd) stepUndo("Step moved", bd); }
   $("mine").addEventListener("pointerup", dragEnd); $("mine").addEventListener("pointercancel", dragEnd);
   // On a project, a step you tick drops to the bottom with the other done steps; unticking brings it back up to just above them
   function settleStep(i){ if(!S.keep || TABS.active === "today" || S.kind === "links") return; var o = S.own[i]; if(!o) return; S.own.splice(i, 1);
@@ -1073,19 +1077,19 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   $("ltabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.tab){ if(PEDIT === "new" && !S.title && !nPicked()){ dropProject(); return; } BACKTOP = true; LASTPG = TABS.active; switchTo(b.dataset.tab); } });
   $("mine").addEventListener("click", function(e){ if(e.target.closest(".ansbox") || e.target.closest(".upform input, .upform textarea, .upform label, .sdetw")){ e.stopPropagation(); return; }
     var mu = e.target.closest("[data-mvup],[data-mvdn]"); if(mu){ e.stopPropagation(); var a = +(mu.dataset.mvup != null ? mu.dataset.mvup : mu.dataset.mvdn), bI = mu.dataset.mvup != null ? a - 1 : a + 1;
-      if(bI < 0 || bI >= S.own.length) return; var t = S.own[a]; S.own[a] = S.own[bI]; S.own[bI] = t; STEPED = -1; save(); render(); return; }
+      if(bI < 0 || bI >= S.own.length) return; var bm = stepsNow(); var t = S.own[a]; S.own[a] = S.own[bI]; S.own[bI] = t; STEPED = -1; save(); render(); stepUndo("Step moved", bm); return; }
     var se = e.target.closest("[data-sted]"); if(se){ e.stopPropagation(); STEPED = +se.dataset.sted; UPDN = null; render(); var sf = document.querySelector("#mine .stname"); if(sf){ sf.focus(); sf.setSelectionRange(sf.value.length, sf.value.length); } return; }
     if(e.target.closest("[data-stx]")){ e.stopPropagation(); STEPED = -1; render(); return; }
     var ss = e.target.closest("[data-stsave]"); if(ss){ e.stopPropagation(); var os = S.own[+ss.dataset.stsave]; if(!os) return; var nn = ((document.querySelector("#mine .stname") || {}).value || "").trim();
       if(!nn){ toast("The step needs some words"); return; } if(nn !== os.n && S.own.some(function(x){ return x !== os && x.n === nn; })){ toast("There's already a step called that"); return; }
-      if(nn !== os.n && S.note && S.note[os.n] != null){ S.note[nn] = S.note[os.n]; delete S.note[os.n]; }
+      var be = stepsNow(); if(nn !== os.n && S.note && S.note[os.n] != null){ S.note[nn] = S.note[os.n]; delete S.note[os.n]; }
       os.n = nn; var dl = ((document.querySelector("#mine .stdet") || {}).value || "").split("\n").map(function(x){ return x.replace(/^[-*•]\s*/, "").trim(); }).filter(Boolean); if(dl.length) os.d = dl; else delete os.d;
-      STEPED = -1; save(); render(); toast("Step saved"); return; }
+      STEPED = -1; save(); render(); stepUndo("Step saved", be); return; }
     var ua = e.target.closest("[data-upadd]"); if(ua){ e.stopPropagation(); var o = S.own[+ua.dataset.upadd]; if(!o) return; STEPED = -1; UPDN = o.n; UPDDRAFT = ""; render(); var f = document.querySelector("#mine .upform " + (myName() ? ".upin" : ".upname")); if(f) f.focus(); return; }
     if(e.target.closest("[data-upx]")){ e.stopPropagation(); UPDN = null; UPDDRAFT = ""; render(); return; }
     var us = e.target.closest("[data-upsave]"); if(us){ e.stopPropagation(); var o2 = S.own[+us.dataset.upsave], t = (document.querySelector("#mine .upin") || {}).value || "", w = ((document.querySelector("#mine .upname") || {}).value || "").trim();
       if(!o2) return; if(!t.trim()){ toast("Type the update first"); return; } try{ if(w) localStorage.setItem("dobytoday-name", w); }catch(er){}
-      o2.up = (o2.up || []).concat([{w:w, d:iso(), t:t.trim()}]); UPDN = null; UPDDRAFT = ""; save(); render(); toast("Update added"); return; }
+      var bu = stepsNow(); o2.up = (o2.up || []).concat([{w:w, d:iso(), t:t.trim()}]); UPDN = null; UPDDRAFT = ""; save(); render(); stepUndo("Update added", bu); return; }
     var ud = e.target.closest("[data-updel]"); if(ud){ e.stopPropagation(); var pr = ud.dataset.updel.split(":"), o3 = S.own[+pr[0]]; if(!o3 || !o3.up) return; var u = o3.up[+pr[1]]; if(!u || !confirm("Delete this update?")) return;
       o3.up.splice(+pr[1], 1); save(); render(); toast("Update deleted", function(){ o3.up.splice(+pr[1], 0, u); save(); render(); }); return; } }, true);
   $("mine").addEventListener("toggle", function(e){ var d = e.target; if(d.classList && d.classList.contains("sdetw")){ if(d.open) DETOPEN[d.dataset.det] = 1; else delete DETOPEN[d.dataset.det]; } }, true);
@@ -1425,7 +1429,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       var nm = b.dataset.own !== undefined ? (S.own[+b.dataset.own] || {}).n : b.dataset.n; if(!nm) return;
       if(b.closest("#mine")) closeMine(); askBag([nm], true); $("sortbox").scrollIntoView({block:"center"}); return; }
     var inMine = !!b.closest("#mine");
-    if(b.dataset.own !== undefined){ var oi = +b.dataset.own, o = S.own[oi]; if(o){ if(inMine){ o.got = !o.got; settleStep(oi); save(); render(); } else takeOff(b); } return; }
+    if(b.dataset.own !== undefined){ var oi = +b.dataset.own, o = S.own[oi]; if(o){ if(inMine){ var bt = isProj() ? stepsNow() : null; o.got = !o.got; settleStep(oi); save(); render(); if(bt) stepUndo(o.got ? "Done – moved to the bottom" : "Back on the list", bt); } else takeOff(b); } return; }
     var n = b.dataset.n, wasSearch = !!query.trim() && !inMine;
     if(inMine){ if(S.got[n]) delete S.got[n]; else S.got[n] = 1; save(); render(); return; }
     if(!S.picked[n]){ S.picked[n] = 1; unpark(n); if(wasSearch){ save(); clearSearch(); openMine(); toast(n + " – on your list, " + bagLabel[bagOf(byNorm[norm(n)])]); return; } }
