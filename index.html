@@ -1,4 +1,5 @@
 <!doctype html>
+<!-- DoByToday v75 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -552,7 +553,17 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
 .pastday{padding:6px 0;border-top:1px solid var(--line);font-size:.9rem}
 .pastday b{color:var(--ink)}
 .sharetop{display:flex;justify-content:space-between;align-items:center;gap:10px;margin:0 0 10px}.sharetop b{color:var(--muted)}#shareX{white-space:nowrap}
-#mine .mrow.hasx{flex-wrap:wrap}#mine .mrow.hasx>.it{flex:1 1 0}
+#mine .mrow.hasx{flex-wrap:wrap;align-items:flex-start;column-gap:4px}#mine .mrow.hasx>.it{flex:1 1 0;order:0;padding:6px 4px}
+/* one line per step on a project: tick, number and text, then the two small links, then ⋯ at the far right; anything else (details, updates, forms) sits below */
+#mine .mrow.hasx>.uplinks{order:1;flex:none;margin:0;padding-top:5px;gap:12px}
+#mine .mrow.hasx>.more{order:2;margin-left:0;height:36px}
+#mine .mrow.hasx>.mctl{order:3}
+#mine .mrow.hasx>.sdetw,#mine .mrow.hasx>.uphead,#mine .mrow.hasx>.upds,#mine .mrow.hasx>.upform,#mine .mrow.hasx>.ansbox{order:5}
+#mine .mrow.hasx>.sdetw:last-child,#mine .mrow.hasx>.upds:last-child{margin-bottom:6px}
+.uplinks .upadd{font-size:.8rem;font-weight:500;color:var(--muted);white-space:nowrap}
+.uplinks .upadd:hover,.uplinks .upadd:focus-visible{color:var(--main)}
+.uplinks .uic{font-weight:700}
+@media (max-width:600px){ #mine .mrow.hasx>.uplinks{gap:2px;padding-top:4px} .uplinks .ulb{display:none} .uplinks .upadd{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;padding:0;font-size:1rem;border-radius:8px} }
 .mrow>.uphead,.mrow>.upds,.mrow>.uplinks,.mrow>.upform,.mrow>.sdetw,.mrow>.ansbox{flex:0 0 calc(100% - 44px);box-sizing:border-box}
 .uphead{margin:6px 0 4px 44px;font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .upds{list-style:none;margin:0 0 6px 44px;padding:0}
@@ -653,7 +664,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v74</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v75</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1020,7 +1031,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(o.up && o.up.length) h += '<div class="uphead">Updates</div><ul class="upds">' + o.up.map(function(u, k){ return '<li><b>' + esc(u.w || "Someone") + "</b> <span class=\"upd\">· " + esc(upDate(u.d)) + '</span> <button type="button" class="updel" data-updel="' + i + ":" + k + '" aria-label="Delete this update">×</button><br>' + esc(u.t) + "</li>"; }).join("") + "</ul>";
     if(UPDN === o.n) h += '<div class="upform"><div class="uprow"><input class="upname" maxlength="30" placeholder="Your name" value="' + esc(myName()) + '" aria-label="Your name"><span class="upd">' + esc(upDate(iso())) + '</span></div><textarea class="upin" rows="3" placeholder="What\'s happened?" aria-label="Update">' + esc(UPDDRAFT) + '</textarea><div class="row"><button type="button" class="btn primary" data-upsave="' + i + '">Save update</button><button type="button" class="link quiet" data-upx="1">Cancel</button></div></div>';
     else if(STEPED === i) h += '<div class="upform"><label class="upl">Step</label><input class="stname" maxlength="200" value="' + esc(o.n) + '" aria-label="Step"><label class="upl">Details <small>– optional, one per line</small></label><textarea class="stdet" rows="3" aria-label="Details">' + esc((o.d || []).join("\n")) + '</textarea><div class="row"><button type="button" class="btn primary" data-stsave="' + i + '">Save</button><button type="button" class="link quiet" data-stx="1">Cancel</button></div></div>';
-    else h += '<div class="uplinks"><button type="button" class="upadd" data-upadd="' + i + '">+ Add update</button><button type="button" class="upadd" data-sted="' + i + '">✎ Edit step</button></div>';
+    else h += '<div class="uplinks"><button type="button" class="upadd" data-upadd="' + i + '" title="Add update" aria-label="Add update"><span class="uic" aria-hidden="true">+</span><span class="ulb"> Add update</span></button><button type="button" class="upadd" data-sted="' + i + '" title="Edit step" aria-label="Edit step"><span class="uic" aria-hidden="true">✎</span><span class="ulb"> Edit step</span></button></div>';
     return h; }
   var STEPED = -1, DETOPEN = {};   // details under a step are folded until tapped; remember which are open
   // a step on a page that ends with a question mark gets a box to write the answer in
