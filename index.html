@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v75 -->
+<!-- DoByToday v76 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -409,6 +409,8 @@ body.hasmic #qClear{right:40px}
 header{position:relative}header>*{position:relative;z-index:1}header::after{content:"";position:absolute;pointer-events:none;z-index:0;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%20200%20190%22%20fill%3D%22none%22%20stroke%3D%22%23b0611c%22%20stroke-width%3D%223.2%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%0A%3Crect%20x%3D%2236%22%20y%3D%2226%22%20width%3D%22112%22%20height%3D%22150%22%20rx%3D%2212%22%2F%3E%0A%3Cpath%20d%3D%22M72%2026v-6a6%206%200%200%201%206-6h28a6%206%200%200%201%206%206v6%22%2F%3E%3Crect%20x%3D%2266%22%20y%3D%2222%22%20width%3D%2252%22%20height%3D%2214%22%20rx%3D%225%22%2F%3E%0A%3Crect%20x%3D%2252%22%20y%3D%2254%22%20width%3D%2214%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M55%2061l4%204%207-9%22%2F%3E%3Cpath%20d%3D%22M76%2061h52%22%2F%3E%0A%3Crect%20x%3D%2252%22%20y%3D%2284%22%20width%3D%2214%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M55%2091l4%204%207-9%22%2F%3E%3Cpath%20d%3D%22M76%2091h44%22%2F%3E%0A%3Crect%20x%3D%2252%22%20y%3D%22114%22%20width%3D%2214%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M76%20121h50%22%2F%3E%0A%3Crect%20x%3D%2252%22%20y%3D%22144%22%20width%3D%2214%22%20height%3D%2214%22%20rx%3D%223%22%2F%3E%3Cpath%20d%3D%22M76%20151h30%22%2F%3E%0A%3Ccircle%20cx%3D%22160%22%20cy%3D%22146%22%20r%3D%2228%22%20fill%3D%22%23fff%22%2F%3E%3Cpath%20d%3D%22M160%20130v16l11%208%22%2F%3E%0A%3Cpath%20d%3D%22M160%20118v-4M188%20146h4M160%20174v4M132%20146h-4%22%2F%3E%0A%3C%2Fsvg%3E") no-repeat center/contain}header::after{right:-6px;top:4px;width:120px;height:114px;opacity:.16}@media (min-width:600px) and (max-width:1079px){header::after{display:none}}@media (min-width:1080px){header::after{right:-150px;top:8px;width:120px;height:114px;opacity:.16;transform:none}}
 #mineShare .cap:empty{display:none}
 #mine .mctl .dayb{flex:none;display:inline-flex;align-items:center;color:#a39a94;cursor:pointer;padding:5px 0 5px 4px}
+#mine .mctl .mvst{display:none}
+#mine .mrow.open .mctl .mvst{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;margin:0;border:1.5px solid var(--line);border-radius:999px;background:#fff;font-size:.9rem;font-weight:700;color:var(--ink);cursor:pointer;user-select:none}
 #mine .mrow.open .mctl .dayb{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;margin:0;border:1.5px solid var(--line);border-radius:999px;background:#fff;font-size:.9rem;font-weight:700;color:var(--ink)}
 #mine .mctl.asking{flex-basis:100%}
 .dayask{display:flex;flex-wrap:wrap;align-items:center;gap:8px;font-size:.9rem;font-weight:700}
@@ -664,7 +666,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v75</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v76</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1012,7 +1014,11 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function toMyDay(n, d){ var title = S.title; withToday(function(T){ if(d <= iso()){ if(!T.own.some(function(o){ return norm(o.n) === norm(n); })) T.own.push({n:n, a:"other", b:"any", got:false}); } else T.later.push({id:lid(), n:n, d:d, a:"other", b:"any"}); });
     MOREN = ""; render(); toast("On your " + (d <= iso() ? "Today" : dayLabel(d)) + " list" + (title ? " (from " + title + ")" : "")); }
   function noteTag(n){ var c = (S.note || {})[n]; return c ? '<span class="qty">'+esc(c)+'</span>' : ''; }
-  function ctl(n, ref){ var c = (S.note || {})[n] || ""; return '<div class="mctl" '+ref+'><span class="cmt'+(c ? ' has' : '')+'" role="button" title="Add a comment" aria-label="Add a comment"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span><input class="qc" type="text" maxlength="60" value="'+esc(c)+'" aria-label="Comment" placeholder="Add a comment">'+MV.replace('</svg></span>', '</svg><span class="lbl">Change time</span></span>')+(S.keep && TABS.active !== "today" ? MYDAYB : DAYB)+RMV.replace('</svg></span>', '</svg><span class="lbl">Remove</span></span>')+'</div>'; }
+  // On a project, a step's ⋯ menu can move it up or down the list
+  function moveBtns(ref){ if(!S.keep || TABS.active === "today" || S.kind === "links") return ""; var m = ref.match(/data-own="(\d+)"/); if(!m) return ""; var i = +m[1];
+    return (i > 0 ? '<span class="mvst" role="button" data-mvup="' + i + '" title="Move this step up"><span aria-hidden="true">↑</span><span class="lbl">Move up</span></span>' : "")
+      + (i < S.own.length - 1 ? '<span class="mvst" role="button" data-mvdn="' + i + '" title="Move this step down"><span aria-hidden="true">↓</span><span class="lbl">Move down</span></span>' : ""); }
+  function ctl(n, ref){ var c = (S.note || {})[n] || ""; return '<div class="mctl" '+ref+'><span class="cmt'+(c ? ' has' : '')+'" role="button" title="Add a comment" aria-label="Add a comment"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span><input class="qc" type="text" maxlength="60" value="'+esc(c)+'" aria-label="Comment" placeholder="Add a comment">'+MV.replace('</svg></span>', '</svg><span class="lbl">Change time</span></span>')+(S.keep && TABS.active !== "today" ? MYDAYB : DAYB)+moveBtns(ref)+RMV.replace('</svg></span>', '</svg><span class="lbl">Remove</span></span>')+'</div>'; }
   // One tidy row per item: the tick box, the name, and a "⋯" button that opens everything else
   var MOREN = "";
   function moreBtn(k){ return '<button type="button" class="more" data-more="'+esc(k)+'" aria-label="More options" aria-expanded="'+(MOREN === k)+'"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>'; }
@@ -1039,6 +1045,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function moreSet(k){ MOREN = k; document.querySelectorAll("#mine .mrow").forEach(function(r){ var b = r.querySelector(".more"), on = !!b && b.dataset.more === k; r.classList.toggle("open", on); if(b) b.setAttribute("aria-expanded", String(on)); }); }
   $("ltabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.tab){ if(PEDIT === "new" && !S.title && !nPicked()){ dropProject(); return; } BACKTOP = true; LASTPG = TABS.active; switchTo(b.dataset.tab); } });
   $("mine").addEventListener("click", function(e){ if(e.target.closest(".ansbox") || e.target.closest(".upform input, .upform textarea, .upform label, .sdetw")){ e.stopPropagation(); return; }
+    var mu = e.target.closest("[data-mvup],[data-mvdn]"); if(mu){ e.stopPropagation(); var a = +(mu.dataset.mvup != null ? mu.dataset.mvup : mu.dataset.mvdn), bI = mu.dataset.mvup != null ? a - 1 : a + 1;
+      if(bI < 0 || bI >= S.own.length) return; var t = S.own[a]; S.own[a] = S.own[bI]; S.own[bI] = t; STEPED = -1; save(); render(); return; }
     var se = e.target.closest("[data-sted]"); if(se){ e.stopPropagation(); STEPED = +se.dataset.sted; UPDN = null; render(); var sf = document.querySelector("#mine .stname"); if(sf){ sf.focus(); sf.setSelectionRange(sf.value.length, sf.value.length); } return; }
     if(e.target.closest("[data-stx]")){ e.stopPropagation(); STEPED = -1; render(); return; }
     var ss = e.target.closest("[data-stsave]"); if(ss){ e.stopPropagation(); var os = S.own[+ss.dataset.stsave]; if(!os) return; var nn = ((document.querySelector("#mine .stname") || {}).value || "").trim();
