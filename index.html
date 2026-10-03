@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v77 -->
+<!-- DoByToday v78 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -410,6 +410,12 @@ header{position:relative}header>*{position:relative;z-index:1}header::after{cont
 #mineShare .cap:empty{display:none}
 #mine .mctl .dayb{flex:none;display:inline-flex;align-items:center;color:#a39a94;cursor:pointer;padding:5px 0 5px 4px}
 #mine .mctl .mvst{display:none}
+#mine .mrow.hasx>.grip{order:-1;flex:none;display:inline-flex;align-items:center;justify-content:center;width:22px;height:36px;margin:0 -6px 0 -4px;color:var(--faint);cursor:grab;touch-action:none;user-select:none;-webkit-user-select:none}
+#mine .mrow.hasx>.grip:hover{color:var(--muted)}
+#mine .mrow.dragging{position:relative;z-index:5;background:var(--card);box-shadow:0 6px 18px rgba(0,0,0,.14);border-radius:10px;opacity:.96}
+#mine .mrow.dragging>.grip{cursor:grabbing}
+#mine .mrow.dropb{box-shadow:inset 0 3px 0 var(--main)}
+#mine .mrow.dropa{box-shadow:inset 0 -3px 0 var(--main)}
 #mine .mrow.open .mctl .mvst{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;margin:0;border:1.5px solid var(--line);border-radius:999px;background:#fff;font-size:.9rem;font-weight:700;color:var(--ink);cursor:pointer;user-select:none}
 #mine .mrow.open .mctl .dayb{display:inline-flex;align-items:center;gap:6px;height:34px;padding:0 12px;margin:0;border:1.5px solid var(--line);border-radius:999px;background:#fff;font-size:.9rem;font-weight:700;color:var(--ink)}
 #mine .mctl.asking{flex-basis:100%}
@@ -666,7 +672,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v77</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v78</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1015,6 +1021,24 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     MOREN = ""; render(); toast("On your " + (d <= iso() ? "Today" : dayLabel(d)) + " list" + (title ? " (from " + title + ")" : "")); }
   function noteTag(n){ var c = (S.note || {})[n]; return c ? '<span class="qty">'+esc(c)+'</span>' : ''; }
   // On a project, a step's ⋯ menu can move it up or down the list
+  // Drag a step by its grip to a new place in the project
+  var DRAG = null;
+  function dragRows(){ return Array.prototype.slice.call(document.querySelectorAll("#mine .mrow.hasx")); }
+  function dragTarget(y){ var others = dragRows().filter(function(r){ return r !== DRAG.row; }), t = 0;
+    others.forEach(function(r){ var b = r.getBoundingClientRect(); if(b.top + b.height / 2 < y) t++; }); return {t:t, others:others}; }
+  function dragMark(y){ var d = dragTarget(y); d.others.forEach(function(r){ r.classList.remove("dropb", "dropa"); });
+    if(d.t < d.others.length) d.others[d.t].classList.add("dropb"); else if(d.others.length) d.others[d.others.length - 1].classList.add("dropa"); return d.t; }
+  $("mine").addEventListener("pointerdown", function(e){ var g = e.target.closest(".grip"); if(!g || DRAG) return; e.preventDefault(); e.stopPropagation();
+    var row = g.closest(".mrow"); DRAG = {from:+g.dataset.grip, row:row, y0:e.clientY, y:e.clientY, id:e.pointerId, later:false};
+    try{ g.setPointerCapture(e.pointerId); }catch(er){} row.classList.add("dragging");
+    DRAG.tick = setInterval(function(){ if(!DRAG) return; var h = window.innerHeight, v = DRAG.y < 70 ? -12 : DRAG.y > h - 70 ? 12 : 0; if(v){ window.scrollBy(0, v); DRAG.y0 -= v; dragMove(DRAG.y); } }, 30); });
+  function dragMove(y){ DRAG.y = y; DRAG.row.style.transform = "translateY(" + (y - DRAG.y0) + "px)"; DRAG.to = dragMark(y); }
+  $("mine").addEventListener("pointermove", function(e){ if(!DRAG || e.pointerId !== DRAG.id) return; e.preventDefault(); dragMove(e.clientY); });
+  function dragEnd(e){ if(!DRAG || (e && e.pointerId !== DRAG.id)) return; var d = DRAG; DRAG = null; clearInterval(d.tick);
+    d.row.classList.remove("dragging"); d.row.style.transform = ""; dragRows().forEach(function(r){ r.classList.remove("dropb", "dropa"); });
+    if(d.to != null && d.to !== d.from && S.own[d.from]){ var o = S.own.splice(d.from, 1)[0]; S.own.splice(d.to, 0, o); STEPED = -1; save(); }
+    render(); }
+  $("mine").addEventListener("pointerup", dragEnd); $("mine").addEventListener("pointercancel", dragEnd);
   // On a project, a step you tick drops to the bottom with the other done steps; unticking brings it back up to just above them
   function settleStep(i){ if(!S.keep || TABS.active === "today" || S.kind === "links") return; var o = S.own[i]; if(!o) return; S.own.splice(i, 1);
     if(o.got){ S.own.push(o); return; } var at = S.own.findIndex(function(x){ return x.got; }); if(at < 0) S.own.push(o); else S.own.splice(at, 0, o); }
@@ -1029,7 +1053,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function mineBtn(it){ return mineRow(it.n, 'data-n="'+esc(it.n)+'"', !!S.got[it.n], '', bagOf(it)); }
   function mineOwn(o, i){ var r = mineRow(o.n, 'data-own="'+i+'"', !!o.got, ' own', o.b, o.link);
     if(o.d && o.d.length && S.keep) r = r.replace(/<\/div>$/, '<details class="sdetw" data-det="' + esc(o.n) + '"' + (DETOPEN[o.n] ? " open" : "") + '><summary>Details <small>(' + o.d.length + ')</small></summary><ul class="sdet">' + o.d.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></details></div>");
-    if(S.keep && TABS.active !== "today" && S.kind !== "links") r = r.replace(/^<div class="mrow/, '<div class="mrow hasx').replace(/<\/div>$/, updHTML(o, i) + "</div>");
+    if(S.keep && TABS.active !== "today" && S.kind !== "links") r = r.replace(/^<div class="mrow/, '<div class="mrow hasx').replace(/^(<div [^>]*>)/, '$1<span class="grip" data-grip="' + i + '" title="Drag to move" aria-label="Drag to move this step"><svg viewBox="0 0 10 16" width="10" height="16" aria-hidden="true" fill="currentColor"><circle cx="3" cy="3" r="1.4"/><circle cx="7" cy="3" r="1.4"/><circle cx="3" cy="8" r="1.4"/><circle cx="7" cy="8" r="1.4"/><circle cx="3" cy="13" r="1.4"/><circle cx="7" cy="13" r="1.4"/></svg></span>').replace(/<\/div>$/, updHTML(o, i) + "</div>");
     if(isQ(o)) r = r.replace(/^<div class="mrow/, '<div class="mrow qrow').replace(/<\/div>$/, '<textarea class="ansbox" data-ans="' + i + '" rows="2" placeholder="Write your answer here" aria-label="Answer">' + esc(o.ans || "") + "</textarea></div>");
     return r; }
   // Updates on a step: who, when, and what's happened – kept on the card for everyone it's shared with
@@ -1164,7 +1188,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   }
   function openMine(){ var mx = $("mineBody"); if(mx.hidden){ mx.hidden = false; $("mineBtn").setAttribute("aria-expanded", "true"); } var t = $("listSec").getBoundingClientRect().top + window.pageYOffset - 80; window.scrollTo({top: Math.max(0, t), behavior:"smooth"}); }
   function closeMine(){}
-  function render(){ var fa = document.activeElement, fi = fa && fa.classList && fa.classList.contains("ansbox") ? {i:fa.dataset.ans, s:fa.selectionStart, e:fa.selectionEnd} : null;
+  function render(){ if(DRAG){ DRAG.later = true; return; } var fa = document.activeElement, fi = fa && fa.classList && fa.classList.contains("ansbox") ? {i:fa.dataset.ans, s:fa.selectionStart, e:fa.selectionEnd} : null;
     var fu = fa && fa.classList && (fa.classList.contains("upin") || fa.classList.contains("upname") || fa.classList.contains("stname") || fa.classList.contains("stdet")) ? {c:fa.className, v:fa.value, s:fa.selectionStart, e:fa.selectionEnd} : null;
     if(fi && S.own[+fi.i]) S.own[+fi.i].ans = fa.value;
     drawTabs();
@@ -1494,7 +1518,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(SAVED !== CODE && TABS.active !== "today" && /^#page=/.test(location.hash)) history.replaceState(null, "", "#page=" + CODE + "&d=" + packPage());   // the address bar link works on its own too
     if(chan) chan.send({type:"broadcast", event:"update", payload:payload});
   }; if(now) go(); else pushT = setTimeout(go, 350); }
-  function syncPull(){ if(!CODE) return Promise.resolve(); return rpc("get_list", {code:CODE}).then(function(d){ if(d) applyRemote(d); }).catch(function(){}); }
+  // a change made here that hasn't gone online yet wins over the (older) online copy; it goes up on the next push
+  function syncPull(){ if(!CODE) return Promise.resolve(); return rpc("get_list", {code:CODE}).then(function(d){ if(!d || DRAG) return; if(snapshot() !== lastSent){ syncPush(true); return; } applyRemote(d); }).catch(function(){}); }
   function listen(){ if(!CODE || chan) return;
     function go(){ try{ var sb = supabase.createClient(SB_URL, SB_KEY); chan = sb.channel("list-" + CODE);
       chan.on("broadcast", {event:"update"}, function(m){ applyRemote(m.payload); }).subscribe(); }catch(e){} }
