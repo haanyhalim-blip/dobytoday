@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v76 -->
+<!-- DoByToday v77 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -666,7 +666,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v76</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v77</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1015,6 +1015,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     MOREN = ""; render(); toast("On your " + (d <= iso() ? "Today" : dayLabel(d)) + " list" + (title ? " (from " + title + ")" : "")); }
   function noteTag(n){ var c = (S.note || {})[n]; return c ? '<span class="qty">'+esc(c)+'</span>' : ''; }
   // On a project, a step's ⋯ menu can move it up or down the list
+  // On a project, a step you tick drops to the bottom with the other done steps; unticking brings it back up to just above them
+  function settleStep(i){ if(!S.keep || TABS.active === "today" || S.kind === "links") return; var o = S.own[i]; if(!o) return; S.own.splice(i, 1);
+    if(o.got){ S.own.push(o); return; } var at = S.own.findIndex(function(x){ return x.got; }); if(at < 0) S.own.push(o); else S.own.splice(at, 0, o); }
   function moveBtns(ref){ if(!S.keep || TABS.active === "today" || S.kind === "links") return ""; var m = ref.match(/data-own="(\d+)"/); if(!m) return ""; var i = +m[1];
     return (i > 0 ? '<span class="mvst" role="button" data-mvup="' + i + '" title="Move this step up"><span aria-hidden="true">↑</span><span class="lbl">Move up</span></span>' : "")
       + (i < S.own.length - 1 ? '<span class="mvst" role="button" data-mvdn="' + i + '" title="Move this step down"><span aria-hidden="true">↓</span><span class="lbl">Move down</span></span>' : ""); }
@@ -1398,7 +1401,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       var nm = b.dataset.own !== undefined ? (S.own[+b.dataset.own] || {}).n : b.dataset.n; if(!nm) return;
       if(b.closest("#mine")) closeMine(); askBag([nm], true); $("sortbox").scrollIntoView({block:"center"}); return; }
     var inMine = !!b.closest("#mine");
-    if(b.dataset.own !== undefined){ var oi = +b.dataset.own, o = S.own[oi]; if(o){ if(inMine){ o.got = !o.got; save(); render(); } else takeOff(b); } return; }
+    if(b.dataset.own !== undefined){ var oi = +b.dataset.own, o = S.own[oi]; if(o){ if(inMine){ o.got = !o.got; settleStep(oi); save(); render(); } else takeOff(b); } return; }
     var n = b.dataset.n, wasSearch = !!query.trim() && !inMine;
     if(inMine){ if(S.got[n]) delete S.got[n]; else S.got[n] = 1; save(); render(); return; }
     if(!S.picked[n]){ S.picked[n] = 1; unpark(n); if(wasSearch){ save(); clearSearch(); openMine(); toast(n + " – on your list, " + bagLabel[bagOf(byNorm[norm(n)])]); return; } }
