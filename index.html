@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v84 -->
+<!-- DoByToday v85 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -642,7 +642,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
 <section id="listSec">
     <nav class="ltabs" id="ltabs" aria-label="Back" hidden></nav>
     <div class="lhead">
-      <div class="ltwrap"><h2 class="ltitle"><button class="sect mine" id="mineBtn" type="button" aria-expanded="true" aria-controls="mineBody"><span class="c"></span>My list</button></h2><span class="htally" id="htally"></span></div>
+      <div class="ltwrap"><h2 class="ltitle"><button class="sect mine" id="mineBtn" type="button" aria-expanded="true" aria-controls="mineBody"><span class="c"></span>My current list</button></h2><span class="htally" id="htally"></span></div>
       <button class="hic hshare" id="mineShare" type="button" aria-expanded="false" aria-controls="shareBox" title="Share this list"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg><span class="cap"></span></button>
       <button class="hic" id="mylSaveLink" type="button" hidden title="Save to My saved lists"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span class="cap">Save</span></button>
       <button class="hic clearic" id="clear" type="button" hidden title="Clear the whole list"><svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="3.7" y1="3.7" x2="12.3" y2="12.3" stroke="currentColor" stroke-width="1.7"/></svg><span class="cap">Clear</span></button>
@@ -694,7 +694,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v84</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v85</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -869,7 +869,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function tabName(l){ if(l.id === TABS.active) return S.title || (l.id === "today" ? "Today" : l.name || "Untitled"); return l.name || (l.id === "today" ? "Today" : "Untitled"); }
   function drawTabs(){ var el = $("ltabs"); if(!el) return; setTimeout(function(){ Object.keys(NEWDRAFT).forEach(function(id){ var f = $(id); if(f && !f.value) f.value = NEWDRAFT[id]; }); }, 0); var page = TABS.active !== "today"; document.body.classList.toggle("pagemode", page); el.hidden = !page; projCards();
     if(page){ var cur0 = TABS.lists.filter(function(l){ return l.id === TABS.active; })[0]; if(cur0 && S.title && cur0.name !== S.title){ cur0.name = S.title; saveTabs(); }
-      el.innerHTML = '<button type="button" class="pback" data-tab="today">← My list &amp; saved lists</button>'; return; }
+      el.innerHTML = '<button type="button" class="pback" data-tab="today">← My current list &amp; saved lists</button>'; return; }
     if(BACKTOP){ BACKTOP = false; setTimeout(function(){ if($("projBox").hidden) $("projBtn").click(); $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 0); }
     el.innerHTML = ""; }
   function newProject(){ var id = newTab("New project"); switchTo(id); S.keep = true; PEDIT = "new"; NEWDRAFT = {}; PMODE = "fields"; render(); window.scrollTo(0, 0); var ti = $("nTitle") || $("pPaste"); if(ti) ti.focus(); }
@@ -1176,7 +1176,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       shown += g.length + og.length;
       var pk = g.filter(function(it){ return S.picked[it.n]; }).length + og.length;
       var open = !!OPEN[a[0]];
-      html += '<h2 class="aisle"><button class="ah" data-a="'+a[0]+'" aria-expanded="'+open+'"><span class="c"></span>'+esc(a[1])+'<span class="n">'+(pk ? '<span class="golist" role="link" title="See these on My list">'+pk+' on list · <u>View</u> ›</span>' : '')+'</span></button></h2><div class="grid"'+(open ? '' : ' hidden')+'>';
+      html += '<h2 class="aisle"><button class="ah" data-a="'+a[0]+'" aria-expanded="'+open+'"><span class="c"></span>'+esc(a[1])+'<span class="n">'+(pk ? '<span class="golist" role="link" title="See these on My current list">'+pk+' on list · <u>View</u> ›</span>' : '')+'</span></button></h2><div class="grid"'+(open ? '' : ' hidden')+'>';
       html += '<div class="addrow" data-add="'+a[0]+'"><input placeholder="Search or add to '+esc(a[1])+'…" autocomplete="off" autocapitalize="off" enterkeyhint="done"><button class="btn primary" type="button">Add</button></div>';
       og.forEach(function(p){ html += ownBtn(p[0], p[1], false); });
       g.forEach(function(it){ html += itemBtn(it, false); });
