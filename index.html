@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v94 -->
+<!-- DoByToday v95 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -730,7 +730,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v94</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v95</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1294,7 +1294,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       + (f.kind === "my" ? '<button type="button" class="link quiet" data-cmanage="1">Rename, update or delete…</button>' : '') + '</div>'
       + '<div class="hscore"><b>' + done + '</b> of ' + rows.length + ' done today' + (two ? ' · ' + two + ' as the two-minute version' : '') + '</div>';
     DEFB.forEach(function(b){ var rs = []; rows.forEach(function(r, i){ if(r.b === b[0]) rs.push([r, i]); }); if(!rs.length) return;
-      h += '<p class="pgrp hgrp">' + esc(b[1]) + '</p>';
+      if(f.hab) h += '<p class="pgrp hgrp">' + esc(b[1]) + '</p>';   // times of day only for habits; other cards are one plain list
       rs.forEach(function(ri){ var r = ri[0], i = ri[1], v = td[i], miss = f.hab && !v && !yd[i] && d[y] !== undefined;
         if(!f.hab){ h += '<button type="button" class="crow' + (v ? ' on' : '') + '" data-hdone="' + i + '" aria-pressed="' + !!v + '"><span class="box"></span><span class="cn">' + esc(r.n) + '</span></button>'; return; }
         h += '<div class="hrow' + (v ? ' on' : '') + '"><div class="hmain"><b>' + esc(r.n) + '</b>' + (r.c ? '<small class="hcue">' + esc(r.c) + '</small>' : '') + (r.m ? '<small class="h2m">Two-minute version: ' + esc(r.m) + '</small>' : '')
@@ -1314,7 +1314,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function drawLoad(){ var box = $("loadBox"); if(!LOADL){ box.hidden = true; box.innerHTML = ""; return; }
     var on = LOADL.rows.filter(function(r, i){ return !LOADL.off[i]; }).length, h = '<div class="phead"><span class="pk">Add these to my list</span><b>' + esc(LOADL.t) + '</b><small>Everything is ticked – untick what you don’t want, then press Add.</small></div>';
     BAGS.forEach(function(b){ var rs = []; LOADL.rows.forEach(function(r, i){ if(live(r.b) === b[0]) rs.push([r, i]); }); if(!rs.length) return;
-      h += '<div class="pgrp">' + esc(b[1]) + '</div><div class="grid">' + rs.map(function(ri){ return '<button class="it" type="button" data-lrow="' + ri[1] + '" aria-pressed="' + !LOADL.off[ri[1]] + '"><span class="box"></span><span><span class="nm">' + esc(ri[0].n) + '</span></span></button>'; }).join("") + '</div>'; });
+      h += '<div class="grid">' + rs.map(function(ri){ return '<button class="it" type="button" data-lrow="' + ri[1] + '" aria-pressed="' + !LOADL.off[ri[1]] + '"><span class="box"></span><span><span class="nm">' + esc(ri[0].n) + '</span></span></button>'; }).join("") + '</div>'; });
     h += '<div class="prow"><button class="btn primary" type="button" data-ladd="1">Add ' + on + ' to my list</button><button class="link quiet" type="button" data-lx="1">Cancel</button></div>';
     box.innerHTML = h; box.hidden = false; }
   $("loadBox").addEventListener("click", function(e){ if(!LOADL) return;
