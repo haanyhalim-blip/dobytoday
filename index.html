@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v80 -->
+<!-- DoByToday v81 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -605,6 +605,8 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
 .swcard .stk{margin-left:auto;color:var(--main);font-weight:800}
 @media (max-width:560px){.swwrap{order:5;position:static!important}.swcard{left:0;right:auto;top:calc(100% - 4px);z-index:2000}}
 .swcard .snote{font-size:.78rem;color:var(--muted);padding:6px 10px 4px;border-top:1px dashed var(--line);margin-top:4px;line-height:1.35}
+.suggestbox{display:flex;align-items:center;gap:12px;width:100%;margin:12px 0 4px;padding:12px 14px;text-align:left;font:inherit;color:var(--ink);background:var(--card);border:1.5px dashed var(--main);border-radius:12px;cursor:pointer}
+.suggestbox:hover{background:#faf6f2}.suggestbox .sgi{font-size:1.3rem;flex:none}.suggestbox b{display:block;color:var(--main)}.suggestbox small{display:block;color:var(--muted);font-size:.85rem;margin-top:1px}
 </style>
 </head>
 <body>
@@ -622,7 +624,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
     <div class="qwrap"><input id="q" placeholder="Type or paste your jobs – put a wash on, call Dad…" autocomplete="off" autocapitalize="off" enterkeyhint="search"><button id="qClear" type="button" aria-label="Clear search" hidden>×</button></div>
     <button class="btn totop" id="toTop" type="button" hidden>↑ Top</button>
   </div>
-  <p class="jumps"><a class="jump" data-to="tripBtn" href="#">Ready-made days</a> · <a class="jump" data-to="projBtn" href="#">Projects</a> · <a class="jump" data-to="shopBtn" href="#">Browse by task</a></p>
+  <p class="jumps"><a class="jump" data-to="projBtn" href="#">My saved lists</a> · <a class="jump" data-to="tripBtn" href="#">Ready-made lists</a> · <a class="jump" data-to="shopBtn" href="#">Browse by task</a></p>
 </div>
 
 <div class="paste sortbox" id="sortbox" hidden>
@@ -636,7 +638,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
     <div class="lhead">
       <div class="ltwrap"><h2 class="ltitle"><button class="sect mine" id="mineBtn" type="button" aria-expanded="true" aria-controls="mineBody"><span class="c"></span>My list</button></h2><span class="htally" id="htally"></span></div>
       <button class="hic hshare" id="mineShare" type="button" aria-expanded="false" aria-controls="shareBox" title="Share this list"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg><span class="cap"></span></button>
-      <button class="hic" id="mylSaveLink" type="button" hidden title="Save to Projects"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span class="cap">Save</span></button>
+      <button class="hic" id="mylSaveLink" type="button" hidden title="Save to My saved lists"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span class="cap">Save</span></button>
       <button class="hic clearic" id="clear" type="button" hidden title="Clear the whole list"><svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="3.7" y1="3.7" x2="12.3" y2="12.3" stroke="currentColor" stroke-width="1.7"/></svg><span class="cap">Clear</span></button>
     </div>
   <div id="mineBody">
@@ -660,12 +662,13 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-<div class="sectabs" role="group" aria-label="Ready-made days, projects or browse by task"><button class="sect" id="tripBtn" type="button" aria-expanded="false" aria-controls="tripBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h3"/></svg><span class="tl">Ready-made days</span></button><button class="sect" id="projBtn" type="button" aria-expanded="false" aria-controls="projBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M8 13l2.5 2.5L16 10"/></svg><span class="tl">Projects</span></button><button class="sect" id="shopBtn" type="button" aria-expanded="false" aria-controls="shopBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg><span class="tl">Browse by task</span></button></div>
+<div class="sectabs" role="group" aria-label="My saved lists, ready-made lists or browse by task"><button class="sect" id="projBtn" type="button" aria-expanded="false" aria-controls="projBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M8 13l2.5 2.5L16 10"/></svg><span class="tl">My saved lists</span></button><button class="sect" id="tripBtn" type="button" aria-expanded="false" aria-controls="tripBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4M8 14h3"/></svg><span class="tl">Ready-made lists</span></button><button class="sect" id="shopBtn" type="button" aria-expanded="false" aria-controls="shopBox"><span class="c"></span><svg class="ti" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="4" width="7" height="7" rx="1.5"/><rect x="13" y="4" width="7" height="7" rx="1.5"/><rect x="4" y="13" width="7" height="7" rx="1.5"/><rect x="13" y="13" width="7" height="7" rx="1.5"/></svg><span class="tl">Browse by task</span></button></div>
 <div id="tripBox" hidden>
   <div id="myl"></div>
   <div class="trips" id="trips"></div>
   <div class="pick" id="listPick" hidden></div>
-  <p class="tripnote">These are starting points, not rules – every house runs differently. Something missing, or a day you'd like added? <button class="link" id="tripSuggest" type="button">Suggest an addition</button></p>
+  <p class="tripnote">These are starting points, not rules – every house runs differently.</p>
+  <button class="suggestbox" id="tripSuggest" type="button"><span class="sgi" aria-hidden="true">💡</span><span><b>Suggest a list for the website</b><small>Got a list everyone could use? Tell us and we'll add it.</small></span></button>
 </div>
 
 <div id="projBox" hidden><section class="projsec" id="projSec"></section><div id="mylHome"></div></div>
@@ -685,7 +688,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v80</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v81</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -831,7 +834,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function projFromLink(){ var m = location.hash.match(/^#proj=([A-Za-z0-9_-]+)/); if(!m) return;
     var x; try{ x = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, "+").replace(/_/g, "/"))))); }catch(e){ x = null; }
     history.replaceState(null, "", location.pathname + location.search); if(!x) return;
-    if(Array.isArray(x.p)){ var made = x.p.map(function(pg){ return makePageFrom(pg); }); switchTo("today"); made.forEach(function(id){ var t = TABS.lists.filter(function(l){ return l.id === id; })[0]; if(t && t.group) OPEN["pg:g:" + t.group] = 1; }); saveOpen(); render(); if($("projBox").hidden) $("projBtn").click(); setTimeout(function(){ $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 50); toast(x.p.length + " pages added to Projects"); return; }
+    if(Array.isArray(x.p)){ var made = x.p.map(function(pg){ return makePageFrom(pg); }); switchTo("today"); made.forEach(function(id){ var t = TABS.lists.filter(function(l){ return l.id === id; })[0]; if(t && t.group) OPEN["pg:g:" + t.group] = 1; }); saveOpen(); render(); if($("projBox").hidden) $("projBtn").click(); setTimeout(function(){ $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 50); toast(x.p.length + " lists added to My saved lists"); return; }
     if(!(x.t || (x.s || []).length)) return;
     var start = function(){ switchTo(newTab(x.t || "Project"));
       S.own = (x.s || []).map(function(n){ return {n:String(n), a:"other", b:"any", got:false}; }); S.title = x.t || ""; S.notes = x.n || ""; S.keep = true; S.day = today();
@@ -855,12 +858,12 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     d.own = names.map(function(n){ return {n:n, a:"other", b:"any", got:!!got[n]}; });
     var id = newTab(S.title); try{ localStorage.setItem(keyOf(id), JSON.stringify(d)); }catch(e){}
     S.title = ""; S.notes = ""; S.after = ""; S.keep = false; S.own = []; save();
-    switchTo(id); ensurePage(); window.scrollTo(0, 0); toast("Moved – it's now its own project, with " + d.own.length + " steps"); }
+    switchTo(id); ensurePage(); window.scrollTo(0, 0); toast("Moved – it's now its own list, with " + d.own.length + " steps"); }
   function newTab(name){ var id = "p" + lid(); TABS.lists.push({id:id, name:name || "New project"}); saveTabs(); return id; }
   function tabName(l){ if(l.id === TABS.active) return S.title || (l.id === "today" ? "Today" : l.name || "Untitled"); return l.name || (l.id === "today" ? "Today" : "Untitled"); }
   function drawTabs(){ var el = $("ltabs"); if(!el) return; setTimeout(function(){ Object.keys(NEWDRAFT).forEach(function(id){ var f = $(id); if(f && !f.value) f.value = NEWDRAFT[id]; }); }, 0); var page = TABS.active !== "today"; document.body.classList.toggle("pagemode", page); el.hidden = !page; projCards();
     if(page){ var cur0 = TABS.lists.filter(function(l){ return l.id === TABS.active; })[0]; if(cur0 && S.title && cur0.name !== S.title){ cur0.name = S.title; saveTabs(); }
-      el.innerHTML = '<button type="button" class="pback" data-tab="today">← My list &amp; projects</button>'; return; }
+      el.innerHTML = '<button type="button" class="pback" data-tab="today">← My list &amp; saved lists</button>'; return; }
     if(BACKTOP){ BACKTOP = false; setTimeout(function(){ if($("projBox").hidden) $("projBtn").click(); $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 0); }
     el.innerHTML = ""; }
   function newProject(){ var id = newTab("New project"); switchTo(id); S.keep = true; PEDIT = "new"; NEWDRAFT = {}; PMODE = "fields"; render(); window.scrollTo(0, 0); var ti = $("nTitle") || $("pPaste"); if(ti) ti.focus(); }
@@ -878,11 +881,11 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var live = ps.filter(function(p){ return !p.done; }), done = ps.filter(function(p){ return p.done; }), gs = [];
     live.forEach(function(p){ var g = (p.l.group || "").trim(); if(g && gs.indexOf(g) < 0) gs.push(g); }); gs.sort(function(a, b){ return a.localeCompare(b); });
     var saved = (MYL || []).length, f = OPEN.pf || "all";
-    var chips = [["all", "All"]].concat(gs.map(function(g){ return ["g:" + g, g]; })).concat(saved ? [["saved", "Saved lists"]] : []).concat(done.length ? [["done", "✓ Done"]] : []);
+    var chips = [["all", "All"]].concat(gs.map(function(g){ return ["g:" + g, g]; })).concat(saved ? [["saved", "Saved days"]] : []).concat(done.length ? [["done", "✓ Done"]] : []);
     if(!chips.some(function(c){ return c[0] === f; })) f = "all"; PF = f;
     var h = chips.length > 1 ? '<div class="filt" role="group" aria-label="Show">' + chips.map(function(c){ return '<button type="button" class="fchip" data-pf="' + esc(c[0]) + '" aria-pressed="' + (f === c[0]) + '">' + esc(c[1]) + "</button>"; }).join("") + "</div>" : "";
     var show = f === "all" ? live.slice().sort(function(a, b){ return (b.l.pin ? 1 : 0) - (a.l.pin ? 1 : 0); }) : f === "done" ? done : f === "saved" ? [] : live.filter(function(p){ return "g:" + (p.l.group || "").trim() === f; });
-    h += '<div class="plist">' + (f === "done" || f === "saved" ? "" : '<button type="button" class="prow pnew" data-newproj="1"><span class="pn">+ Create your own</span><span class="pc">a list, a project or a day plan – paste or type it</span></button>') + show.map(prow).join("") + "</div>";
+    h += '<div class="plist">' + (f === "done" || f === "saved" ? "" : '<button type="button" class="prow pnew" data-newproj="1"><span class="pn">+ Create your own</span><span class="pc">a list, a plan or a project – paste or type it</span></button>') + show.map(prow).join("") + "</div>";
     if(f === "done" && !done.length) h += '<p class="small">Nothing finished yet.</p>';
     el.innerHTML = h; drawMy(); }
   $("projSec").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.pf){ OPEN.pf = b.dataset.pf; saveOpen(); projCards(); return; } if(b.dataset.newproj){ newProject(); return; } if(b.dataset.proj){ switchTo(b.dataset.proj); window.scrollTo(0, 0); return; }
@@ -996,11 +999,11 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       + groupField("") + '<div class="row"><button type="button" class="btn primary" data-pmake="1">Create it</button><button type="button" class="link quiet" data-pdel="1">Cancel</button></div></div>';
     if(PEDIT) return '<div class="pedit"><label for="pTitle">Title</label><input id="pTitle" maxlength="120" value="' + esc(S.title) + '" placeholder="e.g. Overdue occupancy tax"><label for="pNotes">Notes <small>– what it\'s about, who\'s who, numbers to hand. Start a line with "- " for a bullet.</small></label><textarea id="pNotes" rows="10">' + esc(S.notes) + '</textarea>' + (TABS.active !== "today" ? (S.kind === "links" ? '<label for="pItems">Links <small>– one per line: a name, then the link</small></label><textarea id="pItems" rows="6">' + esc(S.own.map(function(o){ return o.n + " – " + (o.url || ""); }).join("\n")) + "</textarea>"
         : '<label for="pItems">Steps <small>– one per line. Change, add, delete or move lines; ticks stay on steps you keep.</small></label><textarea id="pItems" rows="8">' + esc(S.own.map(function(o){ return o.n; }).join("\n")) + "</textarea>") : "")
-      + (TABS.active !== "today" ? groupField(curTab().group || "") + '<label for="pAfter">Notes after the steps <small>– optional</small></label><textarea id="pAfter" rows="5">' + esc(S.after || "") + '</textarea><label class="pkeep"><input type="checkbox" id="pPin"' + (curTab().pin ? " checked" : "") + '> Pin it to the top of Projects</label>' : "")
-      + (TABS.active === "today" ? '<label class="pkeep"><input type="checkbox" id="pKeep"' + (S.keep ? " checked" : "") + '> Keep ticked jobs and the order I add them (like a project)</label>' : "")
+      + (TABS.active !== "today" ? groupField(curTab().group || "") + '<label for="pAfter">Notes after the steps <small>– optional</small></label><textarea id="pAfter" rows="5">' + esc(S.after || "") + '</textarea><label class="pkeep"><input type="checkbox" id="pPin"' + (curTab().pin ? " checked" : "") + '> Pin it to the top of My saved lists</label>' : "")
+      + (TABS.active === "today" ? '<label class="pkeep"><input type="checkbox" id="pKeep"' + (S.keep ? " checked" : "") + '> Keep ticked jobs and the order I add them (like a saved list)</label>' : "")
       + '<div class="row"><button type="button" class="btn primary" data-psave="1">Save</button><button type="button" class="link quiet" data-px="1">Cancel</button>' + (TABS.active !== "today" ? '<button type="button" class="link danger" data-pdel="1">Delete this page</button>' : "") + '</div></div>';
     if(!has && TABS.active === "today") return "";
-    return '<div class="proj"><div class="phead">' + (S.title ? '<h3 class="ptitle">' + esc(S.title) + "</h3>" : TABS.active !== "today" ? '<h3 class="ptitle untitled">Untitled page</h3>' : "<span></span>") + '<button type="button" class="btn pedb" data-pedit="1">✎ Edit</button></div>' + (TABS.active === "today" && S.title ? '<p class="pmove">This looks like a project. <button type="button" class="btn primary" data-pmove="1">Move it to its own project</button></p>' : "") + (S.notes ? '<details class="pnotes"' + (NOPEN ? " open" : "") + '><summary>Notes</summary><div class="pbody">' + fmtNotes(S.notes) + "</div></details>" : "") + "</div>"; }
+    return '<div class="proj"><div class="phead">' + (S.title ? '<h3 class="ptitle">' + esc(S.title) + "</h3>" : TABS.active !== "today" ? '<h3 class="ptitle untitled">Untitled page</h3>' : "<span></span>") + '<button type="button" class="btn pedb" data-pedit="1">✎ Edit</button></div>' + (TABS.active === "today" && S.title ? '<p class="pmove">This looks like a list of its own. <button type="button" class="btn primary" data-pmove="1">Move it to its own list</button></p>' : "") + (S.notes ? '<details class="pnotes"' + (NOPEN ? " open" : "") + '><summary>Notes</summary><div class="pbody">' + fmtNotes(S.notes) + "</div></details>" : "") + "</div>"; }
   function asText(){
     var lines = []; if(S.title) lines.push(S.title.toUpperCase(), "");
     if(S.keep){   // a page: its steps (or links) in order, with any details under each
@@ -1181,13 +1184,13 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function kept(id){ return (Array.isArray(MYL) ? MYL : []).filter(function(m){ return m && m.from === id; })[0]; }   // My Lists load later on; until then nothing shows as kept
   function tripSnap(t){ var d = {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}};
     t.items.forEach(function(nm){ var it = byNorm[norm(nm)]; if(it){ d.picked[it.n] = 1; if(t.force && it.b === "hold") d.bag[it.n] = t.force; } else d.own.push({n:nm, a:classify(nm), b:"any", got:false}); }); return d; }
-  function keepTrip(id, quiet){ var t = TRIPS.filter(function(x){ return x.id === id || x.slug === id; })[0]; if(!t) return false; myLoad(); if(kept(t.id)){ if(!quiet) toast("Already in Projects: " + t.name); return true; }
-    MYL.unshift({id:Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name:t.name, s:tripSnap(t), t:Date.now(), from:t.id}); mySave(); drawTrips(); render(); if(!quiet) toast("★ " + t.name + " – your own copy is in Projects"); return true; }
+  function keepTrip(id, quiet){ var t = TRIPS.filter(function(x){ return x.id === id || x.slug === id; })[0]; if(!t) return false; myLoad(); if(kept(t.id)){ if(!quiet) toast("Already in My saved lists: " + t.name); return true; }
+    MYL.unshift({id:Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name:t.name, s:tripSnap(t), t:Date.now(), from:t.id}); mySave(); drawTrips(); render(); if(!quiet) toast("★ " + t.name + " – your own copy is in My saved lists"); return true; }
   function keepFromLink(){ var m = location.hash.match(/^#keep=([a-z0-9-]+)/); if(!m) return; history.replaceState(null, "", location.pathname + location.search);
     if(keepTrip(m[1])){ OPEN.pf = "saved"; saveOpen(); projCards(); if($("projBox").hidden) $("projBtn").click(); setTimeout(function(){ $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 50); } }
   function personOf(t){ var m = t.name.match(/^(.+?)(?:’s|'s| –| -)/); return m ? m[1] : t.name; }
   function drawTrips(){
-    var card = function(t){ var on = !!kept(t.id); return '<div class="tripw"><button class="trip" type="button" data-trip="'+t.id+'"><b>'+esc(t.name)+'</b><small>'+esc(t.blurb)+'</small><span class="n">'+t.items.length+' jobs</span></button><button type="button" class="tfav'+(on ? ' on' : '')+'" data-fav="'+t.id+'" aria-pressed="'+on+'" title="'+(on ? 'Your copy is in Projects' : 'Save a copy to Projects')+'" aria-label="Save to Projects">'+(on ? '★' : '☆')+'</button></div>'; };
+    var card = function(t){ var on = !!kept(t.id); return '<div class="tripw"><button class="trip" type="button" data-trip="'+t.id+'"><b>'+esc(t.name)+'</b><small>'+esc(t.blurb)+'</small><span class="n">'+t.items.length+' jobs</span></button><button type="button" class="tfav'+(on ? ' on' : '')+'" data-fav="'+t.id+'" aria-pressed="'+on+'" title="'+(on ? 'Your copy is in My saved lists' : 'Save a copy to My saved lists')+'" aria-label="Save to My saved lists">'+(on ? '★' : '☆')+'</button></div>'; };
     var used = {}, groups = [];
     TCATS.forEach(function(c){ var ts = TRIPS.filter(function(t){ return !t.named && c[2].indexOf(t.id) > -1; }); ts.forEach(function(t){ used[t.id] = 1; }); if(ts.length) groups.push([c[0], c[1], ts]); });
     var rest = TRIPS.filter(function(t){ return !t.named && !used[t.id]; }); if(rest.length) groups.push(["more", "More days", rest]);
@@ -1362,7 +1365,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var f = e.target.closest(".tfav"); if(f){ e.stopPropagation(); keepTrip(f.dataset.fav); return; }
     var b = e.target.closest(".trip"); if(!b) return; var t = TRIPS.filter(function(x){ return x.id === b.dataset.trip; })[0];
     if(!t || !t.slug){ openPick(b.dataset.trip); return; } try{ sessionStorage.setItem("dobytoday-back", t.id); }catch(x){} location.href = "/lists/" + t.slug; });
-  $("tripSuggest").addEventListener("click", function(){ var fx = $("feedback"); fx.hidden = false; $("fbBtn").setAttribute("aria-expanded", "true"); if(!$("fbtext").value) $("fbtext").value = "For the ready-made day \"" + "…" + "\" I'd add: "; fx.scrollIntoView({block:"start", behavior:"smooth"}); setTimeout(function(){ $("fbtext").focus(); }, 300); });
+  $("tripSuggest").addEventListener("click", function(){ var fx = $("feedback"); fx.hidden = false; $("fbBtn").setAttribute("aria-expanded", "true"); if(!$("fbtext").value) $("fbtext").value = "A list idea for the website: "; fx.scrollIntoView({block:"start", behavior:"smooth"}); setTimeout(function(){ $("fbtext").focus(); }, 300); });
 
   function addToCat(key, v){
     v = v.trim(); if(!v) return;
@@ -1623,8 +1626,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     // "My Lists" only shows once something has been saved (or while you're naming the first one)
     if(!MYL.length && !MFORM){ el.innerHTML = ""; el.hidden = true; return; } el.hidden = false;
     if(!MFORM && PF !== "all" && PF !== "saved"){ el.innerHTML = ""; el.hidden = true; return; }
-    h += (PF === "all" ? '<p class="psh">Saved lists</p>' : "") + '<div class="mylgrid">';
-    if(MFORM) h += '<div class="mylform"><label for="mylName">Save to Projects – give it a name</label><input id="mylName" maxlength="40" placeholder="e.g. Weekly shop" autocomplete="off" enterkeyhint="done"><button class="btn primary" type="button" data-mylok="1">Save</button><button class="link quiet" type="button" data-mylx="1">Cancel</button></div>';
+    h += (PF === "all" ? '<p class="psh">Saved days</p>' : "") + '<div class="mylgrid">';
+    if(MFORM) h += '<div class="mylform"><label for="mylName">Save to My saved lists – give it a name</label><input id="mylName" maxlength="40" placeholder="e.g. Weekly shop" autocomplete="off" enterkeyhint="done"><button class="btn primary" type="button" data-mylok="1">Save</button><button class="link quiet" type="button" data-mylx="1">Cancel</button></div>';
     MYL.forEach(function(m){ h += '<button class="trip mine" type="button" data-myl="' + esc(m.id) + '"><b>' + (m.from ? "★ " : "") + esc(m.name) + '</b><span class="n">' + snapCount(m.s) + ' ' + (snapCount(m.s) === 1 ? 'job' : 'jobs') + ' · tap to use it</span></button>'; });
     var m = MYL.filter(function(x){ return x.id === MOPEN; })[0];
     if(m){ var nm = snapNames(m.s); h += '<div class="mylopen"><b>' + esc(m.name) + '</b><p>' + esc(nm.slice(0, 12).join(", ")) + (nm.length > 12 ? " and " + (nm.length - 12) + " more" : "") + '</p><div class="row"><button class="btn primary" type="button" data-myadd="1">Add to today</button><button class="btn" type="button" data-mypage="1">Tick-off page</button><button class="link quiet del" type="button" data-mydel="1">Delete</button><button class="link quiet" type="button" data-mymore="1">More</button></div><div class="row mymore"' + (MMORE ? "" : " hidden") + '><button class="link quiet" type="button" data-myrep="1">Replace today\'s list with it</button>'
@@ -1636,7 +1639,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(!c){ c = document.createElement("button"); c.type = "button"; c.id = "mylCreate"; c.className = "trip mkcard"; }
     var kids = [].filter.call(g.children, function(x){ return x !== c; }), at = kids[0] && kids[0].classList.contains("tgrp") ? kids[1] : kids[0];
     if(c.parentNode !== g || c.nextElementSibling !== (at || null)) g.insertBefore(c, at || null);
-    c.innerHTML = '<b>+ Create your own list</b><small>' + (has ? 'Keep the list you’ve made, to use again any time.' : 'Make your list, then save it here to use again any time.') + '</small><span class="n">' + (has ? 'Tap to save it to Projects' : 'Start by adding things above') + '</span>'; }
+    c.innerHTML = '<b>+ Create your own list</b><small>' + (has ? 'Keep the list you’ve made, to use again any time.' : 'Make your list, then save it here to use again any time.') + '</small><span class="n">' + (has ? 'Tap to save it to My saved lists' : 'Start by adding things above') + '</span>'; }
 
   document.addEventListener("click", function(e){ if(!e.target.closest("#mylCreate")) return; e.stopPropagation();
     if(nPicked()){ if($("projBox").hidden) $("projBtn").click(); MFORM = true; MOPEN = ""; drawMy(); setTimeout(function(){ $("myl").scrollIntoView({behavior:"smooth", block:"start"}); var i = $("mylName"); if(i) i.focus({preventScroll:true}); }, 60); }
@@ -1677,7 +1680,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var same = MYL.filter(function(x){ return x.name.toLowerCase() === nm.toLowerCase(); })[0];
     if(same){ if(!confirm("You already have “" + same.name + "”. Replace it with your current list?")) return; same.s = mySnap(); same.t = Date.now(); }
     else MYL.unshift({id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: nm, s: mySnap(), t: Date.now()});
-    MFORM = false; mySave(); drawMy(); toast("Saved to Projects: " + nm); }
+    MFORM = false; mySave(); drawMy(); toast("Saved to My saved lists: " + nm); }
   $("myl").addEventListener("keydown", function(e){ if(e.key === "Enter" && e.target.id === "mylName"){ e.preventDefault(); mySaveNew(); } });
   $("mylSaveLink").addEventListener("click", function(){ OPEN.pf = "saved"; saveOpen(); var bx = $("projBox"); if(bx.hidden){ var t = $("projBtn"); if(t) t.click(); } MFORM = true; MOPEN = ""; drawMy();
     setTimeout(function(){ $("myl").scrollIntoView({behavior:"smooth", block:"start"}); var i = $("mylName"); if(i) i.focus({preventScroll:true}); }, 60); });
