@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v86 -->
+<!-- DoByToday v87 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -694,7 +694,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v86</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v87</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1196,13 +1196,14 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   // Opening it offers to add the items to today, each in its time of day, then to save it to My saved lists.
   var LOADL = null;
   var FAMLOADS = [{"id":"habits","name":"Haany’s daily habits","blurb":"Small daily habits, each tiny enough to do on a bad day – morning, afternoon, evening and if there’s time.","g":{"morning":["10 minutes outside in daylight, straight after waking","One stretch or yoga move before the shower (5 min)","End the shower with 30 seconds cold","Make the bed","Plan today – write the 3 things that matter (5 min)","Decide at breakfast: no sugar today","No cigarette before noon"],"afternoon":["5 minutes on an idea – write, read or build something towards more income","3 minutes on an instrument – guitar, piano or drum","One admin item from the money list – SS, Aviva, house in my name, bills in my name, Juhi's SIPP","Message Mum, Dad or Magda","Give the day job proper attention – one thing finished, not just touched"],"evening":["Dinner done by 6","Phone away from 5:30 to 8","Sit with the children while they eat","Children showered by 6:45","One game or walk with Juhi or the kids","Kids in bed by 7:30","3 minutes quiet – breathe, write a line, or read something positive","Plan tomorrow (2 min)"],"iftime":["Chess or backgammon with Dad or one of the children","10 minutes on one zone – car, shoes and coats, filing, a drawer","Read 10 pages – parenting or self-improvement","Reach out to Raj and Kusum, or Myriam","Call Mum or Dad properly, not just a message"]}}];   // family lists that carry their own items, each in its time of day
+  var GENLOADS = [{"id":"smallhabits","name":"Small daily habits","blurb":"Tiny habits tied to a time of day – each small enough to do on a bad day.","g":{"morning":["10 minutes outside in daylight, straight after waking","One stretch or yoga move (5 min)","End the shower with 30 seconds cold","Make the bed","Plan today – write the 3 things that matter (5 min)","Decide at breakfast: no sugar today","Put off the habit you’re cutting down until noon"],"afternoon":["5 minutes on an idea or side project","3 minutes practising an instrument or a skill","One money admin job – a bill, a pension, an insurance, a form","Message a family member or a friend","Give your work proper attention – finish one thing, not just touch it"],"evening":["Dinner done early","Phone away from dinner until bedtime","Sit with the family while they eat","One game or walk with someone at home","Kids in bed on time","3 minutes quiet – breathe, write a line, or read something positive","Plan tomorrow (2 min)"],"iftime":["A board game with someone you love","10 minutes on one zone – the car, the hall, the filing, a drawer","Read 10 pages of a good book","Reach out to an old friend","Call a parent or relative properly, not just a message"]}}];   // the same kind of list, for anyone (shown with the other ready-made lists)
   function loadFromLink(){ famFromLink(); var m = location.hash.match(/^#load=([A-Za-z0-9_-]+)/); if(!m) return; history.replaceState(null, "", location.pathname + location.search);
     var x; try{ x = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, "+").replace(/_/g, "/"))))); }catch(e){ x = null; } if(!x || !x.g) return;
     var rows = []; BAGS.forEach(function(b){ (x.g[b[0]] || []).forEach(function(n){ n = String(n).trim(); if(n) rows.push({n:n, b:b[0]}); }); }); if(!rows.length) return; openLoad(String(x.t || "A list"), rows); }
   function openLoad(t, rows){ if(TABS.active !== "today") switchTo("today");
     LOADL = {t:t, rows:rows, off:{}}; drawLoad(); setTimeout(function(){ $("loadBox").scrollIntoView({block:"start"}); window.scrollBy(0, -12); }, 50); }
   function famRows(f){ var rows = []; BAGS.forEach(function(b){ (f.g[b[0]] || []).forEach(function(n){ rows.push({n:n, b:b[0]}); }); }); return rows; }
-  function openFamLoad(id){ var f = FAMLOADS.filter(function(x){ return x.id === id; })[0]; if(f) openLoad(f.name, famRows(f)); }
+  function openFamLoad(id){ var f = FAMLOADS.concat(GENLOADS).filter(function(x){ return x.id === id; })[0]; if(f) openLoad(f.name, famRows(f)); }
   // short link to one of them: dobytoday.com/#fam=habits
   function famFromLink(){ var m = location.hash.match(/^#fam=([a-z0-9-]+)/); if(!m) return; history.replaceState(null, "", location.pathname + location.search); openFamLoad(m[1]); }
   function drawLoad(){ var box = $("loadBox"); if(!LOADL){ box.hidden = true; box.innerHTML = ""; return; }
@@ -1229,15 +1230,18 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var people = {}, porder = []; TRIPS.filter(function(t){ return t.named; }).forEach(function(t){ var k = personOf(t); if(!people[k]){ people[k] = []; porder.push(k); } people[k].push(t); });
     var fold = function(g){ var k = "cat:" + g[0], o = !!OPEN[k]; return '<details class="tcat" data-cat="'+esc(k)+'"'+(o ? ' open' : '')+'><summary>'+esc(g[1])+' <small>'+g[2].length+'</small></summary><div class="trips tin">'+g[2].map(card).join("")+'</div></details>'; };
     var fam = TRIPS.filter(function(t){ return t.named; }), f = OPEN.tf || "all";
-    var famHTML = function(){ return FAMLOADS.map(function(x){ var n = famRows(x).length; return '<div class="tripw"><button class="trip" type="button" data-fload="' + x.id + '"><b>' + esc(x.name) + '</b><small>' + esc(x.blurb) + '</small><span class="n">' + n + ' habits</span></button></div>'; }).join("") + fam.map(card).join(""); };
+    var loadCard = function(x){ var n = famRows(x).length; return '<div class="tripw"><button class="trip" type="button" data-fload="' + x.id + '"><b>' + esc(x.name) + '</b><small>' + esc(x.blurb) + '</small><span class="n">' + n + ' habits</span></button></div>'; };
+    var anyCard = function(t){ return t.g ? loadCard(t) : card(t); };
+    if(GENLOADS.length) groups.push(["habits", "Daily habits", GENLOADS]);
+    var famHTML = function(){ return FAMLOADS.map(loadCard).join("") + fam.map(card).join(""); };
     if(f !== "all" && f !== "family" && !groups.some(function(g){ return g[0] === f; })) f = "all";
     var chips = [["all", "All"]].concat(fam.length ? [["family", "From our family"]] : []).concat(groups.map(function(g){ return [g[0], g[1]]; }));
     var h = '<div class="filt" role="group" aria-label="Show">' + chips.map(function(c){ return '<button type="button" class="fchip" data-tf="' + c[0] + '" aria-pressed="' + (f === c[0]) + '">' + esc(c[1]) + "</button>"; }).join("") + "</div>";
     var famNote = '<p class="famnote">🏠 The lists we actually use in our house.</p>';
     if(f === "all"){ if(fam.length){ var fo = !!OPEN["cat:family"]; h += '<details class="tcat" data-cat="cat:family"' + (fo ? " open" : "") + '><summary>🏠 From our family <small>' + (fam.length + FAMLOADS.length) + '</small></summary>' + famNote + '<div class="trips tin">' + famHTML() + "</div></details>"; }
-      h += groups.map(function(g){ return g[2].map(card).join(""); }).join(""); }
+      h += groups.map(function(g){ return g[2].map(anyCard).join(""); }).join(""); }
     else if(f === "family") h += famNote + famHTML();
-    else h += groups.filter(function(g){ return g[0] === f; })[0][2].map(card).join("");
+    else h += groups.filter(function(g){ return g[0] === f; })[0][2].map(anyCard).join("");
     $("trips").innerHTML = h;
   }
   function openMine(){ var mx = $("mineBody"); if(mx.hidden){ mx.hidden = false; $("mineBtn").setAttribute("aria-expanded", "true"); } var t = $("listSec").getBoundingClientRect().top + window.pageYOffset - 80; window.scrollTo({top: Math.max(0, t), behavior:"smooth"}); }
