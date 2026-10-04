@@ -143,12 +143,13 @@ function bags(S) { return PBB_BAGS.concat((S.cbags || []).filter((c) => c && c.k
 function entries(S) {   // every item on the list: {n, got, own index or null, key}
   const out = [];
   Object.keys(S.picked || {}).forEach((n) => out.push({ n, got: !!(S.got || {})[n], own: null, key: (S.bag || {})[n] || "" }));
-  (S.own || []).forEach((o, i) => out.push({ n: o.n, got: !!o.got, own: i, key: o.b || "", who: o.w || "" }));
+  (S.own || []).forEach((o, i) => out.push({ n: o.n, got: !!o.got, own: i, key: o.b || "", who: o.w || "", link: o.link || "" }));
   return out;
 }
 function describe(site, d) {
   const S = d.s, all = entries(S), lines = [];
-  const tick = (e) => (e.got ? "☑ " : "☐ ") + (site === "dobytoday" && (S.urg || {})[e.n] ? "❗ " : "") + (e.who ? e.who + ": " : "") + e.n;
+  const tick = (e) => (e.got ? "☑ " : "☐ ") + (site === "dobytoday" && (S.urg || {})[e.n] ? "❗ " : "") + (e.who ? e.who + ": " : "") + e.n
+    + ((S.note || {})[e.n] ? "  [note: " + S.note[e.n] + "]" : "") + (e.link ? "  [link: " + e.link + "]" : "");
   if (site === "dobytoday") {
     const secs = sections(S), live = (k) => (secs.some((s) => s[0] === k) ? k : (secs.find((s) => s[0] === "any") || secs[0])[0]);
     lines.push("DobyToday – My to-do list (sections: " + secs.map((s) => s[1]).join(", ") + ")");
@@ -186,7 +187,7 @@ function findItems(S, names) {
     const q = low(raw); if (!q) return;
     let e = all.filter((x) => low(x.n) === q);
     if (!e.length) e = all.filter((x) => low(x.n).includes(q) || q.includes(low(x.n)));
-    if (e.length === 1 || (e.length > 1 && e.every((x) => low(x.n) === low(e[0].n)))) hit.push(e[0]); else miss.push(raw + (e.length > 1 ? " (matches " + e.map((x) => x.n).join(", ") + " – be more exact)" : ""));
+    if (e.length === 1 || (e.length > 1 && e.every((x) => low(x.n) === low(e[0].n)))) hit.push(Object.assign({}, e[0], { q: raw })); else miss.push(raw + (e.length > 1 ? " (matches " + e.map((x) => x.n).join(", ") + " – be more exact)" : ""));
   });
   return { hit, miss };
 }
@@ -229,7 +230,9 @@ function addItems(site, S, a) {
   return ((added.length ? "Added " + added.length + where + ": " + added.join(", ") + "." : "") + (skipped.length ? " Already on the list" + (site === "dobytoday" && a.urgent ? " (now marked ❗ urgent)" : "") + ": " + skipped.join(", ") + "." : "")).trim();
 }
 function updateItems(site, S, a) {
-  const act = a.action, { hit, miss } = findItems(S, (a.items || []).map(String));
+  const act = a.action, map = act === "set_note" ? a.notes : act === "set_link" ? a.links : null;
+  if (map && typeof map === "object" && !(a.items || []).length) a.items = Object.keys(map);   // many notes or links in one go
+  const { hit, miss } = findItems(S, (a.items || []).map(String));
   if (!hit.length) return "None of those are on the list" + (miss.length ? ": " + miss.join(", ") : "") + ".";
   let p = { key: "" };
   if (act === "move" && !(site === "dobytoday" && a.day)) { p = resolvePlace(site, S, a.section || a.bag); if (p.error) return p.error; if (!p.key) return "Say which " + (site === "dobytoday" ? "section" : "bag") + " to move them to."; }
@@ -242,8 +245,8 @@ function updateItems(site, S, a) {
     else if (act === "remove") removeEntry(S, e);
     else if (act === "mark_urgent") { S.urg = S.urg || {}; S.urg[e.n] = 1; }
     else if (act === "unmark_urgent") { if (S.urg) delete S.urg[e.n]; }
-    else if (act === "set_note") { S.note = S.note || {}; const t = String(a.text || "").trim(); if (t) S.note[e.n] = t.slice(0, 300); else delete S.note[e.n]; }
-    else if (act === "set_link") { if (o) { const u = String(a.link || "").trim(); if (/^https:\/\//.test(u)) o.link = u; else delete o.link; } }
+    else if (act === "set_note") { S.note = S.note || {}; const t = String((map && map[e.q] !== undefined ? map[e.q] : a.text) || "").trim(); if (t) S.note[e.n] = t.slice(0, 300); else delete S.note[e.n]; }
+    else if (act === "set_link") { if (o) { const u = String((map && map[e.q] !== undefined ? map[e.q] : a.link) || "").trim(); if (/^https:\/\//.test(u)) o.link = u; else delete o.link; } }
     else if (act === "move") {
       if (site === "dobytoday" && a.day && a.day > todayISO()) { const b = o ? o.b : (S.bag || {})[e.n] || "any"; removeEntry(S, e); S.later = (S.later || []).concat([{ id: lid(), n: e.n, d: a.day, a: o ? o.a : "", b }]); }
       else if (o) o.b = p.key; else { S.bag = S.bag || {}; S.bag[e.n] = p.key; }
@@ -303,6 +306,8 @@ const TOOLS = [
         action: { type: "string", enum: ["tick", "untick", "remove", "mark_urgent", "unmark_urgent", "move", "set_note", "set_link"] },
         text: { type: "string", description: "For set_note: a short note shown under the item (empty removes it)" },
         link: { type: "string", description: "For set_link (DobyToday): an https link opened by the job's 'Open ↗' button" },
+        notes: { type: "object", additionalProperties: { type: "string" }, description: "For set_note: a different note for each item, as {item name: note} (items can then be left empty)" },
+        links: { type: "object", additionalProperties: { type: "string" }, description: "For set_link: a different link for each item, as {item name: link}" },
         section: { type: "string", description: "For move: the DobyToday section or PackbyBag bag" },
         day: { type: "string", description: "For move on DobyToday: a later day, YYYY-MM-DD" },
       },
@@ -438,7 +443,7 @@ async function callTool(token, name, a) {
 }
 
 // ---------- MCP over HTTP ----------
-const INSTRUCTIONS = "These tools reach the person's own lists on three sites: DobyToday (to-do list, sorted by when), PackbyBag (packing list, sorted by bag) and ListbyAisle (shopping list, sorted by aisle). Call get_my_lists before changing things so you use their exact item and section names. DobyToday also has pages (projects and step lists under My saved lists): open them with get_page and change them with update_page. Keep item names short. Children are referred to by first name only.";
+const INSTRUCTIONS = "These tools reach the person's own lists on three sites: DobyToday (to-do list, sorted by when), PackbyBag (packing list, sorted by bag) and ListbyAisle (shopping list, sorted by aisle). Call get_my_lists before changing things so you use their exact item and section names. DobyToday also has pages (projects and step lists under My saved lists): open them with get_page and change them with update_page. Keep item names short. Children are referred to by first name only. Make changes one call at a time – wait for each to finish before the next, never in parallel, or they can overwrite each other; to change many items, put them all in one call (items, notes or links).";
 
 async function rpcMessage(token, m) {
   const id = m.id, reply = (result) => ({ jsonrpc: "2.0", id, result }), fail = (code, message) => ({ jsonrpc: "2.0", id, error: { code, message } });
