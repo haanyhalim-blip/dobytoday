@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v88 -->
+<!-- DoByToday v89 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -612,6 +612,23 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
 .loadbox .grid{margin:6px 0 12px}
 .loadbox .pgrp{border:0;background:none;padding:0;border-radius:0}
 .famnote{grid-column:1/-1;margin:2px 0 4px;color:var(--muted);font-size:.88rem}
+body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habitmode #loadBox,body.habitmode #listSec,body.habitmode #shareBox,body.habitmode .sectabs,body.habitmode #tripBox,body.habitmode #projBox,body.habitmode #shopBox,body.habitmode .guide,body.habitmode .about,body.habitmode .ltwrap{display:none!important}
+.habpage[hidden]{display:none}.habpage{margin:6px 0 30px}
+.habpage .ptitle{font-size:1.6rem;margin:18px 0 6px}
+.hintro{color:var(--muted);margin:0 0 12px;line-height:1.45}
+.hscore{display:inline-block;margin:0 0 6px;padding:8px 14px;border-radius:12px;background:var(--wash,#f6efe9);font-size:.95rem}.hscore b{font-size:1.1rem;color:var(--main)}
+.hgrp{border:0!important;background:none!important;padding:0!important;border-radius:0!important;margin:18px 0 6px!important;font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--main-deep,var(--main))}
+.hrow{display:flex;gap:10px;align-items:flex-start;justify-content:space-between;padding:10px 12px;margin:0 0 6px;background:var(--card);border:1.5px solid var(--line);border-radius:12px}
+.hrow.on{border-color:var(--main);background:#fdf8f4}
+.hmain{min-width:0}.hmain b{display:block;font-size:1rem;line-height:1.3}
+.hmain small{display:block;font-size:.84rem;line-height:1.35;color:var(--muted);margin-top:2px}.hmain .hcue::before{content:"⏰ "}.hmain .h2m{color:var(--ink)}
+.hmain .hnudge{color:#b9472c;font-weight:700}
+.hweek{display:flex;gap:4px;margin-top:6px}.hweek i{width:9px;height:9px;border-radius:50%;border:1.5px solid var(--line);display:block}.hweek i.full{background:var(--main);border-color:var(--main)}.hweek i.half{background:linear-gradient(90deg,var(--main) 50%,transparent 50%);border-color:var(--main)}
+.hbtns{display:flex;flex-direction:column;gap:6px;flex:none}
+.hb{font:inherit;font-size:.85rem;font-weight:700;padding:6px 10px;border-radius:999px;border:1.5px solid var(--main);background:var(--card);color:var(--main);cursor:pointer;white-space:nowrap}
+.hb.on{background:var(--main);color:#fff}.hb.two{border-style:dashed}.hb.two.on{border-style:solid}
+.hfoot{margin:16px 0 8px}
+.habout{margin-top:10px;color:var(--muted);font-size:.92rem}.habout summary{cursor:pointer;font-weight:700;color:var(--ink)}
 </style>
 </head>
 <body>
@@ -623,6 +640,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
 </header>
 <div class="keep" id="dayBox" hidden></div>
 <div class="pick loadbox" id="loadBox" hidden></div>
+<section class="habpage" id="habitPage" hidden></section>
 
 <div class="sticky">
   <h2 class="stitle">Search</h2>
@@ -694,7 +712,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v88</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v89</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1196,16 +1214,48 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   // Opening it offers to add the items to today, each in its time of day, then to save it to My saved lists.
   var LOADL = null;
   var FAMLOADS = [{"id":"habits","name":"Haany’s atomic habits","blurb":"Small daily habits, each tiny enough to do on a bad day – morning, afternoon, evening and if there’s time.","g":{"morning":["10 minutes outside in daylight, straight after waking","One stretch or yoga move before the shower (5 min)","End the shower with 30 seconds cold","Make the bed","Plan today – write the 3 things that matter (5 min)","Decide at breakfast: no sugar today","No cigarette before noon"],"afternoon":["5 minutes on an idea – write, read or build something towards more income","3 minutes on an instrument – guitar, piano or drum","One admin item from the money list – SS, Aviva, house in my name, bills in my name, Juhi's SIPP","Message Mum, Dad or Magda","Give the day job proper attention – one thing finished, not just touched"],"evening":["Dinner done by 6","Phone away from 5:30 to 8","Sit with the children while they eat","Children showered by 6:45","One game or walk with Juhi or the kids","Kids in bed by 7:30","3 minutes quiet – breathe, write a line, or read something positive","Plan tomorrow (2 min)"],"iftime":["Chess or backgammon with Dad or one of the children","10 minutes on one zone – car, shoes and coats, filing, a drawer","Read 10 pages – parenting or self-improvement","Reach out to Raj and Kusum, or Myriam","Call Mum or Dad properly, not just a message"]}}];   // family lists that carry their own items, each in its time of day
-  var GENLOADS = [{"id":"smallhabits","name":"Atomic habits","blurb":"Tiny habits tied to a time of day – each small enough to do on a bad day, in the spirit of James Clear’s Atomic Habits.","g":{"morning":["10 minutes outside in daylight, straight after waking","One stretch or yoga move (5 min)","End the shower with 30 seconds cold","Make the bed","Plan today – write the 3 things that matter (5 min)","Decide at breakfast: no sugar today","Put off the habit you’re cutting down until noon"],"afternoon":["5 minutes on an idea or side project","3 minutes practising an instrument or a skill","One money admin job – a bill, a pension, an insurance, a form","Message a family member or a friend","Give your work proper attention – finish one thing, not just touch it"],"evening":["Dinner done early","Phone away from dinner until bedtime","Sit with the family while they eat","One game or walk with someone at home","Kids in bed on time","3 minutes quiet – breathe, write a line, or read something positive","Plan tomorrow (2 min)"],"iftime":["A board game with someone you love","10 minutes on one zone – the car, the hall, the filing, a drawer","Read 10 pages of a good book","Reach out to an old friend","Call a parent or relative properly, not just a message"]}}];   // the same kind of list, for anyone (shown with the other ready-made lists)
+  var GENLOADS = [{"id":"atomic","name":"Atomic habits","blurb":"Small daily habits, each tied to something you already do and with a two-minute version for bad days – the Atomic Habits way.","g":{"morning":[{"n":"Drink a glass of water","c":"After I get out of bed","m":"Just take a few sips"},{"n":"10 minutes outside in daylight","c":"After I get dressed","m":"Step outside the front door"},{"n":"Write the 3 things that matter today","c":"After I make my first drink","m":"Write one"},{"n":"Make the bed","c":"After I get up","m":"Pull the duvet straight"},{"n":"Floss","c":"After I brush my teeth","m":"Floss one tooth"}],"afternoon":[{"n":"A 20-minute walk or workout","c":"After lunch","m":"Put your trainers on"},{"n":"25 minutes on your most important task","c":"After my first break","m":"Open the document"},{"n":"Message someone you care about","c":"After lunch","m":"Send one line"}],"evening":[{"n":"Tidy the kitchen","c":"After dinner","m":"Put one thing away"},{"n":"Phone in another room","c":"After dinner","m":"Switch it to do-not-disturb"},{"n":"5 minutes of stretching","c":"After I sit down in the evening","m":"One stretch"},{"n":"Read instead of scrolling","c":"After I get into bed","m":"Read one page"},{"n":"Write one line about today","c":"Before I turn the light off","m":"One word"}],"iftime":[{"n":"Practise an instrument or a skill","c":"When the TV goes off","m":"Get it out and play one note"},{"n":"Declutter one spot","c":"When I pass the messiest drawer","m":"Throw away one thing"},{"n":"One minute of quiet breathing","c":"When I feel rushed","m":"Three slow breaths"}]}}];   // Atomic habits for anyone: each habit has its cue (c) and its two-minute version (m)
   function loadFromLink(){ famFromLink(); var m = location.hash.match(/^#load=([A-Za-z0-9_-]+)/); if(!m) return; history.replaceState(null, "", location.pathname + location.search);
     var x; try{ x = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, "+").replace(/_/g, "/"))))); }catch(e){ x = null; } if(!x || !x.g) return;
     var rows = []; BAGS.forEach(function(b){ (x.g[b[0]] || []).forEach(function(n){ n = String(n).trim(); if(n) rows.push({n:n, b:b[0]}); }); }); if(!rows.length) return; openLoad(String(x.t || "A list"), rows); }
   function openLoad(t, rows){ if(TABS.active !== "today") switchTo("today");
     LOADL = {t:t, rows:rows, off:{}}; drawLoad(); setTimeout(function(){ $("loadBox").scrollIntoView({block:"start"}); window.scrollBy(0, -12); }, 50); }
-  function famRows(f){ var rows = []; BAGS.forEach(function(b){ (f.g[b[0]] || []).forEach(function(n){ rows.push({n:n, b:b[0]}); }); }); return rows; }
-  function openFamLoad(id){ var f = FAMLOADS.concat(GENLOADS).filter(function(x){ return x.id === id; })[0]; if(f) openLoad(f.name, famRows(f)); }
+  function famRows(f){ var rows = []; BAGS.forEach(function(b){ (f.g[b[0]] || []).forEach(function(x){ var o = typeof x === "string" ? {n:x} : x; rows.push({n:o.n, c:o.c || "", m:o.m || "", b:b[0]}); }); }); return rows; }
+  function findHab(id){ return FAMLOADS.concat(GENLOADS).filter(function(x){ return x.id === id; })[0]; }
+  function openFamLoad(id){ var f = findHab(id); if(f) openLoad(f.name, famRows(f).map(function(r){ return {n:r.n, b:r.b}; })); }
   // short link to one of them: dobytoday.com/#fam=habits
-  function famFromLink(){ var m = location.hash.match(/^#fam=([a-z0-9-]+)/); if(!m) return; history.replaceState(null, "", location.pathname + location.search); openFamLoad(m[1]); }
+  function famFromLink(){ var m = location.hash.match(/^#fam=([a-z0-9-]+)/); if(m){ location.hash = "#habits=" + m[1]; return; } habitFromLink(); }
+  // ---------- Atomic habits page: today's tally, each habit with its cue and two-minute version, a 7-day row, "never miss twice" ----------
+  var HABP = null;
+  function habKey(id){ return "dobytoday-habits-" + id; }
+  function habLoad(id){ try{ return JSON.parse(localStorage.getItem(habKey(id)) || "{}") || {}; }catch(e){ return {}; } }
+  function habSave(id, d){ try{ localStorage.setItem(habKey(id), JSON.stringify(d)); }catch(e){} }
+  function habDay(off){ return iso(Date.now() - off * 864e5); }
+  function habitFromLink(){ var m = location.hash.match(/^#habits=([a-z0-9-]+)/), f = m && findHab(m[1]);
+    if(!f){ if(HABP){ HABP = null; document.body.classList.remove("habitmode"); $("habitPage").hidden = true; } return; }
+    if(TABS.active !== "today") switchTo("today");
+    HABP = f; document.body.classList.add("habitmode"); drawHabits(); window.scrollTo(0, 0); }
+  function drawHabits(){ var f = HABP, el = $("habitPage"); if(!f) return; var rows = famRows(f), d = habLoad(f.id), t = habDay(0), y = habDay(1), td = d[t] || {}, yd = d[y] || {};
+    var done = rows.filter(function(r, i){ return td[i]; }).length, two = rows.filter(function(r, i){ return td[i] === "m"; }).length;
+    var days = []; for(var k = 6; k >= 0; k--) days.push(habDay(k));
+    var h = '<button type="button" class="pback" data-hx="1">← My current list</button><h2 class="ptitle">' + esc(f.name) + '</h2>'
+      + '<p class="hintro">Tiny habits, done every day. Each one is tied to something you already do – and the two-minute version still counts. Missed one? Fine – just never miss twice.</p>'
+      + '<div class="hscore"><b>' + done + '</b> of ' + rows.length + ' done today' + (two ? ' · ' + two + ' as the two-minute version' : '') + '</div>';
+    BAGS.forEach(function(b){ var rs = []; rows.forEach(function(r, i){ if(r.b === b[0]) rs.push([r, i]); }); if(!rs.length) return;
+      h += '<p class="pgrp hgrp">' + esc(b[1]) + '</p>';
+      rs.forEach(function(ri){ var r = ri[0], i = ri[1], v = td[i], miss = !v && !yd[i] && d[y] !== undefined;
+        h += '<div class="hrow' + (v ? ' on' : '') + '"><div class="hmain"><b>' + esc(r.n) + '</b>' + (r.c ? '<small class="hcue">' + esc(r.c) + '</small>' : '') + (r.m ? '<small class="h2m">Two-minute version: ' + esc(r.m) + '</small>' : '')
+          + (miss ? '<small class="hnudge">Missed yesterday – don’t miss twice</small>' : '') + '<span class="hweek" aria-label="Last 7 days">' + days.map(function(dd){ var x = (d[dd] || {})[i]; return '<i class="' + (x === "m" ? "half" : x ? "full" : "") + '"></i>'; }).join("") + '</span></div>'
+          + '<div class="hbtns"><button type="button" class="hb' + (v === "d" ? ' on' : '') + '" data-hdone="' + i + '" aria-pressed="' + (v === "d") + '">✓ Done</button>' + (r.m ? '<button type="button" class="hb two' + (v === "m" ? ' on' : '') + '" data-htwo="' + i + '" aria-pressed="' + (v === "m") + '">2 min</button>' : '') + '</div></div>'; }); });
+    h += '<div class="hfoot"><button type="button" class="btn" data-hadd="1">Add these to my current list</button></div>'
+      + '<details class="habout"><summary>What are atomic habits?</summary><p>From James Clear’s book <i>Atomic Habits</i>: small habits, repeated daily, add up. Four rules help them stick – <b>make it obvious</b> (tie it to a cue: “after I…, I will…”), <b>make it attractive</b>, <b>make it easy</b> (the two-minute version) and <b>make it satisfying</b> (tick it off and watch the row of dots grow). And never miss twice.</p></details>';
+    el.innerHTML = h; el.hidden = false; }
+  $("habitPage").addEventListener("click", function(e){ if(!HABP) return; var f = HABP;
+    if(e.target.closest("[data-hx]")){ history.replaceState(null, "", location.pathname + location.search); HABP = null; document.body.classList.remove("habitmode"); $("habitPage").hidden = true; window.scrollTo(0, 0); return; }
+    if(e.target.closest("[data-hadd]")){ var rows = famRows(f); history.replaceState(null, "", location.pathname + location.search); HABP = null; document.body.classList.remove("habitmode"); $("habitPage").hidden = true; openLoad(f.name, rows.map(function(r){ return {n:r.n, b:r.b}; })); return; }
+    var b = e.target.closest("[data-hdone],[data-htwo]"); if(!b) return; var i = b.dataset.hdone != null ? b.dataset.hdone : b.dataset.htwo, val = b.dataset.hdone != null ? "d" : "m";
+    var d = habLoad(f.id), t = habDay(0); d[t] = d[t] || {}; if(d[t][i] === val) delete d[t][i]; else d[t][i] = val;
+    Object.keys(d).sort().slice(0, -120).forEach(function(k){ delete d[k]; }); habSave(f.id, d); drawHabits(); });
   function drawLoad(){ var box = $("loadBox"); if(!LOADL){ box.hidden = true; box.innerHTML = ""; return; }
     var on = LOADL.rows.filter(function(r, i){ return !LOADL.off[i]; }).length, h = '<div class="phead"><span class="pk">Add these to my list</span><b>' + esc(LOADL.t) + '</b><small>Everything is ticked – untick what you don’t want, then press Add.</small></div>';
     BAGS.forEach(function(b){ var rs = []; LOADL.rows.forEach(function(r, i){ if(r.b === b[0]) rs.push([r, i]); }); if(!rs.length) return;
@@ -1400,7 +1450,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   // A ready-made list opens as a page of its own (dobytoday.com/lists/…) that works as a tick-off checklist; its "Add to my list" comes back here
   $("trips").addEventListener("toggle", function(e){ var d = e.target; if(!d.classList || !d.classList.contains("tcat")) return; if(d.open) OPEN[d.dataset.cat] = 1; else delete OPEN[d.dataset.cat]; saveOpen(); }, true);
   $("trips").addEventListener("click", function(e){ var fc = e.target.closest("[data-tf]"); if(fc){ e.stopPropagation(); OPEN.tf = fc.dataset.tf; saveOpen(); drawTrips(); return; }
-    var fl = e.target.closest("[data-fload]"); if(fl){ e.stopPropagation(); openFamLoad(fl.dataset.fload); return; }
+    var fl = e.target.closest("[data-fload]"); if(fl){ e.stopPropagation(); location.hash = "#habits=" + fl.dataset.fload; return; }
     var f = e.target.closest(".tfav"); if(f){ e.stopPropagation(); keepTrip(f.dataset.fav); return; }
     var b = e.target.closest(".trip"); if(!b) return; var t = TRIPS.filter(function(x){ return x.id === b.dataset.trip; })[0];
     if(!t || !t.slug){ openPick(b.dataset.trip); return; } try{ sessionStorage.setItem("dobytoday-back", t.id); }catch(x){} location.href = "/lists/" + t.slug; });
