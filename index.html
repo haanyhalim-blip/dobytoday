@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v79 -->
+<!-- DoByToday v80 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -592,6 +592,19 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
 .ansbox:focus{outline:none;border-color:var(--main)}
 .sharedone{display:flex;justify-content:flex-end;margin-top:12px}
 .shared .shon{display:block;font-size:.85rem;color:var(--muted);margin:8px 0 4px}
+/* Switcher between the three sites (top right, next to Sign in) */
+.swwrap{position:relative;z-index:2000!important;display:inline-flex;align-self:center;margin-left:6px}
+.swb{display:inline-flex;align-items:center;justify-content:center;width:38px;height:38px;padding:0;border-radius:10px;border:1.5px solid var(--line);background:#fff;color:var(--ink);cursor:pointer}
+.swb:hover,.swb[aria-expanded="true"]{border-color:var(--ink)}
+.swcard{position:absolute;right:0;top:calc(100% + 8px);width:290px;max-width:calc(100vw - 32px);background:#fff;border:1.5px solid var(--ink);border-radius:14px;box-shadow:0 10px 30px rgba(0,0,0,.15);padding:8px;text-align:left}
+.swcard[hidden]{display:none}
+.swcard a{display:flex;gap:12px;align-items:center;padding:10px;border-radius:10px;text-decoration:none;color:var(--ink)}
+.swcard a:hover{background:#faf6f2}.swcard a.on{background:#f6efe9;cursor:default}
+.swcard b{display:block;font-size:1rem;line-height:1.25}.swcard small{display:block;color:var(--muted);font-size:.82rem;line-height:1.3}
+.swcard .sic{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:1.1rem;flex:none}
+.swcard .stk{margin-left:auto;color:var(--main);font-weight:800}
+@media (max-width:560px){.swwrap{order:5;position:static!important}.swcard{left:0;right:auto;top:calc(100% - 4px);z-index:2000}}
+.swcard .snote{font-size:.78rem;color:var(--muted);padding:6px 10px 4px;border-top:1px dashed var(--line);margin-top:4px;line-height:1.35}
 </style>
 </head>
 <body>
@@ -599,7 +612,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
 <header>
   <a class="brand" href="/">Do<span>by</span>Today</a>
   <h1 class="tagline">Today's list, sorted by when.</h1>
-  <button class="btn keepb acctb" id="acctBtn" type="button">Sign in</button>
+  <button class="btn keepb acctb" id="acctBtn" type="button">Sign in</button><span class="swwrap"><button class="swb" id="swBtn" type="button" aria-expanded="false" aria-controls="swCard" title="Our other handy sites" aria-label="Switch to our other sites"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><circle cx="5" cy="5" r="2.2"/><circle cx="12" cy="5" r="2.2"/><circle cx="19" cy="5" r="2.2"/><circle cx="5" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="19" cy="12" r="2.2"/><circle cx="5" cy="19" r="2.2"/><circle cx="12" cy="19" r="2.2"/><circle cx="19" cy="19" r="2.2"/></svg></button><div class="swcard" id="swCard" hidden></div></span>
 </header>
 <div class="keep" id="dayBox" hidden></div>
 
@@ -672,7 +685,7 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v79</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v80</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1722,6 +1735,38 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   $("acOutBtn").addEventListener("click", function(){ if(!asb) return; asb.auth.signOut().then(function(){ AUSER = null; acctUI(); acctClose(); toast("Signed out – your list stays on this phone"); }); });
   document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !$("acct").hidden) acctClose(); });
   document.addEventListener("visibilitychange", function(){ if(!document.hidden && AUSER) acctPull(); });
+  // Switcher between DobyToday, PackbyBag and ListbyAisle. Going across while signed in asks the server for a
+  // one-time pass, so you arrive signed in on the other site too (each site keeps its own sign-in).
+  var SW_ME = "dobytoday.com", SW_FN = SB_URL + "/functions/v1/hyper-processor";
+  var SW_SITES = [{h:"dobytoday.com", n:"DoByToday", d:"Today\u2019s jobs & shared lists", i:"\u2705", c:"#f7e3d6"},
+    {h:"packbybag.com", n:"PackByBag", d:"Packing lists, bag by bag", i:"\uD83E\uDDF3", c:"#dfeee6"},
+    {h:"listbyaisle.com", n:"ListByAisle", d:"Shopping, sorted by aisle", i:"\uD83D\uDED2", c:"#e3e8f6"}];
+  function swDraw(){ $("swCard").innerHTML = SW_SITES.map(function(x){ var on = x.h === SW_ME;
+      return '<a ' + (on ? 'class="on" aria-current="page"' : 'href="https://' + x.h + '/" data-sw="' + x.h + '"') + '><span class="sic" style="background:' + x.c + '">' + x.i + '</span><span><b>' + x.n + '</b><small>' + x.d + '</small></span>' + (on ? '<span class="stk" aria-hidden="true">\u2713</span>' : '') + '</a>'; }).join("")
+      + '<div class="snote">' + (AUSER ? "You stay signed in when you switch." : "Sign in once here and you\u2019ll stay signed in when you switch.") + '</div>'; }
+  function swShow(open){ $("swCard").hidden = !open; $("swBtn").setAttribute("aria-expanded", String(open)); if(open) swDraw(); }
+  $("swBtn").addEventListener("click", function(e){ e.stopPropagation(); swShow($("swCard").hidden); });
+  document.addEventListener("click", function(e){ if(!$("swCard").hidden && !e.target.closest(".swwrap")) swShow(false); });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape" && !$("swCard").hidden) swShow(false); });
+  $("swCard").addEventListener("click", function(e){ var a = e.target.closest("a"); if(!a) return; if(!a.dataset.sw){ e.preventDefault(); swShow(false); return; }
+    if(!AUSER || !asb) return;   // not signed in: just go
+    e.preventDefault(); var href = a.href, gone = false, go = function(h){ if(gone) return; gone = true; location.href = h; };
+    a.querySelector("small").textContent = "Opening\u2026"; setTimeout(function(){ go(href); }, 6000);   // never hang: go anyway after 6 seconds
+    asb.auth.getSession().then(function(r){ var tok = r.data && r.data.session ? r.data.session.access_token : "";
+      if(!tok) return go(href);
+      return fetch(SW_FN, {method:"POST", headers:{"Content-Type":"application/json", "Authorization":"Bearer " + tok, "apikey":SB_KEY}, body:"{}"})
+        .then(function(res){ return res.ok ? res.json() : null; })
+        .then(function(d){ go(d && d.token_hash ? href + "#hlt=" + encodeURIComponent(d.token_hash) : href); }); })
+      .catch(function(){ go(href); }); });
+  // Arriving from one of the other sites with a one-time pass: sign in with it (unless already signed in here)
+  (function(){ var m = location.hash.match(/^#hlt=([^&]+)/); if(!m) return; var th = decodeURIComponent(m[1]);
+    history.replaceState(null, "", location.pathname + location.search);
+    var has = false; try{ has = !!localStorage.getItem("hlt-auth"); }catch(e){} if(has) return;
+    acctLib(function(){ asb.auth.verifyOtp({token_hash:th, type:"email"}).then(function(res){
+        if(res.error) return asb.auth.verifyOtp({token_hash:th, type:"magiclink"});
+        return res; })
+      .then(function(res){ if(!res || res.error || !res.data || !res.data.user) return;
+        AUSER = res.data.user; acctUI(); toast("Signed in \u2013 carried over from your other site"); acctPull(true); }, function(){}); }); })();
   // Already signed in on this device? Load the sign-in library and bring the list up to date.
   (function(){ var has = false; try{ has = !!localStorage.getItem("hlt-auth"); }catch(e){}
     if(has) acctLib(function(){ asb.auth.getSession().then(function(r){ AUSER = r.data && r.data.session ? r.data.session.user : null; acctUI(); acctPull(); }); }); })();
