@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v90 -->
+<!-- DoByToday v91 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -718,7 +718,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v90</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v91</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -776,7 +776,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   var S = {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}, day:"", later:[], past:[], seen:[], title:"", notes:"", keep:false};
   function today(){ var d = new Date(); return d.getFullYear() + "-" + (d.getMonth() + 1) + "-" + d.getDate(); }
   var query = "";
-  var OKEY = "dobytoday-open-v1", OPEN = {home:1};
+  var OKEY = "dobytoday-open-v1", OPEN = {};   // every row starts closed
   var $ = function(id){ return document.getElementById(id); };
   var norm = function(s){ return String(s).toLowerCase().replace(/[’']/g,"").replace(/[^a-z0-9&\s]/g," ").replace(/\s+/g," ").trim(); };
   var esc = function(s){ return String(s).replace(/[&<>"]/g,function(c){ return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"})[c]; }); };
@@ -796,6 +796,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function load(){ try{ var r = localStorage.getItem(KEY); if(r){ var v = JSON.parse(r); if(v && typeof v === "object"){ S.picked = v.picked || {}; S.got = v.got || {}; S.own = v.own || []; S.bag = v.bag || {}; S.removed = v.removed || []; S.note = v.note || {}; S.day = v.day || ""; S.later = v.later || []; S.past = v.past || []; S.seen = v.seen || []; S.title = v.title || ""; S.notes = v.notes || ""; S.after = v.after || ""; S.keep = !!v.keep; S.kind = v.kind || ""; } } }catch(e){}
     newDay();
     try{ var o = localStorage.getItem(OKEY); if(o) OPEN = JSON.parse(o) || OPEN; }catch(e){}
+    Object.keys(OPEN).forEach(function(k){ if(k !== "pf") delete OPEN[k]; });   // rows start closed each visit (only the My saved lists filter is remembered)
     S.own.forEach(function(o){ if(!CATS.some(function(a){ return a[0] === o.a; })) o.a = classify(o.n); if(!bagLabel[o.b]) o.b = BAGOF[o.a] || "hold"; }); }
   // ---------- Days: today's list, jobs for later days, and what got done on earlier days ----------
   var WDN = ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"], MON = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
@@ -1311,14 +1312,10 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var anyCard = function(t){ return t.g ? loadCard(t) : card(t); };
     if(GENLOADS.length) groups.push(["habits", "Atomic habits", GENLOADS]);
     var famHTML = function(){ return FAMLOADS.map(loadCard).join("") + fam.map(card).join(""); };
-    if(f !== "all" && f !== "family" && !groups.some(function(g){ return g[0] === f; })) f = "all";
-    var chips = [["all", "All"]].concat(fam.length ? [["family", "From our family"]] : []).concat(groups.map(function(g){ return [g[0], g[1]]; }));
-    var h = '<div class="filt" role="group" aria-label="Show">' + chips.map(function(c){ return '<button type="button" class="fchip" data-tf="' + c[0] + '" aria-pressed="' + (f === c[0]) + '">' + esc(c[1]) + "</button>"; }).join("") + "</div>";
-    var famNote = '<p class="famnote">🏠 The lists we actually use in our house.</p>';
-    if(f === "all"){ if(fam.length){ var fo = !!OPEN["cat:family"]; h += '<details class="tcat" data-cat="cat:family"' + (fo ? " open" : "") + '><summary>🏠 From our family <small>' + (fam.length + FAMLOADS.length) + '</small></summary>' + famNote + '<div class="trips tin">' + famHTML() + "</div></details>"; }
-      h += groups.map(function(g){ return g[2].map(anyCard).join(""); }).join(""); }
-    else if(f === "family") h += famNote + famHTML();
-    else h += groups.filter(function(g){ return g[0] === f; })[0][2].map(anyCard).join("");
+    // Ready-made lists: one collapsed row per group (closed until you open it)
+    var famNote = '<p class="famnote">🏠 The lists we actually use in our house.</p>', h = "";
+    if(fam.length || FAMLOADS.length){ var fo = !!OPEN["cat:family"]; h += '<details class="tcat" data-cat="cat:family"' + (fo ? " open" : "") + '><summary>🏠 From our family <small>' + (fam.length + FAMLOADS.length) + '</small></summary>' + famNote + '<div class="trips tin">' + famHTML() + "</div></details>"; }
+    h += groups.map(function(g){ var k = "cat:" + g[0], o = !!OPEN[k]; return '<details class="tcat" data-cat="'+esc(k)+'"'+(o ? ' open' : '')+'><summary>'+esc(g[1])+' <small>'+g[2].length+'</small></summary><div class="trips tin">'+g[2].map(anyCard).join("")+'</div></details>'; }).join("");
     $("trips").innerHTML = h;
   }
   function openMine(){ var mx = $("mineBody"); if(mx.hidden){ mx.hidden = false; $("mineBtn").setAttribute("aria-expanded", "true"); } var t = $("listSec").getBoundingClientRect().top + window.pageYOffset - 80; window.scrollTo({top: Math.max(0, t), behavior:"smooth"}); }
@@ -1476,7 +1473,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       toast(n2 ? t.name + ": " + n2 + " added" : "All of those are on your list already"); } });
   // A ready-made list opens as a page of its own (dobytoday.com/lists/…) that works as a tick-off checklist; its "Add to my list" comes back here
   $("trips").addEventListener("toggle", function(e){ var d = e.target; if(!d.classList || !d.classList.contains("tcat")) return; if(d.open) OPEN[d.dataset.cat] = 1; else delete OPEN[d.dataset.cat]; saveOpen(); }, true);
-  $("trips").addEventListener("click", function(e){ var fc = e.target.closest("[data-tf]"); if(fc){ e.stopPropagation(); OPEN.tf = fc.dataset.tf; saveOpen(); drawTrips(); return; }
+  $("trips").addEventListener("click", function(e){
     var fl = e.target.closest("[data-fload]"); if(fl){ e.stopPropagation(); openCard("hab", fl.dataset.fload); return; }
     var f = e.target.closest(".tfav"); if(f){ e.stopPropagation(); keepTrip(f.dataset.fav); return; }
     var b = e.target.closest(".trip"); if(!b) return; var t = TRIPS.filter(function(x){ return x.id === b.dataset.trip; })[0];
