@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Use your lists with Claude or ChatGPT – Handy Little Tools</title>
+<meta name="description" content="Connect Claude or ChatGPT to your DobyToday to-do list, PackbyBag packing list and ListbyAisle shopping list. Ask it to add jobs, tick things off, make a packing list or turn a recipe into a shopping list.">
+<style>
+:root{--ink:#2a211c;--muted:#6f645c;--line:#e6ddd4;--main:#c25a2f;--main-deep:#9a4320;--bg:#f6f1ec;--card:#fff}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font:16px/1.55 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+.wrap{max-width:640px;margin:0 auto;padding:24px 16px 48px}
+.top{display:flex;gap:14px;flex-wrap:wrap;font-size:.9rem;margin-bottom:10px}
+.top a{color:var(--main-deep);font-weight:700}
+h1{font-size:1.7rem;line-height:1.2;margin:6px 0 10px}
+h2{font-size:1.15rem;margin:0 0 8px}
+.lead{font-size:1.05rem;color:var(--muted);margin:0 0 18px}
+.card{background:var(--card);border:1.5px solid var(--line);border-radius:14px;padding:16px;margin:0 0 14px}
+ol,ul{margin:6px 0 0;padding-left:22px}li{margin:6px 0}
+.addr{display:flex;gap:8px;align-items:stretch;margin:10px 0 4px}
+.addr code{flex:1 1 auto;min-width:0;overflow-wrap:anywhere;background:#f6f1ec;border:1.5px solid var(--line);border-radius:10px;padding:10px 12px;font-size:.9rem}
+.btn{font:inherit;font-weight:700;padding:10px 16px;border-radius:10px;border:1.5px solid var(--main);background:var(--main);color:#fff;cursor:pointer;flex:none}
+.say li{font-style:italic}
+.small{font-size:.88rem;color:var(--muted)}
+b.k{font-weight:700}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="top"><a href="https://dobytoday.com/">DobyToday</a><a href="https://packbybag.com/">PackbyBag</a><a href="https://listbyaisle.com/">ListbyAisle</a></div>
+  <h1>Use your lists with Claude or ChatGPT</h1>
+  <p class="lead">Connect your AI once, and it can read and change your to-do list, packing list and shopping list for you – just by asking.</p>
+
+  <div class="card">
+    <h2>Things you can ask</h2>
+    <ul class="say">
+      <li>“Put everything from this email on my to-do list for tomorrow.”</li>
+      <li>“Add ‘pay the football club’ to Today and mark it urgent.”</li>
+      <li>“Make a packing list for 5 days in Rhodes with a 12-year-old, hand luggage only.”</li>
+      <li>“Turn this recipe into a shopping list for 6 people.”</li>
+      <li>“What's left on the house project? Add an update to step 3: rang the plumber.”</li>
+      <li>“Tick off milk and eggs.”</li>
+    </ul>
+  </div>
+
+  <div class="card">
+    <h2>Before you start</h2>
+    <p style="margin:0">Sign in on <a href="https://dobytoday.com/">DobyToday</a>, <a href="https://packbybag.com/">PackbyBag</a> or <a href="https://listbyaisle.com/">ListbyAisle</a> (top right, <b class="k">Sign in</b> – just your email, no password). Your AI works with the lists saved in your account.</p>
+  </div>
+
+  <div class="card">
+    <h2>Claude</h2>
+    <ol>
+      <li>In Claude, open <b class="k">Settings</b> → <b class="k">Connectors</b> → <b class="k">Add custom connector</b>.</li>
+      <li>Name it <b class="k">Handy Little Lists</b> and paste this address:
+        <div class="addr"><code id="u1">https://nlbeqaoffratriysazrx.supabase.co/functions/v1/lists</code><button class="btn" type="button" data-copy="u1">Copy</button></div></li>
+      <li>Press <b class="k">Add</b>, then <b class="k">Connect</b>. Sign in with your email code and press <b class="k">Allow</b>.</li>
+      <li>In a chat, make sure Handy Little Lists is switched on (the tools menu under the message box), then ask away.</li>
+    </ol>
+  </div>
+
+  <div class="card">
+    <h2>ChatGPT</h2>
+    <ol>
+      <li>In ChatGPT, open <b class="k">Settings</b> → <b class="k">Apps &amp; Connectors</b> → <b class="k">Advanced settings</b> and turn on <b class="k">Developer mode</b>.</li>
+      <li>Back in Apps &amp; Connectors, press <b class="k">Create</b>. Name it <b class="k">Handy Little Lists</b>, paste the same address, and choose <b class="k">OAuth</b> for authentication:
+        <div class="addr"><code id="u2">https://nlbeqaoffratriysazrx.supabase.co/functions/v1/lists</code><button class="btn" type="button" data-copy="u2">Copy</button></div></li>
+      <li>Sign in with your email code and press <b class="k">Allow</b>. Then choose Handy Little Lists in a chat and ask away.</li>
+    </ol>
+    <p class="small" style="margin:8px 0 0">Menus in ChatGPT change from time to time – look for “connectors” or “apps” in Settings.</p>
+  </div>
+
+  <div class="card">
+    <h2>Good to know</h2>
+    <ul>
+      <li>It can only reach your own lists – not your email, and nobody else's lists.</li>
+      <li>Changes show on the sites within about 20 seconds while they're open, or as soon as you open them.</li>
+      <li>Shared lists and projects update for everyone you've shared them with.</li>
+      <li>To disconnect, remove it from the Connectors page in Claude or ChatGPT.</li>
+      <li>Free to use. You use your own Claude or ChatGPT account; adding your own connectors may need a paid plan on theirs.</li>
+    </ul>
+  </div>
+</div>
+<script>
+document.addEventListener("click", function(e){ var b = e.target.closest("[data-copy]"); if(!b) return; var t = document.getElementById(b.dataset.copy).textContent;
+  var done = function(){ b.textContent = "Copied ✓"; setTimeout(function(){ b.textContent = "Copy"; }, 1800); };
+  if(navigator.clipboard) navigator.clipboard.writeText(t).then(done, function(){ prompt("Copy this address:", t); }); else prompt("Copy this address:", t); });
+</script>
+</body>
+</html>

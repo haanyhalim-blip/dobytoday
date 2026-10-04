@@ -64,12 +64,72 @@ function freshList(site) {
 async function loadSite(token, site) {
   const d = (await rpc(token, "hlt_get", { p_site: site })) || {};
   d.s = Object.assign(freshList(site), d.s || {});
+  if (site === "dobytoday" && d.c) {   // a shared to-do list: the shared copy is the one everyone sees
+    const live = await rpc(token, "get_list", { code: d.c }).catch(() => null);
+    if (live) d.s = Object.assign(freshList(site), live);
+  }
   return d;
 }
+// The fields a DobyToday list (or page) shares through its link – the same as the site's own snapshot
+const SHARED = ["picked", "got", "own", "bag", "removed", "note", "day", "later", "past", "title", "notes", "after", "keep", "kind", "urg", "secs"];
+function sharedCopy(S) { const o = {}; SHARED.forEach((k) => { if (S[k] !== undefined) o[k] = S[k]; }); o.t = Date.now(); return o; }
 async function saveSite(token, site, d) {
   d.t = Date.now();   // newer than the phone's copy, so the site takes these changes when it next opens
+  if (site === "dobytoday" && d.c) await rpc(token, "save_list", { code: d.c, payload: sharedCopy(d.s) });
   await rpc(token, "hlt_save", { p_site: site, p_data: d });
 }
+
+// ---------- DobyToday pages: projects, plans and lists of steps kept under My saved lists ----------
+// Every page has its own share code; the shared copy is the live one (Magda and anyone else with the link sees it).
+async function loadPage(token, l) {
+  let S = l.s || {};
+  if (l.c) { const live = await rpc(token, "get_list", { code: l.c }).catch(() => null); if (live) S = live; }
+  return Object.assign(freshList("dobytoday"), { keep: true }, S);
+}
+async function savePage(token, d, l, S) {
+  const copy = sharedCopy(S);
+  if (l.c) await rpc(token, "save_list", { code: l.c, payload: copy });
+  delete copy.t; l.s = copy;
+  await saveSite(token, "dobytoday", d);
+}
+const pageName = (l, S) => (S && S.title) || l.name || "Untitled";
+function findPage(d, name) {
+  const L = (d.L || []).filter((l) => l && l.id), q = low(name);
+  if (!q) return { error: "Say which page." };
+  let m = L.filter((l) => low(l.name) === q || low((l.s || {}).title) === q);
+  if (!m.length) m = L.filter((l) => low(l.name).includes(q) || low((l.s || {}).title).includes(q) || q.includes(low(l.name)));
+  if (m.length === 1) return { l: m[0] };
+  return { error: m.length ? "More than one page matches “" + name + "”: " + m.map((l) => l.name).join(", ") + "." : "There's no page called “" + name + "”. Your pages: " + L.map((l) => l.name).join(", ") + "." };
+}
+function stepsOf(S) { return (S.own || []).map((o, i) => ({ o, i })); }
+function findSteps(S, refs) {
+  const st = stepsOf(S), hit = [], miss = [];
+  (refs || []).forEach((r) => {
+    const q = low(r); if (!q) return;
+    const num = q.match(/^(?:step\s*)?(\d{1,3})$/);
+    let m = num ? st.filter((x) => x.i === +num[1] - 1) : st.filter((x) => low(x.o.n) === q);
+    if (!m.length && !num) m = st.filter((x) => low(x.o.n).includes(q));
+    if (m.length === 1) hit.push(m[0]); else miss.push(String(r) + (m.length > 1 ? " (matches several – use the step number)" : ""));
+  });
+  return { hit, miss };
+}
+function describePage(l, S, full) {
+  const st = stepsOf(S), done = st.filter((x) => x.o.got).length, out = [];
+  const links = S.kind === "links";
+  out.push(pageName(l, S) + (l.group ? " [" + l.group + "]" : "") + (links ? " – " + st.length + " links" : " – " + done + " of " + st.length + " done") + (l.c ? " (shared page)" : ""));
+  if (!full) return out[0];
+  if (S.notes) out.push("Notes: " + S.notes);
+  st.forEach(({ o, i }) => {
+    if (links) { out.push("  " + (i + 1) + ". " + o.n + (o.url ? " – " + o.url : "")); return; }
+    out.push("  " + (o.got ? "☑ " : "☐ ") + (i + 1) + ". " + o.n);
+    (o.d || []).forEach((x) => out.push("       – " + x));
+    if (o.ans) out.push("       Answer: " + o.ans);
+    (o.up || []).forEach((u) => out.push("       Update – " + (u.w || "Someone") + ", " + (u.d || "") + ": " + u.t));
+  });
+  if (S.after) out.push("After the steps: " + S.after);
+  return out.join("\n");
+}
+function newCode() { const a = "abcdefghjkmnpqrstuvwxyz23456789"; let o = "t"; for (let i = 0; i < 11; i++) o += a[Math.floor(Math.random() * a.length)]; return o; }
 
 // ---------- reading a list ----------
 const low = (x) => String(x || "").trim().toLowerCase();
@@ -113,6 +173,7 @@ function describe(site, d) {
     all.forEach((e) => lines.push("  " + tick(e) + ((S.qty || {})[e.n] ? " ×" + S.qty[e.n] : "")));
     if (!all.length) lines.push("  (the shopping list is empty)");
   }
+  if (site === "dobytoday" && d.pagesText) lines.push("  My saved lists – pages and projects (use get_page to open one):\n" + d.pagesText);
   const m = Array.isArray(d.m) ? d.m : [];
   if (m.length) lines.push("  Saved lists: " + m.map((x) => x.name + " (" + (Object.keys((x.s || {}).picked || {}).length + ((x.s || {}).own || []).length) + ")").join(", "));
   return lines.join("\n");
@@ -172,7 +233,8 @@ function updateItems(site, S, a) {
   if (!hit.length) return "None of those are on the list" + (miss.length ? ": " + miss.join(", ") : "") + ".";
   let p = { key: "" };
   if (act === "move" && !(site === "dobytoday" && a.day)) { p = resolvePlace(site, S, a.section || a.bag); if (p.error) return p.error; if (!p.key) return "Say which " + (site === "dobytoday" ? "section" : "bag") + " to move them to."; }
-  if ((act === "mark_urgent" || act === "unmark_urgent") && site !== "dobytoday") return "Urgent marks are only on DobyToday.";
+  if ((act === "mark_urgent" || act === "unmark_urgent" || act === "set_link") && site !== "dobytoday") return "Urgent marks and links are only on DobyToday.";
+  if (act === "set_link" && hit.some((e) => e.own === null)) return "Links can only go on jobs you added yourself (not ready-made ones).";
   hit.forEach((e) => {
     const o = e.own === null ? null : S.own[e.own];
     if (act === "tick") { if (o) o.got = true; else S.got[e.n] = 1; }
@@ -180,13 +242,15 @@ function updateItems(site, S, a) {
     else if (act === "remove") removeEntry(S, e);
     else if (act === "mark_urgent") { S.urg = S.urg || {}; S.urg[e.n] = 1; }
     else if (act === "unmark_urgent") { if (S.urg) delete S.urg[e.n]; }
+    else if (act === "set_note") { S.note = S.note || {}; const t = String(a.text || "").trim(); if (t) S.note[e.n] = t.slice(0, 300); else delete S.note[e.n]; }
+    else if (act === "set_link") { if (o) { const u = String(a.link || "").trim(); if (/^https:\/\//.test(u)) o.link = u; else delete o.link; } }
     else if (act === "move") {
       if (site === "dobytoday" && a.day && a.day > todayISO()) { const b = o ? o.b : (S.bag || {})[e.n] || "any"; removeEntry(S, e); S.later = (S.later || []).concat([{ id: lid(), n: e.n, d: a.day, a: o ? o.a : "", b }]); }
       else if (o) o.b = p.key; else { S.bag = S.bag || {}; S.bag[e.n] = p.key; }
     }
   });
   tidy(S);
-  const verb = { tick: "Ticked off", untick: "Unticked", remove: "Removed", mark_urgent: "Marked urgent", unmark_urgent: "No longer urgent", move: "Moved" }[act] || act;
+  const verb = { tick: "Ticked off", untick: "Unticked", remove: "Removed", mark_urgent: "Marked urgent", unmark_urgent: "No longer urgent", move: "Moved", set_note: "Updated the note on", set_link: "Updated the link on" }[act] || act;
   return verb + (act === "move" ? (a.day ? " to " + a.day : " to " + p.label) : "") + ": " + hit.map((e) => e.n).join(", ") + "." + (miss.length ? " Not found: " + miss.join(", ") + "." : "");
 }
 function saveCopy(site, d, a) {
@@ -205,6 +269,7 @@ function saveCopy(site, d, a) {
 
 // ---------- the tools Claude / ChatGPT see ----------
 const SITE_PROP = { type: "string", enum: ["dobytoday", "packbybag", "listbyaisle"], description: "dobytoday = to-do list, packbybag = packing list, listbyaisle = shopping list" };
+const PAGE_PROP = { type: "string", description: "The page's name (or part of it), as listed by get_my_lists" };
 const TOOLS = [
   {
     name: "get_my_lists", title: "See my lists",
@@ -229,18 +294,54 @@ const TOOLS = [
   },
   {
     name: "update_items", title: "Tick, move or remove",
-    description: "Change items already on a list: tick them off, untick them, remove them, mark or unmark them ❗ urgent (DobyToday), or move them to another section/bag (or, on DobyToday, to a later day). Use the item names as they appear in get_my_lists.",
+    description: "Change items already on a list: tick them off, untick them, remove them, mark or unmark them ❗ urgent (DobyToday), move them to another section/bag (or, on DobyToday, to a later day), or give them a short note or (DobyToday) a link. Use the item names as they appear in get_my_lists. For steps on a DobyToday page or project, use update_page instead.",
     inputSchema: {
       type: "object", required: ["site", "items", "action"],
       properties: {
         site: SITE_PROP,
         items: { type: "array", items: { type: "string" } },
-        action: { type: "string", enum: ["tick", "untick", "remove", "mark_urgent", "unmark_urgent", "move"] },
+        action: { type: "string", enum: ["tick", "untick", "remove", "mark_urgent", "unmark_urgent", "move", "set_note", "set_link"] },
+        text: { type: "string", description: "For set_note: a short note shown under the item (empty removes it)" },
+        link: { type: "string", description: "For set_link (DobyToday): an https link opened by the job's 'Open ↗' button" },
         section: { type: "string", description: "For move: the DobyToday section or PackbyBag bag" },
         day: { type: "string", description: "For move on DobyToday: a later day, YYYY-MM-DD" },
       },
     },
     annotations: { destructiveHint: true },
+  },
+  {
+    name: "get_page", title: "Open a page or project",
+    description: "Open one of the person's DobyToday pages (projects, plans and step lists kept under My saved lists – some are shared with family): its notes, every numbered step with ticks, details, answers and dated updates.",
+    inputSchema: { type: "object", required: ["name"], properties: { name: PAGE_PROP } },
+    annotations: { readOnlyHint: true },
+  },
+  {
+    name: "update_page", title: "Change a page or project",
+    description: "Change a DobyToday page or project: tick or untick steps, add new steps, remove steps, add a dated update to a step (e.g. 'Rang PWC, waiting on the account number'), add details under a step, answer a step that asks a question, or rename a step. Refer to steps by number or name. Shared pages update for everyone who has the link.",
+    inputSchema: {
+      type: "object", required: ["name", "action"],
+      properties: {
+        name: PAGE_PROP,
+        action: { type: "string", enum: ["tick", "untick", "add_steps", "remove", "add_update", "add_details", "answer", "rename"] },
+        steps: { type: "array", items: { type: "string" }, description: "Step numbers or names; for add_steps, the new steps" },
+        text: { type: "string", description: "For add_update, add_details (one per line), answer or rename" },
+        who: { type: "string", description: "For add_update: whose update (first name)" },
+      },
+    },
+    annotations: { destructiveHint: true },
+  },
+  {
+    name: "create_page", title: "Make a new page or project",
+    description: "Make a new DobyToday page under My saved lists: a project, plan or checklist with numbered steps (each step can have details underneath). Good for anything with several steps, e.g. 'Sort the occupancy tax', 'Plan Sedona's party'.",
+    inputSchema: {
+      type: "object", required: ["name", "steps"],
+      properties: {
+        name: { type: "string" },
+        steps: { type: "array", items: { type: "object", required: ["name"], properties: { name: { type: "string" }, details: { type: "array", items: { type: "string" } } } } },
+        notes: { type: "string", description: "A short description shown at the top (optional)" },
+        group: { type: "string", description: "A group to file it under in My saved lists (optional)" },
+      },
+    },
   },
   {
     name: "save_list", title: "Save a list to use again",
@@ -252,12 +353,75 @@ const TOOLS = [
   },
 ];
 
+function pageTool(S, a) {
+  const act = a.action, who = String(a.who || "").trim().slice(0, 30);
+  if (act === "add_steps") {
+    const add = (a.steps || []).map((x) => String(x).replace(/\s+/g, " ").trim()).filter(Boolean);
+    if (!add.length) return "Give the steps to add.";
+    const have = new Set((S.own || []).map((o) => low(o.n)));
+    const fresh = add.filter((n) => !have.has(low(n)));
+    fresh.forEach((n) => S.own.push({ n, a: "other", b: "any", got: false }));
+    return fresh.length ? "Added " + fresh.length + (fresh.length === 1 ? " step: " : " steps: ") + fresh.join(", ") + "." : "Already on the page: " + add.join(", ") + ".";
+  }
+  const { hit, miss } = findSteps(S, a.steps);
+  if (!hit.length) return "None of those steps are on the page" + (miss.length ? ": " + miss.join(", ") : "") + ". Use the step number or its name from get_page.";
+  const text = String(a.text || "").trim();
+  if ((act === "add_update" || act === "add_details" || act === "answer" || act === "rename") && !text) return "Give the text.";
+  if ((act === "add_update" || act === "add_details" || act === "answer" || act === "rename") && hit.length > 1) return "Do that one step at a time.";
+  hit.forEach(({ o }) => {
+    if (act === "tick") o.got = true;
+    else if (act === "untick") o.got = false;
+    else if (act === "remove") o._gone = true;
+    else if (act === "add_update") o.up = (o.up || []).concat([{ w: who || "Assistant", d: todayISO(), t: text.slice(0, 500) }]);
+    else if (act === "add_details") o.d = (o.d || []).concat(text.split(/\n+/).map((x) => x.replace(/^[-•*\s]+/, "").trim()).filter(Boolean));
+    else if (act === "answer") { o.ans = text.slice(0, 1000); o.got = true; }
+    else if (act === "rename") o.n = text.slice(0, 200);
+  });
+  S.own = S.own.filter((o) => !o._gone);
+  const verb = { tick: "Ticked off", untick: "Unticked", remove: "Removed", add_update: "Added an update to", add_details: "Added details to", answer: "Answered", rename: "Renamed" }[act];
+  if (!verb) return "Unknown action.";
+  return verb + ": " + hit.map(({ o, i }) => (i + 1) + ". " + o.n).join(", ") + "." + (miss.length ? " Not found: " + miss.join(", ") + "." : "");
+}
+
 async function callTool(token, name, a) {
   a = a || {};
+  if (name === "get_page" || name === "update_page" || name === "create_page") {
+    const d = await loadSite(token, "dobytoday");
+    d.L = Array.isArray(d.L) ? d.L : [];
+    if (name === "create_page") {
+      const title = String(a.name || "").replace(/\s+/g, " ").trim().slice(0, 80);
+      if (!title) return "Give the page a name.";
+      if (d.L.some((l) => low(l.name) === low(title))) return "You already have a page called “" + title + "”. Use update_page to change it.";
+      const own = (a.steps || []).map((x) => (typeof x === "string" ? { name: x } : x || {})).map((x) => ({ n: String(x.name || "").trim(), d: (x.details || []).map(String).filter(Boolean), a: "other", b: "any", got: false })).filter((o) => o.n);
+      own.forEach((o) => { if (!o.d.length) delete o.d; });
+      if (!own.length) return "Give the page some steps.";
+      const S = Object.assign(freshList("dobytoday"), { keep: true, title, notes: String(a.notes || "").trim(), own, day: todayISO() });
+      const l = { id: "p" + lid(), name: title, group: String(a.group || "").trim().slice(0, 30), pin: false, c: newCode(), s: {} };
+      d.L.push(l);
+      await savePage(token, d, l, S);
+      return "Made the page “" + title + "” with " + own.length + " steps. It's in My saved lists on DobyToday (dobytoday.com).";
+    }
+    const f = findPage(d, a.name); if (f.error) return f.error;
+    const S = await loadPage(token, f.l);
+    if (name === "get_page") return describePage(f.l, S, true);
+    const msg = pageTool(S, a);
+    if (!/^(Added|Ticked|Unticked|Removed|Answered|Renamed)/.test(msg)) return msg;
+    await savePage(token, d, f.l, S);
+    return msg + " (" + pageName(f.l, S) + " on dobytoday.com)";
+  }
   if (name === "get_my_lists") {
     const which = !a.site || a.site === "all" ? Object.keys(SITES) : [a.site];
     const out = [];
-    for (const s of which) { if (!SITES[s]) continue; out.push(describe(s, await loadSite(token, s))); }
+    for (const s of which) {
+      if (!SITES[s]) continue;
+      const d = await loadSite(token, s);
+      if (s === "dobytoday" && Array.isArray(d.L) && d.L.length) {
+        const ls = d.L.filter((l) => l && l.id);
+        const pages = await Promise.all(ls.map((l) => loadPage(token, l).then((S) => "    – " + describePage(l, S, false)).catch(() => "    – " + (l.name || "Page"))));
+        d.pagesText = pages.join("\n");
+      }
+      out.push(describe(s, d));
+    }
     return out.join("\n\n") + "\n\nChanges show on the websites the next time they're opened or come back on screen.";
   }
   const site = a.site;
@@ -274,7 +438,7 @@ async function callTool(token, name, a) {
 }
 
 // ---------- MCP over HTTP ----------
-const INSTRUCTIONS = "These tools reach the person's own lists on three sites: DobyToday (to-do list, sorted by when), PackbyBag (packing list, sorted by bag) and ListbyAisle (shopping list, sorted by aisle). Call get_my_lists before changing things so you use their exact item and section names. Keep item names short. Children are referred to by first name only.";
+const INSTRUCTIONS = "These tools reach the person's own lists on three sites: DobyToday (to-do list, sorted by when), PackbyBag (packing list, sorted by bag) and ListbyAisle (shopping list, sorted by aisle). Call get_my_lists before changing things so you use their exact item and section names. DobyToday also has pages (projects and step lists under My saved lists): open them with get_page and change them with update_page. Keep item names short. Children are referred to by first name only.";
 
 async function rpcMessage(token, m) {
   const id = m.id, reply = (result) => ({ jsonrpc: "2.0", id, result }), fail = (code, message) => ({ jsonrpc: "2.0", id, error: { code, message } });

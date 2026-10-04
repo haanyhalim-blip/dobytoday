@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v93 -->
+<!-- DoByToday v94 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -719,7 +719,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
 </div>
 
 <div class="about">
-  <p class="footlinks"><button class="link" id="fbBtn" type="button" aria-expanded="false" aria-controls="feedback">Feedback &amp; suggestions</button></p>
+  <p class="footlinks"><button class="link" id="fbBtn" type="button" aria-expanded="false" aria-controls="feedback">Feedback &amp; suggestions</button> · <a class="link" href="/ai/">🤖 Use with Claude or ChatGPT</a></p>
 <section class="fb" id="feedback" hidden>
   <p class="fbq">What would make this better?</p>
   <p>A job that's missing, a ready-made day you'd like (moving day, a birthday party, the first day of term) – or something a ready-made day gets wrong for how your house runs.</p>
@@ -730,7 +730,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v93</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v94</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -739,11 +739,12 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
     <p>Sign in with your email and your list is saved to your account – open it on any phone or laptop. No password: we email you a 6-digit code.</p>
     <div id="acStep1"><label for="acEmail">Your email</label><input id="acEmail" type="email" autocomplete="email" inputmode="email" maxlength="200"><button class="btn primary" id="acSend" type="button">Email me a code</button></div>
     <div id="acStep2" hidden><p>We've sent a code to <b id="acTo"></b>. It can take a minute – check your junk folder too.</p><label for="acCode">The code from the email</label><input id="acCode" inputmode="numeric" autocomplete="one-time-code" maxlength="10"><button class="btn primary" id="acGo" type="button">Sign in</button><button class="link" id="acBack" type="button">Use a different email</button></div>
-    <p class="acsmall">Optional. We only use your email to sign you in. One sign-in works on all the Handy Little Tools sites.</p>
+    <p class="acsmall">Optional. We only use your email to sign you in. One sign-in works on all the Handy Little Tools sites – and lets you <a href="/ai/">use your lists with Claude or ChatGPT</a>.</p>
   </div>
   <div id="acIn" hidden>
     <p>Signed in as <b id="acWho"></b>. Your list is saved to your account – sign in on any phone or laptop to open it.</p>
     <p class="acsmall" id="acState"></p>
+    <p class="acsmall">🤖 Your lists work with Claude and ChatGPT too – ask them to add jobs, tick things off or make a list. <a href="/ai/">How to connect</a></p>
     <button class="btn" id="acOutBtn" type="button">Sign out</button>
   </div>
 </div></div>
@@ -1859,7 +1860,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function acctState(t){ var el = $("acState"); if(el) el.textContent = t; }
   function acctPush(){ if(aApplying) return; setLocalT(Date.now()); if(!AUSER || !asb) return; clearTimeout(apushT); apushT = setTimeout(function(){
     var raw = readList("today"), L = TABS.lists.filter(function(l){ return l.id !== "today"; }).map(function(l){ var c = ""; try{ c = localStorage.getItem(ckeyOf(l.id)) || ""; }catch(e){} return {id:l.id, name:l.name, group:l.group || "", pin:!!l.pin, s:readList(l.id), c:c}; });
-    acctState("Saving…"); asb.rpc("hlt_save", {p_site:SITE, p_data:{s:raw, L:L, f:favs(), t:localT(), m:myLoad()}}).then(function(res){ acctState(res.error ? "Saved on this phone – it'll save to your account when you're connected" : "✓ Saved to your account"); }); }, 1500); }
+    acctState("Saving…"); asb.rpc("hlt_save", {p_site:SITE, p_data:{s:raw, L:L, f:favs(), t:localT(), m:myLoad(), c:(function(){ try{ return localStorage.getItem(ckeyOf("today")) || ""; }catch(e){ return ""; } })()}}).then(function(res){ acctState(res.error ? "Saved on this phone – it'll save to your account when you're connected" : "✓ Saved to your account"); }); }, 1500); }
   function acctPull(first){ if(!AUSER || !asb) return;
     asb.rpc("hlt_get", {p_site:SITE}).then(function(res){ if(res.error) return acctState("Saved on this phone – it'll save to your account when you're connected");
       var d = res.data, lt = localT();
