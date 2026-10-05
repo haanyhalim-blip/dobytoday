@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v122 -->
+<!-- DoByToday v123 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -258,6 +258,14 @@ body.searching #shopBox[hidden]{display:block}
 .swhobar{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);margin:2px 0 6px}
 .swhobar .fchip{padding:4px 11px;font-size:.82rem}
 .swhobar .pplplus{border-style:dashed}
+.oneline .mrow .it>span:last-child{min-width:0;overflow:hidden}
+.oneline .mrow:not(.exp) .it .nm{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#mine .oneline .mrow:not(.exp) .cnote,#mine .oneline .mrow:not(.exp) .rowlink{display:none}
+#mine .oneline .mrow.exp{flex-wrap:wrap}
+#mine .oneline .mrow.exp .it{flex:1 1 calc(100% - 48px)}
+#mine .oneline .mrow.exp .rowlink{order:5;flex:0 0 auto;margin:0 0 8px 34px}
+.ohint{display:none}
+.oneline .mrow:not(.exp) .ohint{display:inline;order:3;flex:none;font-size:.8rem;opacity:.7;margin-left:4px}
 .swhobar .nochb{margin-left:auto}
 .whodid{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:2px 0 8px 34px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--card,#fff);font-size:.85rem}
 .whodid .ntag{cursor:pointer;border:1.5px solid transparent;font:inherit;font-size:.8rem;font-weight:700;padding:3px 10px}
@@ -825,7 +833,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v122</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v123</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1384,9 +1392,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       + '<span class="mvst" role="button" data-upadd="' + i + '" title="Add an update"><span aria-hidden="true">+</span><span class="lbl">Add update</span></span><span class="mvst" role="button" data-sted="' + i + '" title="Edit this step"><span aria-hidden="true">✎</span><span class="lbl">Edit step</span></span>'; }
   function ctl(n, ref){ var c = (S.note || {})[n] || ""; return '<div class="mctl" '+ref+'><span class="cmt'+(c ? ' has' : '')+'" role="button" title="Add a comment" aria-label="Add a comment"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span><input class="qc" type="text" maxlength="60" value="'+esc(c)+'" aria-label="Comment" placeholder="Add a comment">'+(FLAT || S.keep ? '' : MV.replace('</svg></span>', '</svg><span class="lbl">Change time</span></span>'))+(S.keep && TABS.active !== "today" ? '' : DAYB + '<span class="urgb" role="button">' + (isUrg(n) ? '❗ Remove urgent' : '❗ Urgent') + '</span><span class="lowb" role="button">' + (isLow(n) ? '↕ Back to normal' : '↓ Not urgent') + '</span>')+moveBtns(ref)+RMV.replace('</svg></span>', '</svg><span class="lbl">Remove</span></span>')+'</div>'; }
   // One tidy row per item: the tick box, the name, and a "⋯" button that opens everything else
-  var MOREN = "";
+  var MOREN = "", ONEEXP = {};   // ONEEXP: to-do rows opened to show their full text, note and link
   function moreBtn(k){ return '<button type="button" class="more" data-more="'+esc(k)+'" aria-label="More options" aria-expanded="'+(MOREN === k)+'"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>'; }
-  function mineRow(n, ref, got, cls, b, link){ var mk = cls + "|" + n; return '<div class="mrow'+(got?" got":"")+(isUrg(n) && !S.keep ? " urg" : "")+(isLow(n) && !S.keep ? " low" : "")+(!got && MOREN === mk ? " open" : "")+'"><button class="it'+cls+(got?" got":"")+'" '+ref+' aria-pressed="'+got+'"><span class="box"></span><span><span class="nm" data-done="'+doneWord(b)+'">'+(SCHED ? schedHTML(n) : esc(n))+'</span>'+(got ? noteTag(n) : ''+((S.note || {})[n] ? '<small class="cnote">'+esc((S.note || {})[n])+'</small>' : '')+'')+'</span></button>'+(link ? '<a class="jlink rowlink" href="'+esc(link)+'" target="_blank" rel="noopener">Open list ↗</a>' : '')+(got ? '' : moreBtn(mk) + ctl(n, ref))+'</div>'; }
+  function mineRow(n, ref, got, cls, b, link){ var mk = cls + "|" + n; return '<div class="mrow'+(got?" got":"")+(isUrg(n) && !S.keep ? " urg" : "")+(isLow(n) && !S.keep ? " low" : "")+(!got && MOREN === mk ? " open" : "")+(ONEEXP[n] ? " exp" : "")+'"><button class="it'+cls+(got?" got":"")+'" '+ref+' aria-pressed="'+got+'"><span class="box"></span>'+(!got && ((S.note || {})[n] || link) ? '<span class="ohint" aria-hidden="true">'+((S.note || {})[n] ? '📝' : '')+(link ? '🔗' : '')+'</span>' : '')+'<span><span class="nm" data-done="'+doneWord(b)+'">'+(SCHED ? schedHTML(n) : esc(n))+'</span>'+(got ? noteTag(n) : ''+((S.note || {})[n] ? '<small class="cnote">'+esc((S.note || {})[n])+'</small>' : '')+'')+'</span></button>'+(link ? '<a class="jlink rowlink" href="'+esc(link)+'" target="_blank" rel="noopener">Open list ↗</a>' : '')+(got ? '' : moreBtn(mk) + ctl(n, ref))+'</div>'; }
   function mineBtn(it){ return mineRow(it.n, 'data-n="'+esc(it.n)+'"', !!S.got[it.n], '', bagOf(it)); }
   function mineOwn(o, i){ var gv = !!o.got;
     if(SCUR && SWHO && SWHO.charAt(0) !== "*"){ var me = namesOf(o.n).map(function(x){ return x.trim(); }).filter(function(x){ return x.toLowerCase() === SWHO.toLowerCase(); })[0]; if(me) gv = ptOn(o, me); }   // a child's view shows their own tick
@@ -1472,7 +1480,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(mine){
       html = projHTML();
       if(FLAT){ var fr = [], fh = {}; items.forEach(function(it){ if(S.picked[it.n]){ fr.push({n:it.n}); fh[it.n] = mineBtn(it); } }); S.own.forEach(function(o, i){ fr.push({n:o.n}); fh[o.n] = mineOwn(o, i); });
-        shown = fr.length; if(shown) html += '<div class="grid">' + ordered(fr).map(function(r){ return fh[r.n]; }).join("") + '</div>'; }
+        shown = fr.length; if(shown) html += '<div class="grid' + (S.keep ? '' : ' oneline') + '">' + ordered(fr).map(function(r){ return fh[r.n]; }).join("") + '</div>'; }
       else chosen().forEach(function(g){
         shown += g.rows.length;
         html += '<h2 class="aisle"><button class="ah" data-a="'+g.key+'"><span class="c"></span>'+esc(g.label)+(g.sub ? ' <span class="sub">– '+esc(g.sub)+'</span>' : '')+'</button></h2><div class="grid">';
@@ -1889,6 +1897,10 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(t.dataset.pplx){ S.ppl = (S.ppl || []).filter(function(x){ return x !== t.dataset.pplx; }); SWHO = ""; try{ localStorage.setItem("dobytoday-who", ""); }catch(x){} save(); render(); return; }
     var nm = (prompt("Add a person to the Show buttons on this card (first name):") || "").replace(/\s+/g, " ").trim().slice(0, 20); if(!nm) return; nm = nm.charAt(0).toUpperCase() + nm.slice(1);
     S.ppl = (S.ppl || []).filter(function(x){ return x.toLowerCase() !== nm.toLowerCase(); }).concat([nm]); save(); render(); }, true);
+  // To-do list: each job on one line; tap its words to see the rest (full text, note, link), tap the box to tick it
+  $("mine").addEventListener("click", function(e){ var it = e.target.closest(".oneline .mrow .it"); if(!it || e.target.closest(".box")) return; var row = it.closest(".mrow"), nm = it.querySelector(".nm"); if(!nm || row.classList.contains("got")) return;
+    var more = row.classList.contains("exp") || nm.scrollWidth > nm.clientWidth + 1 || row.querySelector(".cnote, .rowlink"); if(!more) return;
+    e.stopImmediatePropagation(); e.preventDefault(); var k = nm.textContent; var on = !row.classList.contains("exp"); row.classList.toggle("exp", on); var key = it.dataset.n || (S.own[+it.dataset.own] || {}).n; if(key){ if(on) ONEEXP[key] = 1; else delete ONEEXP[key]; } }, true);
   $("mine").addEventListener("click", function(e){ var t = e.target.closest("[data-noch]"); if(!t) return; e.stopImmediatePropagation(); e.preventDefault(); NOCH = !NOCH; try{ localStorage.setItem("dobytoday-nochores", NOCH ? "1" : ""); }catch(x){} render(); }, true);
   $("mine").addEventListener("click", function(e){ var t = e.target.closest("[data-who]"); if(!t) return; e.stopImmediatePropagation(); e.preventDefault(); SWHO = SWHO === t.dataset.who ? "" : t.dataset.who; try{ localStorage.setItem("dobytoday-who", SWHO); }catch(x){} render(); }, true);
   $("mine").addEventListener("click", function(e){ var x = e.target.closest(".steps.bytime .sbody, .steps.bytime .stime"); if(!x) return; var it = x.closest(".it[data-own]"); if(!it) return;
