@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v98 -->
+<!-- DoByToday v99 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -217,6 +217,11 @@ body.searching #shopBox[hidden]{display:block}
 #mine .mrow .it .nm{font-size:1.08rem}
 #mine .mrow.urg .it .nm{color:#b42318;font-weight:700}
 #mine .mrow.urg .it .nm::before{content:"❗";margin-right:4px}
+.layrow{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:2px 0 10px;font-size:.85rem;color:var(--muted)}
+.layrow .fchip{padding:4px 11px;font-size:.82rem}
+#mine .steps.bytime .grip{display:none!important}
+.steps .tgroup{grid-column:1/-1;margin:14px 0 2px;font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.steps .tgroup:first-child{margin-top:2px}
 #mine .mrow.low .it .nm{color:var(--muted);font-weight:500}
 #mine .mctl .lowb{flex:none;display:inline-flex;align-items:center;gap:4px;cursor:pointer;padding:5px 0 5px 8px;color:var(--muted);font-size:.85rem;user-select:none}
 #mine .mctl .urgb{flex:none;display:inline-flex;align-items:center;gap:4px;cursor:pointer;padding:5px 0 5px 5px;color:#b42318;font-size:.85rem;user-select:none}
@@ -738,7 +743,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v98</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v99</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -785,7 +790,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function keyOf(id){ return id === "today" ? "dobytoday-v1" : "dobytoday-v1:" + id; }
   function ckeyOf(id){ return id === "today" ? "dobytoday-code-v1" : "dobytoday-code-v1:" + id; }
   function saveTabs(){ try{ localStorage.setItem(LKEY, JSON.stringify(TABS)); }catch(e){} }
-  function freshS(){ return {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}, day:"", later:[], past:[], seen:[], title:"", notes:"", after:"", keep:false, kind:"", urg:{}, secs:null, low:{}, at:{}}; }
+  function freshS(){ return {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}, day:"", later:[], past:[], seen:[], title:"", notes:"", after:"", keep:false, kind:"", urg:{}, secs:null, low:{}, at:{}, layout:""}; }
   function readList(id){ var d; try{ d = JSON.parse(localStorage.getItem(keyOf(id)) || "{}") || {}; }catch(e){ d = {}; } var f = freshS(); Object.keys(f).forEach(function(k){ if(d[k] == null) d[k] = f[k]; }); return d; }
   // Do something to the Today list even while a project is open
   function withToday(fn){ if(TABS.active === "today"){ fn(S); save(); render(); return; }
@@ -834,7 +839,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function doneWord(b){ return "done"; }
 
   function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} if(typeof syncPush === "function") syncPush(); if(typeof acctPush === "function") acctPush(); }
-  function load(){ try{ var r = localStorage.getItem(KEY); if(r){ var v = JSON.parse(r); if(v && typeof v === "object"){ S.picked = v.picked || {}; S.got = v.got || {}; S.own = v.own || []; S.bag = v.bag || {}; S.removed = v.removed || []; S.note = v.note || {}; S.day = v.day || ""; S.later = v.later || []; S.past = v.past || []; S.seen = v.seen || []; S.title = v.title || ""; S.notes = v.notes || ""; S.after = v.after || ""; S.keep = !!v.keep; S.kind = v.kind || ""; S.urg = v.urg || {}; S.secs = v.secs || null; S.low = v.low || {}; S.at = v.at || {}; } } }catch(e){}
+  function load(){ try{ var r = localStorage.getItem(KEY); if(r){ var v = JSON.parse(r); if(v && typeof v === "object"){ S.picked = v.picked || {}; S.got = v.got || {}; S.own = v.own || []; S.bag = v.bag || {}; S.removed = v.removed || []; S.note = v.note || {}; S.day = v.day || ""; S.later = v.later || []; S.past = v.past || []; S.seen = v.seen || []; S.title = v.title || ""; S.notes = v.notes || ""; S.after = v.after || ""; S.keep = !!v.keep; S.kind = v.kind || ""; S.urg = v.urg || {}; S.secs = v.secs || null; S.low = v.low || {}; S.at = v.at || {}; S.layout = v.layout || ""; } } }catch(e){}
     applySecs(); newDay();
     try{ var o = localStorage.getItem(OKEY); if(o) OPEN = JSON.parse(o) || OPEN; }catch(e){}
     Object.keys(OPEN).forEach(function(k){ if(k !== "pf") delete OPEN[k]; });   // rows start closed each visit (only the My saved lists filter is remembered)
@@ -1002,7 +1007,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function niceCase(t){ return /[a-z]/.test(t) ? t : t.split(/(\s+)/).map(function(w, i){ return /\s/.test(w) ? w : caseWord(w, i === 0, false); }).join(""); }
   function capsHead(x){ return x.length <= 70 && /[A-Z]{2}/.test(x) && !/[a-z]/.test(x) && !/^(?:[-*•]|\d+[.)\]])\s/.test(x); }
   // Numbered steps: a line starting 1. 2. 3. (or "Step 1 -") in order starts a step; the lines under it are its details until the next number
-  var NUMRE = /^\s*(?:step\s*)?(\d{1,2})\s*(?:[.):]|\s[-–—])\s*(.+)$/i;
+  var NUMRE = /^\s*(?:step\s*)?(\d{1,2})\s*(?:[.):](?!\d)|\s[-–—])\s*(.+)$/i;
   function numbered(t){ var lines = String(t || "").replace(/\r/g, "").split("\n"), pre = [], post = [], steps = [], details = {}, want = 0, cur = null, gap = false;
     lines.forEach(function(l){ var x = l.trim(), m = x.match(NUMRE), k = m ? +m[1] : -1;
       if(m && (want === 0 ? k === 1 : k === want)){ var n = m[2].trim().replace(/^[-–—:]\s*/, ""); if(capsHead(n)) n = niceCase(n); while(details[n]) n += " "; cur = n; steps.push(n); details[n] = []; want = k + 1; gap = false; return; }
@@ -1044,7 +1049,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(lk.length && lk.length >= (steps.length || out.notes.split("\n").filter(function(l){ return l.trim(); }).length) / 2){ out.links = lk; if(!steps.length) out.notes = out.notes.split("\n").filter(function(l){ return !linkOf(l); }).join("\n").trim(); out.steps = []; }
     return out; }
   var URLRE = /(https?:\/\/[^\s<>"]+)/i;
-  function linkOf(l){ var x = String(l || "").replace(/^[\s\-*•]*(?:\d+[.)\]:]\s*)?/, "").trim(), m = x.match(URLRE); if(!m) return null;
+  function linkOf(l){ var x = String(l || "").replace(/^[\s\-*•]*(?:\d+(?:[.)\]:](?!\d))\s*)?/, "").trim(), m = x.match(URLRE); if(!m) return null;
     var label = x.replace(m[1], "").replace(/[\s:–\-|]+$/, "").replace(/^[\s:–\-|]+/, "").trim(); return {n:label || hostOf(m[1]), url:m[1].replace(/#success$/, "")}; }
   function hostOf(u){ try{ return new URL(u).hostname.replace(/^www\./, ""); }catch(e){ return u; } }
   function fmtNotes(t){ var lines = String(t || "").replace(/\r/g, "").split("\n"), h = "", list = "";
@@ -1117,6 +1122,18 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   // Undo for project steps: keep how the steps looked just before a change, and offer to put them back
   function stepsNow(){ return JSON.parse(JSON.stringify(S.own)); }
   function stepUndo(msg, before){ toast(msg, function(){ S.own = before; STEPED = -1; UPDN = null; save(); render(); toast("Undone"); }); }
+  // A card's layout: a plain list, or grouped by time of day (Morning / Afternoon / Evening / Anytime) and put in time order.
+  // Cards that are mostly timed steps ("3:15 – Pick up…") start out by time of day; you can switch either way at any time.
+  function stepMins(t){ var m = String(t || "").match(/^\s*(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)?(?![\d])/i); if(!m || (!m[2] && !m[3])) return -1;
+    var h = +m[1], mi = +(m[2] || 0), ap = (m[3] || "").toLowerCase(); if(h > 23 || mi > 59) return -1;
+    if(ap === "pm" && h < 12) h += 12; else if(ap === "am" && h === 12) h = 0; else if(!ap && h >= 1 && h <= 7) h += 12;   // "3:15" on a school day is the afternoon
+    return h * 60 + mi; }
+  function layoutOf(){ if(S.layout === "time" || S.layout === "plain") return S.layout; var n = S.own.length, t = S.own.filter(function(o){ return stepMins(o.n) >= 0; }).length;
+    return n && t >= 3 && t >= n * 0.6 ? "time" : "plain"; }
+  function timeSteps(){ var g = [["Morning", []], ["Afternoon", []], ["Evening", []], ["Anytime", []]];
+    S.own.map(function(o, i){ return {o:o, i:i, m:stepMins(o.n)}; }).sort(function(a, b){ return (a.m < 0) - (b.m < 0) || a.m - b.m || a.i - b.i; })
+      .forEach(function(x){ g[x.m < 0 ? 3 : x.m < 720 ? 0 : x.m < 1020 ? 1 : 2][1].push(mineOwn(x.o, x.i)); });
+    return g.filter(function(x){ return x[1].length; }).map(function(x){ return '<h3 class="tgroup">' + x[0] + '</h3>' + x[1].join(""); }).join(""); }
   function isProj(){ return S.keep && TABS.active !== "today" && S.kind !== "links"; }
   // Drag a step by its grip to a new place in the project
   var DRAG = null;
@@ -1220,7 +1237,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(mine && S.keep){
       html = projHTML(); var steps = S.own.map(function(o, i){ return mineOwn(o, i); }).join("") + items.filter(function(it){ return S.picked[it.n]; }).map(mineBtn).join("");
       if(PEDIT === "new") return html;
-      if(steps) html += '<h2 class="aisle dsec"><span class="c"></span>Steps <span class="sub">– ' + nGot() + " of " + nPicked() + ' done</span></h2><div class="grid steps">' + steps + "</div>";
+      var lay = isProj() ? layoutOf() : "plain"; if(lay === "time") steps = timeSteps();
+      if(steps) html += '<h2 class="aisle dsec"><span class="c"></span>Steps <span class="sub">– ' + nGot() + " of " + nPicked() + ' done</span></h2>' + (isProj() ? '<div class="layrow" role="group" aria-label="Layout"><span>Layout:</span><button type="button" class="fchip" data-lay="plain" aria-pressed="' + (lay === "plain") + '">List</button><button type="button" class="fchip" data-lay="time" aria-pressed="' + (lay === "time") + '">By time of day</button></div>' : '') + '<div class="grid steps' + (lay === "time" ? ' bytime' : '') + '">' + steps + "</div>";
       else html += '<h2 class="aisle dsec"><span class="c"></span>Steps</h2><p class="small">No steps yet.</p>';
       html += '<div class="stepadd"><textarea id="stepIn" rows="1" placeholder="Add a step (paste several, one per line)"></textarea><button type="button" class="btn" data-addstep="1">Add</button></div>';
       if(S.after) html += '<div class="proj pafter"><div class="pbody">' + fmtNotes(S.after) + "</div></div>";
@@ -1398,7 +1416,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     toast(r.n + " removed", function(){ unpark(r.n); if(r.own){ if(!S.own.some(function(o){ return norm(o.n) === norm(r.n); })) S.own.push({n:r.n, a:r.own.a, b:r.own.b, got:false}); } else { S.picked[r.n] = 1; delete S.got[r.n]; } save(); render(); }); }
 
   function addOne(v){
-    if(S.keep){ v = String(v).replace(/^[\s\-*•]*(?:\d+[.)\]:]\s*)?/, "").trim(); if(!v || S.own.some(function(o){ return o.n === v; })) return false; S.own.push({n:v, a:"other", b:"any", got:false}); return v; }   // a project: every step as written, in order
+    if(S.keep){ v = String(v).replace(/^[\s\-*•]*(?:\d+(?:[.)\]:](?!\d))\s*)?/, "").trim(); if(!v || S.own.some(function(o){ return o.n === v; })) return false; S.own.push({n:v, a:"other", b:"any", got:false}); return v; }   // a project: every step as written, in order
     v = v.trim().replace(/^[-*\u2022\u2610\u2611\u2612\[\]x ]+/i, "").replace(/^\d+\s*x?\s+/i, "").trim(); if(!v) return false;
     var hit = find(v);
     if(hit){ S.picked[hit.n] = 1; unpark(hit.n); return hit.n; }
@@ -1416,7 +1434,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       while(i > -1){ out.push([i, p[1]]); q = q.slice(0, i) + " " + new Array(p[0].length + 1).join("#") + " " + q.slice(i + k.length); i = q.indexOf(k); } });
     out.sort(function(a,b){ return a[0] - b[0]; }); return out.map(function(x){ return x[1]; }); }
   function splitRaw(t){ return S.keep ? splitSteps(t) : splitJobs(t); }
-  function splitSteps(t){ return joinWrap(String(t).replace(/\r/g, "").split(/\n+/).map(function(x){ return x.replace(/^[\s\-*•\u2610\u2611]*(?:\d+[.)\]:]\s*)?/, "").trim(); }).filter(Boolean)); }
+  function splitSteps(t){ return joinWrap(String(t).replace(/\r/g, "").split(/\n+/).map(function(x){ return x.replace(/^[\s\-*•\u2610\u2611]*(?:\d+(?:[.)\]:](?!\d))\s*)?/, "").trim(); }).filter(Boolean)); }
   // text copied from a narrow screen arrives chopped mid-sentence: put a line back onto the one before when it carries on from it
   function joinWrap(a){ var out = [];
     a.forEach(function(x){ var p = out[out.length - 1];
@@ -1430,7 +1448,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var filler = /^(?:can you|could you|please|pls|pack|bring|take|remember|don't forget|dont forget|some|a|an|the|we need|need|also|and|more|oh|ok|hey|hi|plus|maybe|my|your)\s+|\s+(?:please|pls|thanks|thank you|too|as well|x|xx|xxx|if you can|if poss)[!?]*$/i;
     var chatter = /^(?:oh|ok|okay|hi|hey|hello|thanks|thank you|cheers|x|xx|xxx|yes|yep|no|love you|lol|haha|please|pls|(?:some |a few |few )?(?:stuff|things|bits|bits and pieces|bits and bobs|clothes))$/i;
     parts.forEach(function(p){
-      p = p.replace(/^[\s\-*:)\]]*(?:\d+[.)\]:]\s*)?/, "").replace(/[.\s]+$/, "").trim();
+      p = p.replace(/^[\s\-*:)\]]*(?:\d+(?:[.)\]:](?!\d))\s*)?/, "").replace(/[.\s]+$/, "").trim();
       var prev; do { prev = p; p = p.replace(filler, "").trim(); } while(p && p !== prev);
       p = p.replace(/[!?]+$/, "").trim();
       if(!p || /^\d+$/.test(p) || chatter.test(p)) return;
@@ -1640,6 +1658,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     else { takeOff(b); return; }
     save(); render();
   }
+  $("mine").addEventListener("click", function(e){ var b = e.target.closest("[data-lay]"); if(!b) return; e.stopPropagation(); S.layout = b.dataset.lay; save(); render(); toast(S.layout === "time" ? "Grouped by time of day" : "Shown as a plain list"); }, true);
   $("out").addEventListener("click", onListClick); $("mine").addEventListener("click", onListClick);
   $("mine").addEventListener("input", function(e){ var i = e.target.closest(".qc"); if(!i) return; var n = ctlKey(i.closest(".mctl")); if(!n) return; S.note = S.note || {}; var v = i.value.trim(); if(v) S.note[n] = v; else delete S.note[n]; save(); $("paper").textContent = nPicked() ? asText() : "Nothing on the list yet"; });
   $("mine").addEventListener("input", function(e){ var a = e.target.closest(".ansbox"); if(!a) return; var o = S.own[+a.dataset.ans]; if(!o) return;
@@ -1701,7 +1720,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     return btoa(unescape(encodeURIComponent(j))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }catch(e){ return ""; } }
   function unpackPage(){ var m = location.hash.match(/[#&]d=([A-Za-z0-9_-]+)/); if(!m) return null;
     try{ var d = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, "+").replace(/_/g, "/"))))); return d && typeof d === "object" ? d : null; }catch(e){ return null; } }
-  function snapshot(){ return JSON.stringify({picked:S.picked, got:S.got, own:S.own, bag:S.bag, removed:S.removed, note:S.note || {}, day:S.day, later:S.later || [], past:S.past || [], title:S.title || "", notes:S.notes || "", after:S.after || "", keep:!!S.keep, kind:S.kind || "", urg:S.urg || {}, secs:S.secs || null, low:S.low || {}, at:S.at || {}}); }
+  function snapshot(){ return JSON.stringify({picked:S.picked, got:S.got, own:S.own, bag:S.bag, removed:S.removed, note:S.note || {}, day:S.day, later:S.later || [], past:S.past || [], title:S.title || "", notes:S.notes || "", after:S.after || "", keep:!!S.keep, kind:S.kind || "", urg:S.urg || {}, secs:S.secs || null, low:S.low || {}, at:S.at || {}, layout:S.layout || ""}); }
   var SAVED = "", SAVEERR = false, lastT = 0, BKEY = "dobytoday-backup-v1";
   function countOf(d){ return Object.keys(d.picked || {}).length + (d.own || []).length + (d.later || []).length + (d.title || d.notes ? 1 : 0); }
   function mergeInto(d){ var r = {picked:Object.assign({}, d.picked || {}, S.picked || {}), got:Object.assign({}, d.got || {}, S.got || {}), bag:Object.assign({}, d.bag || {}, S.bag || {}), note:Object.assign({}, d.note || {}, S.note || {}), own:(d.own || []).slice(), removed:(d.removed || []).slice(), day:S.day || d.day || "", title:S.title || d.title || "", notes:S.notes || d.notes || "", after:S.after || d.after || "", keep:!!(S.keep || d.keep), kind:S.kind || d.kind || "", later:(d.later || []).slice(), past:(d.past || []).slice()};
@@ -1712,12 +1731,12 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var here = countOf(S), there = countOf(d);
     if(!there && here){ lastSent = ""; syncPush(true); return; }
     var merged = false; if(viaJoin && here && there){ d = mergeInto(d); merged = true; }
-    var j = JSON.stringify({picked:d.picked || {}, got:d.got || {}, own:d.own || [], bag:d.bag || {}, removed:d.removed || [], note:d.note || {}, day:d.day || "", later:d.later || [], past:d.past || [], title:d.title || "", notes:d.notes || "", after:d.after || "", keep:!!d.keep, kind:d.kind || "", urg:("urg" in d ? d.urg : S.urg) || {}, secs:("secs" in d ? d.secs : S.secs) || null, low:("low" in d ? d.low : S.low) || {}, at:("at" in d ? d.at : S.at) || {}}); if(j === snapshot()) return;
+    var j = JSON.stringify({picked:d.picked || {}, got:d.got || {}, own:d.own || [], bag:d.bag || {}, removed:d.removed || [], note:d.note || {}, day:d.day || "", later:d.later || [], past:d.past || [], title:d.title || "", notes:d.notes || "", after:d.after || "", keep:!!d.keep, kind:d.kind || "", urg:("urg" in d ? d.urg : S.urg) || {}, secs:("secs" in d ? d.secs : S.secs) || null, low:("low" in d ? d.low : S.low) || {}, at:("at" in d ? d.at : S.at) || {}, layout:("layout" in d ? d.layout : S.layout) || ""}); if(j === snapshot()) return;
     var before = snapshot(), lost = here - there;
     try{ localStorage.setItem(BKEY, before); }catch(e){}
     var fa = document.activeElement, typing = fa && fa.classList && fa.classList.contains("ansbox") ? {n:(S.own[+fa.dataset.ans] || {}).n, v:fa.value} : null;
     if(typing) (d.own || []).forEach(function(o){ if(o.n === typing.n){ o.ans = typing.v; o.got = !!typing.v.trim(); } });
-    applying = true; S.picked = d.picked || {}; S.got = d.got || {}; S.own = d.own || []; S.bag = d.bag || {}; S.removed = d.removed || []; S.note = d.note || {}; S.day = d.day || ""; S.later = d.later || []; S.past = d.past || []; S.title = d.title || ""; S.notes = d.notes || ""; S.after = d.after || ""; S.keep = !!d.keep; S.kind = d.kind || ""; if("urg" in d) S.urg = d.urg || {}; if("low" in d) S.low = d.low || {}; if("at" in d) S.at = d.at || {}; if("secs" in d){ S.secs = d.secs || null; applySecs(); } if(d.t) lastT = d.t; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} lastSent = snapshot(); render(); applying = false;
+    applying = true; S.picked = d.picked || {}; S.got = d.got || {}; S.own = d.own || []; S.bag = d.bag || {}; S.removed = d.removed || []; S.note = d.note || {}; S.day = d.day || ""; S.later = d.later || []; S.past = d.past || []; S.title = d.title || ""; S.notes = d.notes || ""; S.after = d.after || ""; S.keep = !!d.keep; S.kind = d.kind || ""; if("urg" in d) S.urg = d.urg || {}; if("low" in d) S.low = d.low || {}; if("at" in d) S.at = d.at || {}; if("layout" in d) S.layout = d.layout || ""; if("secs" in d){ S.secs = d.secs || null; applySecs(); } if(d.t) lastT = d.t; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} lastSent = snapshot(); render(); applying = false;
     if(merged){ lastSent = ""; syncPush(true); }
     if(!viaJoin && lost > 0){ toast("List updated from the shared link (" + lost + " fewer)", function(){ try{ var b = JSON.parse(before); applying = true; S.picked = b.picked || {}; S.got = b.got || {}; S.own = b.own || []; S.bag = b.bag || {}; S.removed = b.removed || []; S.note = b.note || {}; S.day = b.day || ""; S.later = b.later || []; S.past = b.past || []; S.title = b.title || ""; S.notes = b.notes || ""; S.after = b.after || ""; S.keep = !!b.keep; S.kind = b.kind || ""; S.urg = b.urg || {}; S.secs = b.secs || null; S.low = b.low || {}; S.at = b.at || {}; applySecs(); applying = false; save(); render(); lastSent = ""; syncPush(true); }catch(e){} }); } }
   function syncPush(now){ if(!CODE || applying) return; clearTimeout(pushT); var go = function(){

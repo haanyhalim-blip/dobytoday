@@ -71,7 +71,7 @@ async function loadSite(token, site) {
   return d;
 }
 // The fields a DobyToday list (or page) shares through its link – the same as the site's own snapshot
-const SHARED = ["picked", "got", "own", "bag", "removed", "note", "day", "later", "past", "title", "notes", "after", "keep", "kind", "urg", "secs", "low", "at"];
+const SHARED = ["picked", "got", "own", "bag", "removed", "note", "day", "later", "past", "title", "notes", "after", "keep", "kind", "urg", "secs", "low", "at", "layout"];
 function sharedCopy(S) { const o = {}; SHARED.forEach((k) => { if (S[k] !== undefined) o[k] = S[k]; }); o.t = Date.now(); return o; }
 async function saveSite(token, site, d) {
   d.t = Date.now();   // newer than the phone's copy, so the site takes these changes when it next opens
