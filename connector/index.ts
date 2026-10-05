@@ -116,7 +116,7 @@ function findSteps(S, refs) {
 function describePage(l, S, full) {
   const st = stepsOf(S), done = st.filter((x) => x.o.got).length, out = [];
   const links = S.kind === "links";
-  out.push(pageName(l, S) + (l.group ? " [" + l.group + "]" : "") + (links ? " – " + st.length + " links" : " – " + done + " of " + st.length + " done") + (l.c ? " (shared page)" : ""));
+  out.push(pageName(l, S) + (l.group ? " [" + l.group + "]" : "") + (links ? " – " + st.length + " links" : " – " + done + " of " + st.length + " done") + (l.c ? " – share link: https://dobytoday.com/#page=" + l.c : ""));
   if (!full) return out[0];
   if (S.notes) out.push("Notes: " + S.notes);
   st.forEach(({ o, i }) => {
