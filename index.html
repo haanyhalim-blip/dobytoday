@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v113 -->
+<!-- DoByToday v114 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -258,6 +258,10 @@ body.searching #shopBox[hidden]{display:block}
 .swhobar{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);margin:2px 0 6px}
 .swhobar .fchip{padding:4px 11px;font-size:.82rem}
 .swhobar .pplplus{border-style:dashed}
+.whodid{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:2px 0 8px 34px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--card,#fff);font-size:.85rem}
+.whodid .ntag{cursor:pointer;border:1.5px solid transparent;font:inherit;font-size:.8rem;font-weight:700;padding:3px 10px}
+.whodid .ntag.on{border-color:#3a2f2a}
+.whodid .fchip{padding:3px 10px;font-size:.8rem}
 .swhobar .pplx{padding:4px 8px;margin-left:-4px}
 .ntag{display:inline-block;padding:1px 8px;margin:0 6px 2px 0;border-radius:999px;font-size:.78rem;font-weight:700;color:#3a2f2a;vertical-align:1px;white-space:nowrap}
 .steps.bytime .mrow.got .stxt{text-decoration:line-through;color:var(--muted)}
@@ -816,7 +820,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v113</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v114</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1875,7 +1879,14 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(it && !e.target.closest(".mctl")){ var o2 = S.own[+it.dataset.own]; if(!o2 || !namesOf(o2.n).length) return; e.stopImmediatePropagation(); e.preventDefault();
       var all2 = namesOf(o2.n).map(function(x){ return x.trim(); }), me = all2.filter(function(x){ return SWHO && x.toLowerCase() === SWHO.toLowerCase(); })[0];
       if(me){ o2.pt = o2.pt || {}; if(o2.got) all2.forEach(function(x){ o2.pt[x] = 1; }); if(o2.pt[me]) delete o2.pt[me]; else o2.pt[me] = 1; o2.got = all2.every(function(x){ return o2.pt[x]; }); if(!Object.keys(o2.pt).length) delete o2.pt; save(); render(); return; }   // a child's view: their box is their own tick
+      if(!o2.got && all2.length > 1){   // shared job in the Everyone view: ask who did it rather than ticking them all
+        var old = document.querySelector(".whodid"); if(old){ var same = old.dataset.for === it.dataset.own; old.remove(); if(same) return; }
+        var box = document.createElement("div"); box.className = "whodid"; box.dataset.for = it.dataset.own;
+        box.innerHTML = '<span>Who did it?</span>' + all2.map(function(x){ var on = !!(o2.pt || {})[x]; return '<button type="button" class="ntag pt' + (on ? ' on' : '') + '" data-pt="' + it.dataset.own + '|' + esc(x) + '" style="background:' + tagCol(x.toLowerCase()) + '">' + (on ? '✓ ' : '') + esc(x) + '</button>'; }).join("") + '<button type="button" class="fchip" data-ptall="' + it.dataset.own + '">All of them</button>';
+        (it.closest(".mrow") || it).insertAdjacentElement("afterend", box); return; }
       o2.got = !o2.got; if(o2.got){ o2.pt = {}; all2.forEach(function(x){ o2.pt[x] = 1; }); } else delete o2.pt; save(); render(); } }, true);
+  $("mine").addEventListener("click", function(e){ var b = e.target.closest("[data-ptall]"); if(!b) return; e.stopImmediatePropagation(); e.preventDefault(); var o = S.own[+b.dataset.ptall]; if(!o) return;
+    o.got = true; o.pt = {}; namesOf(o.n).forEach(function(x){ o.pt[x.trim()] = 1; }); save(); render(); }, true);
   $("mine").addEventListener("click", function(e){ var b = e.target.closest("[data-lay]"); if(!b) return; e.stopPropagation(); S.layout = b.dataset.lay; save(); render(); toast(S.layout === "time" ? "Family schedule" : S.layout === "timeline" ? "Timeline" : "Shown as a plain list"); }, true);
   $("out").addEventListener("click", onListClick); $("mine").addEventListener("click", onListClick);
   $("mine").addEventListener("input", function(e){ var i = e.target.closest(".qc"); if(!i) return; var n = ctlKey(i.closest(".mctl")); if(!n) return; S.note = S.note || {}; var v = i.value.trim(); if(v) S.note[n] = v; else delete S.note[n]; save(); $("paper").textContent = nPicked() ? asText() : "Nothing on the list yet"; });
