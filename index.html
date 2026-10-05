@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v99 -->
+<!-- DoByToday v100 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -743,7 +743,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v99</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v100</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1124,7 +1124,10 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function stepUndo(msg, before){ toast(msg, function(){ S.own = before; STEPED = -1; UPDN = null; save(); render(); toast("Undone"); }); }
   // A card's layout: a plain list, or grouped by time of day (Morning / Afternoon / Evening / Anytime) and put in time order.
   // Cards that are mostly timed steps ("3:15 – Pick up…") start out by time of day; you can switch either way at any time.
-  function stepMins(t){ var m = String(t || "").match(/^\s*(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)?(?![\d])/i); if(!m || (!m[2] && !m[3])) return -1;
+  // a step can also start with a part of the day: "Morning – make your bed", "After school – unpack", "Evening – brush teeth"
+  var DAYPART = [[/^\s*(?:morning|before school)\b/i, 360], [/^\s*(?:afternoon|after school)\b/i, 1005], [/^\s*(?:evening|bedtime|night|sunday night)\b/i, 1170]];
+  function stepMins(t){ for(var k = 0; k < DAYPART.length; k++) if(DAYPART[k][0].test(String(t || ""))) return DAYPART[k][1];
+    var m = String(t || "").match(/^\s*(\d{1,2})(?:[:.](\d{2}))?\s*(am|pm)?(?![\d])/i); if(!m || (!m[2] && !m[3])) return -1;
     var h = +m[1], mi = +(m[2] || 0), ap = (m[3] || "").toLowerCase(); if(h > 23 || mi > 59) return -1;
     if(ap === "pm" && h < 12) h += 12; else if(ap === "am" && h === 12) h = 0; else if(!ap && h >= 1 && h <= 7) h += 12;   // "3:15" on a school day is the afternoon
     return h * 60 + mi; }
