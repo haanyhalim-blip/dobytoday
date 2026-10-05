@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v117 -->
+<!-- DoByToday v118 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -258,6 +258,7 @@ body.searching #shopBox[hidden]{display:block}
 .swhobar{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);margin:2px 0 6px}
 .swhobar .fchip{padding:4px 11px;font-size:.82rem}
 .swhobar .pplplus{border-style:dashed}
+.swhobar .nochb{margin-left:auto}
 .whodid{display:flex;flex-wrap:wrap;align-items:center;gap:6px;margin:2px 0 8px 34px;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px;background:var(--card,#fff);font-size:.85rem}
 .whodid .ntag{cursor:pointer;border:1.5px solid transparent;font:inherit;font-size:.8rem;font-weight:700;padding:3px 10px}
 .whodid .ntag.on{border-color:#3a2f2a}
@@ -820,7 +821,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v117</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v118</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1220,7 +1221,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function tagsHTML(names){ return names.map(function(x){ x = x.trim(); return '<span class="ntag" role="button" data-who="' + esc(x) + '" title="Show ' + esc(x) + ' only" style="background:' + tagCol(x.toLowerCase()) + '">' + esc(x) + '</span>'; }).join(""); }
   function hm(mi){ var h = Math.floor(mi / 60) % 24, m = mi % 60; return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m; }   // 24-hour: 07:55, 15:15
   var SWHO = "", SCUR = null, SEXP = {};
-  try{ SWHO = localStorage.getItem("dobytoday-who") || ""; }catch(e){} if(SWHO === "*general") SWHO = "";
+  try{ SWHO = localStorage.getItem("dobytoday-who") || ""; }catch(e){} if(SWHO === "*general" || SWHO === "*chores") SWHO = "";
+  var NOCH = false; try{ NOCH = localStorage.getItem("dobytoday-nochores") === "1"; }catch(e){}   // "No chores": see the day's timings without the chores (remembered on this phone)
   var PARENTRE = /^(parents?|mum|mom|dad|mummy|daddy)$/i;
   function isParent(x){ x = String(x).trim(); return PARENTRE.test(x) || (S.ppl || []).some(function(y){ return y.toLowerCase() === x.toLowerCase(); }); }
   function isChore(n){ return !/^\s*\d/.test(String(n)) && namesOf(n).some(function(x){ return !isParent(x); }); }   // a child's job with no clock time   // the person picked on this phone stays picked (a child's tablet opens on their own things)
@@ -1231,7 +1233,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     return '<span class="ntag pt' + (on ? ' on' : '') + '" role="button" data-pt="' + i + '|' + esc(x) + '" aria-pressed="' + on + '" title="' + esc(x) + (on ? ' – done' : ' – tap when done') + '" style="background:' + tagCol(x.toLowerCase()) + '"><span class="full">' + (on ? '✓ ' : '') + esc(x) + '</span><span class="ini">' + (on ? '✓' : esc(x.slice(0, 2))) + '</span></span>'; }).join(""); }   // tap a name: show just that person's part of the day
   function namesOf(n){ var t = String(n).replace(/^\s*(?:morning|before school|afternoon|after school|evening|bedtime|night|sunday night)\s*[–—-]\s*/i, "").replace(/^\s*\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?\s*(?:[–—-]\s*\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?)?\s*[–—-]\s*/i, "");
     var w = t.match(/^\s*((?:[A-Z][a-z]+|All three|Everyone)(?:\s*(?:&|and|,|·)\s*(?:[A-Z][a-z]+))*)\s*:\s*/); return w ? w[1].split(/\s*(?:&|\band\b|,|·)\s*/) : []; }
-  function forWho(n){ if(!SWHO) return true; if(SWHO === "*general") return !namesOf(n).length; if(SWHO === "*chores") return isChore(n);
+  function forWho(n){ if(NOCH && isChore(n)) return false; if(!SWHO) return true; if(SWHO === "*general") return !namesOf(n).length; if(SWHO === "*chores") return isChore(n);
     if(SWHO === "*parents") return !namesOf(n).length || namesOf(n).some(isParent);   // parents see the family things (pick-ups, meals) and their own jobs
     var ns = namesOf(n).map(function(x){ return x.toLowerCase(); }); return ns.indexOf(SWHO.toLowerCase()) > -1 || /^all three|^everyone/i.test(ns[0] || "") || (!ns.length && (new RegExp("\\b" + SWHO + "\\b", "i").test(n) || (S.ppl || []).some(function(x){ return x.toLowerCase() === SWHO.toLowerCase(); }))); }   // an added person (a parent) also sees the family things – pick-ups, meals
   function schedHTML(n){ var t = String(n), time = "", a = stepMins(t);
@@ -1336,11 +1338,12 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var who = showBar();
     return who + g.filter(function(x){ return x[1].length; }).map(function(x){ return '<h3 class="tgroup">' + x[0] + '</h3>' + x[1].join(""); }).join("") + info; }
   // Show: everyone, or one person – the names used on the card plus anyone added with "+ Person" (e.g. a parent with nothing on it yet)
-  var PPLPLUS = false;   // the "+ Person" button (extra names on a card) – off: parents go under one "Parents" button
+  var PPLPLUS = false, CHORESBTN = false;   // CHORESBTN: a "Chores" Show button – off   // the "+ Person" button (extra names on a card) – off: parents go under one "Parents" button
   function showBar(){ var people = [], extra = (S.ppl || []).slice(), chores = false; S.own.forEach(function(o){ if(infoStep(o)) return; if(isChore(o.n)) chores = true; namesOf(o.n).forEach(function(x){ x = x.trim(); if(/^(all three|everyone)$/i.test(x) || isParent(x)) return; if(people.indexOf(x) < 0) people.push(x); }); });
     if(!people.length) return "";
     function chip(v, label){ return '<button type="button" class="fchip" data-who="' + esc(v) + '" aria-pressed="' + (SWHO === v) + '">' + esc(label) + '</button>'; }
-    return '<div class="swhobar" role="group" aria-label="Show"><span>Show:</span>' + chip("", "Everyone") + people.map(function(x){ return chip(x, x); }).join("") + chip("*parents", "Parents") + (chores ? chip("*chores", "Chores") : "")
+    return '<div class="swhobar" role="group" aria-label="Show"><span>Show:</span>' + chip("", "Everyone") + people.map(function(x){ return chip(x, x); }).join("") + chip("*parents", "Parents") + (CHORESBTN && chores ? chip("*chores", "Chores") : "")
+      + (chores && layoutOf() !== "timeline" ? '<button type="button" class="fchip nochb" data-noch="1" aria-pressed="' + NOCH + '">No chores</button>' : "")
       + (PPLPLUS ? '<button type="button" class="fchip pplplus" data-pplplus="1">+ Person</button>' : '') + '</div>'; }
   function isProj(){ return S.keep && TABS.active !== "today" && S.kind !== "links"; }
   // Drag a step by its grip to a new place in the project
@@ -1875,6 +1878,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(t.dataset.pplx){ S.ppl = (S.ppl || []).filter(function(x){ return x !== t.dataset.pplx; }); SWHO = ""; try{ localStorage.setItem("dobytoday-who", ""); }catch(x){} save(); render(); return; }
     var nm = (prompt("Add a person to the Show buttons on this card (first name):") || "").replace(/\s+/g, " ").trim().slice(0, 20); if(!nm) return; nm = nm.charAt(0).toUpperCase() + nm.slice(1);
     S.ppl = (S.ppl || []).filter(function(x){ return x.toLowerCase() !== nm.toLowerCase(); }).concat([nm]); save(); render(); }, true);
+  $("mine").addEventListener("click", function(e){ var t = e.target.closest("[data-noch]"); if(!t) return; e.stopImmediatePropagation(); e.preventDefault(); NOCH = !NOCH; try{ localStorage.setItem("dobytoday-nochores", NOCH ? "1" : ""); }catch(x){} render(); }, true);
   $("mine").addEventListener("click", function(e){ var t = e.target.closest("[data-who]"); if(!t) return; e.stopImmediatePropagation(); e.preventDefault(); SWHO = SWHO === t.dataset.who ? "" : t.dataset.who; try{ localStorage.setItem("dobytoday-who", SWHO); }catch(x){} render(); }, true);
   $("mine").addEventListener("click", function(e){ var x = e.target.closest(".steps.bytime .sbody, .steps.bytime .stime"); if(!x) return; var it = x.closest(".it[data-own]"); if(!it) return;
     e.stopImmediatePropagation(); e.preventDefault(); var k = it.dataset.own; if(SEXP[k]) delete SEXP[k]; else SEXP[k] = 1; var row = it.closest(".mrow"); if(row) row.classList.toggle("exp", !!SEXP[k]); }, true);
