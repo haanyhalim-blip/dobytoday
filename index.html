@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v111 -->
+<!-- DoByToday v112 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -246,7 +246,10 @@ body.searching #shopBox[hidden]{display:block}
 .tlaxis .tlbody{border-left:0}
 .tlh{position:absolute;left:0;right:0;border-top:1px dashed var(--line)}
 .tlh span{position:absolute;top:-8px;left:0;font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums;background:var(--card,#fff);padding-right:4px}
-.tlcols .tlbody{background:repeating-linear-gradient(to bottom,transparent 0,transparent 68px,var(--line) 68px,var(--line) 69px)}
+.tlgap{position:absolute;left:0;right:0;background:repeating-linear-gradient(135deg,transparent 0,transparent 5px,var(--line) 5px,var(--line) 6px);opacity:.7}
+.tlgapl span{font-style:italic}
+.tlb .tlic{display:block;text-align:center;font-size:.85rem;line-height:1.1}
+.tlb.flex{padding-top:0;padding-bottom:0}
 .tlb.flex{border:1.5px dashed rgba(0,0,0,.35);opacity:.85}
 .tlb{position:absolute;box-sizing:border-box;border-radius:6px;padding:2px 5px;font-size:.74rem;line-height:1.25;overflow:hidden;border:1px solid rgba(0,0,0,.08);color:#2a211c}
 @media (max-width:520px){.tlaxis{width:36px}.tlcol{min-width:56px}.tlcols{gap:2px}.tlb{font-size:.68rem;padding:2px 3px}}
@@ -814,7 +817,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v111</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v112</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1210,7 +1213,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   // step shown at the bottom as an open section with tap-able links. The words of each step are never changed.
   var SCHED = false;
   function infoStep(o){ return /\b(links?|logins?|passwords?)\b/i.test(o.n) && o.d && o.d.length; }
-  function tagCol(nm){ var h = 0; for(var i = 0; i < nm.length; i++) h = (h * 39 + nm.charCodeAt(i)) % 997; return ["#fde2e4", "#e2ecfd", "#e3f4e1", "#f6e6fb", "#fff1d6", "#dff4f4"][h % 6]; }
+  function tagCol(nm){ var h = 0; for(var i = 0; i < nm.length; i++) h = (h * 39 + nm.charCodeAt(i)) % 997; return ["#fbd3d9", "#cfe1fb", "#d4f0cf", "#e8d5f7", "#ffe7b3", "#ffd3b8"][h % 6]; }
   function tagsHTML(names){ return names.map(function(x){ x = x.trim(); return '<span class="ntag" role="button" data-who="' + esc(x) + '" title="Show ' + esc(x) + ' only" style="background:' + tagCol(x.toLowerCase()) + '">' + esc(x) + '</span>'; }).join(""); }
   function hm(mi){ var h = Math.floor(mi / 60) % 24, m = mi % 60; return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m; }   // 24-hour: 07:55, 15:15
   var SWHO = "", SCUR = null, SEXP = {};
@@ -1294,16 +1297,27 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(!items.length && SWHO) return '<p class="small">Nothing for ' + esc(SWHO) + ' on this card yet.</p>';
     if(!items.length) return '<p class="small">Nothing on this card has a time yet. Steps that start with a time (like “15:15 – …”) show up here.</p>';
     lanes.sort(function(x, y){ return (x === FAM) - (y === FAM) || x.localeCompare(y); });
-    var lo = Math.floor(Math.min.apply(null, items.map(function(x){ return x.a; })) / 60) * 60, hi = Math.ceil(Math.max.apply(null, items.map(function(x){ return x.b; })) / 60) * 60, K = 1.15, H = (hi - lo) * K;
-    var axis = ""; for(var h = lo; h <= hi; h += 60) axis += '<div class="tlh" style="top:' + ((h - lo) * K) + 'px"><span>' + hm(h) + '</span></div>';
+    var lo = Math.floor(Math.min.apply(null, items.map(function(x){ return x.a; })) / 60) * 60, hi = Math.ceil(Math.max.apply(null, items.map(function(x){ return x.b; })) / 60) * 60, K = 1.7, GAP = 30;
+    // hours with nothing in them (school time) fold into one short band, so the busy parts get the room
+    var segs = [], y0 = 0, h, axis = "", lines = "";
+    for(h = lo; h < hi; h += 60){ var empty = !items.some(function(x){ return x.a < h + 60 && x.b > h; }), last = segs[segs.length - 1];
+      if(empty && last && last.empty) last.n++; else segs.push({a:h, n:1, empty:empty}); }
+    segs = segs.reduce(function(out, g){ if(g.empty && g.n < 2){ g.empty = false; } var prev = out[out.length - 1]; if(prev && !prev.empty && !g.empty){ prev.n += g.n; return out; } out.push(g); return out; }, []);
+    segs.forEach(function(g){ g.y = y0; g.k = g.empty ? GAP / (g.n * 60) : K; y0 += g.n * 60 * g.k; });
+    var H = y0;
+    function Y(m){ for(var j = segs.length - 1; j >= 0; j--) if(m >= segs[j].a) return segs[j].y + Math.min(m - segs[j].a, segs[j].n * 60) * segs[j].k; return 0; }
+    segs.forEach(function(g){ if(g.empty){ axis += '<div class="tlh tlgapl" style="top:' + g.y + 'px"><span>' + hm(g.a) + '</span></div>';
+        lines += '<div class="tlgap" style="top:' + g.y + 'px;height:' + (g.n * 60 * g.k) + 'px"></div>'; return; }
+      for(var m = g.a; m < g.a + g.n * 60; m += 60){ axis += '<div class="tlh" style="top:' + Y(m) + 'px"><span>' + hm(m) + '</span></div>'; lines += '<div class="tlh" style="top:' + Y(m) + 'px"></div>'; } });
+    axis += '<div class="tlh" style="top:' + H + 'px"><span>' + hm(hi) + '</span></div>';
     var anyFlex = items.some(function(x){ return x.flex; });
     var cols = lanes.map(function(p){ var its = items.filter(function(x){ return x.p === p; }).sort(function(x, y){ return x.a - y.a; }), ends = [];
       its.forEach(function(x){ var c = 0; while(ends[c] > x.a) c++; ends[c] = x.b; x.c = c; }); var nc = Math.max(1, ends.length);
-      return '<div class="tlcol"><div class="tlhead"><span class="ntag" style="background:' + (p === FAM ? "#eee" : tagCol(p.toLowerCase())) + '">' + esc(p) + '</span></div><div class="tlbody" style="height:' + H + 'px">'
-        + its.map(function(x){ var ic = iconFor(x.t), ht = Math.max(20, (x.b - x.a) * K - 2);
-          return '<div class="tlb' + (x.got ? ' got' : '') + (x.flex ? ' flex' : '') + '" style="top:' + ((x.a - lo) * K) + 'px;height:' + ht + 'px;left:' + (x.c * 100 / nc) + '%;width:' + (100 / nc) + '%;background:' + (p === FAM ? "#f1eeea" : tagCol(p.toLowerCase())) + '" title="' + esc((x.flex ? "Suggested time ≈" : "") + hm(x.a) + "–" + hm(x.b) + " " + x.t) + '">' + (ic ? ic + ' ' : '') + esc(x.t) + '</div>'; }).join("") + '</div></div>'; }).join("");
+      return '<div class="tlcol"><div class="tlhead"><span class="ntag" style="background:' + (p === FAM ? "#eee" : tagCol(p.toLowerCase())) + '">' + esc(p) + '</span></div><div class="tlbody" style="height:' + H + 'px">' + lines
+        + its.map(function(x){ var ic = iconFor(x.t), ht = Math.max(18, Y(x.b) - Y(x.a) - 2);
+          return '<div class="tlb' + (x.got ? ' got' : '') + (x.flex ? ' flex' : '') + '" style="top:' + Y(x.a) + 'px;height:' + ht + 'px;left:' + (x.c * 100 / nc) + '%;width:' + (100 / nc) + '%;background:' + (p === FAM ? "#f1eeea" : tagCol(p.toLowerCase())) + '" title="' + esc((p === FAM ? "" : p + " · ") + (x.flex ? "suggested ≈" : "") + hm(x.a) + "–" + hm(x.b) + " · " + x.t) + '">' + (x.flex && ic ? '<span class="tlic">' + ic + '</span>' : (ic ? ic + ' ' : '') + esc(x.t)) + '</div>'; }).join("") + '</div></div>'; }).join("");
     return '<div class="tl"><div class="tlaxis"><div class="tlhead"></div><div class="tlbody" style="height:' + H + 'px">' + axis + '</div></div><div class="tlcols">' + cols + '</div></div>'
-      + '<p class="small tlnote">' + (anyFlex ? 'Tap a block to see its time. Dashed blocks are suggested times for jobs that don’t have a set time – to fix one, give that step a time (⋯ → Edit step).' : '') + '</p>'; }
+      + '<p class="small tlnote">' + (anyFlex ? 'Tap a block to see who it’s for and when. Chores show as just their symbol. Dashed blocks are suggested times for jobs that don’t have a set time – to fix one, give that step a time (⋯ → Edit step).' : '') + '</p>'; }
   function timeSteps(){ var g = [["Morning", []], ["Afternoon", []], ["Evening", []], ["Anytime", []]], info = "";
     schedDay(); SCHED = true;
     S.own.map(function(o, i){ return {o:o, i:i, m:stepMins(o.n)}; }).sort(function(a, b){ return (a.m < 0) - (b.m < 0) || a.m - b.m || a.i - b.i; })
