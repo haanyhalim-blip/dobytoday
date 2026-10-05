@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v102 -->
+<!-- DoByToday v103 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -234,8 +234,10 @@ body.searching #shopBox[hidden]{display:block}
 .ntag{display:inline-block;padding:1px 8px;margin:0 6px 2px 0;border-radius:999px;font-size:.78rem;font-weight:700;color:#3a2f2a;vertical-align:1px;white-space:nowrap}
 .steps.bytime .mrow.got .stxt{text-decoration:line-through;color:var(--muted)}
 .steps.bytime .mrow .sdetw{margin-left:132px}
-.schinfo{grid-column:1/-1;margin:6px 0 2px}
-.schinfo ul{list-style:none;margin:6px 0 0;padding:0}
+.schinfo{grid-column:1/-1;margin:28px 0 4px}
+.schinfo>summary{font-size:1.02rem}
+.schinfo>summary small{font-weight:600;color:var(--muted);font-size:.8rem}
+.schinfo ul{list-style:none;margin:0;padding:0 12px 12px}
 .schinfo li{padding:8px 10px;margin:4px 0;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:.92rem;line-height:1.45;overflow-wrap:anywhere}
 .schinfo a{font-weight:700;color:var(--main-deep, #9a4320)}
 .steps.bytime .mrow .nm::before{content:none}
@@ -762,7 +764,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v102</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v103</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1175,8 +1177,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     t = t.charAt(0).toUpperCase() + t.slice(1);
     return '<span class="stime">' + (time || "") + '</span><span class="sbody"><span class="stxt">' + esc(t) + '</span></span><span class="swho">' + tags + '</span>'; }
   function linkify(x){ return esc(x).replace(/https?:\/\/[^\s<]+?(?=[\s·]|$)/g, function(u){ return '<a href="' + u + '" target="_blank" rel="noopener">Open ↗</a>'; }); }
-  function infoHTML(o){ return '<div class="schinfo"><h3 class="tgroup">' + esc(o.n.replace(/\s*and\s*/i, " & ")) + '</h3><ul>' + o.d.filter(function(x){ var w = x.match(/^\s*([A-Z][a-z]+)\s*[–—-]/); return !SWHO || !w || w[1].toLowerCase() === SWHO.toLowerCase(); }).map(function(x){
-      var w = x.match(/^\s*([A-Z][a-z]+)\s*[–—-]\s*/); return '<li>' + (w ? tagsHTML([w[1]]) + linkify(x.slice(w[0].length)) : linkify(x)) + '</li>'; }).join("") + '</ul></div>'; }
+  var INFOOPEN = false;   // the links row is folded until you open it (remembered while the page is open)
+  function infoHTML(o){ return '<details class="tcat schinfo"' + (INFOOPEN ? ' open' : '') + '><summary>🔑 ' + esc(o.n.replace(/\s*and\s*/i, " & ")) + ' <small>' + o.d.length + '</small></summary><ul>' + o.d.filter(function(x){ var w = x.match(/^\s*([A-Z][a-z]+)\s*[–—-]/); return !SWHO || !w || w[1].toLowerCase() === SWHO.toLowerCase(); }).map(function(x){
+      var w = x.match(/^\s*([A-Z][a-z]+)\s*[–—-]\s*/); return '<li>' + (w ? tagsHTML([w[1]]) + linkify(x.slice(w[0].length)) : linkify(x)) + '</li>'; }).join("") + '</ul></details>'; }
   function schedDay(){ var t = iso(); if(S.tday === t) return; var any = S.own.some(function(o){ return o.got; }); S.tday = t;
     if(any){ S.own.forEach(function(o){ o.got = false; }); save(); } else { try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} } }   // a new day: every tick box empty again
   function timeSteps(){ var g = [["Morning", []], ["Afternoon", []], ["Evening", []], ["Anytime", []]], info = "";
@@ -1711,6 +1714,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     else { takeOff(b); return; }
     save(); render();
   }
+  $("mine").addEventListener("toggle", function(e){ if(e.target.classList && e.target.classList.contains("schinfo")) INFOOPEN = e.target.open; }, true);
   $("mine").addEventListener("click", function(e){ var t = e.target.closest("[data-who]"); if(!t) return; e.stopImmediatePropagation(); e.preventDefault(); SWHO = SWHO === t.dataset.who ? "" : t.dataset.who; render(); }, true);
   $("mine").addEventListener("click", function(e){ var b = e.target.closest("[data-lay]"); if(!b) return; e.stopPropagation(); S.layout = b.dataset.lay; save(); render(); toast(S.layout === "time" ? "Family schedule" : "Shown as a plain list"); }, true);
   $("out").addEventListener("click", onListClick); $("mine").addEventListener("click", onListClick);
