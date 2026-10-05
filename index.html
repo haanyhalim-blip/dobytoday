@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v118 -->
+<!-- DoByToday v119 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -273,6 +273,9 @@ body.searching #shopBox[hidden]{display:block}
 .schinfo ul{list-style:none;margin:0;padding:0 12px 12px}
 .schinfo li{padding:8px 10px;margin:4px 0;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:.92rem;line-height:1.45;overflow-wrap:anywhere}
 .schinfo a{font-weight:700;color:var(--main-deep, #9a4320)}
+.schinfo .svc{display:inline-block;background:#ece8e4;border:1px solid #d9d2cb;border-radius:6px;padding:1px 8px;margin-right:6px;font-weight:800;font-size:.86rem;color:#2a211c}
+.schinfo .svcw{color:var(--muted);font-weight:600;margin-right:6px}
+.schinfo .svcd{display:block;margin-top:4px}
 .steps.bytime .mrow .nm::before{content:none}
 #mine .uplinks{display:none}
 /* one line per step, whatever the screen: long words fade into "…" – tap the words to read it all */
@@ -821,7 +824,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v118</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v119</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1257,7 +1260,10 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function linkify(x){ return esc(x).replace(/https?:\/\/[^\s<]+?(?=[\s·]|$)/g, function(u){ return '<a href="' + u + '" target="_blank" rel="noopener">Open ↗</a>'; }); }
   var INFOOPEN = false;   // the links row is folded until you open it (remembered while the page is open)
   function infoHTML(o){ return '<details class="tcat schinfo"' + (INFOOPEN ? ' open' : '') + '><summary>🔑 ' + esc(o.n.replace(/\s*and\s*/i, " & ")) + ' <small>' + o.d.length + '</small></summary><ul>' + o.d.filter(function(x){ var w = x.match(/^\s*([A-Z][a-z]+)\s*[–—-]/); return !SWHO || !w || w[1].toLowerCase() === SWHO.toLowerCase(); }).map(function(x){
-      var w = x.match(/^\s*([A-Z][a-z]+)\s*[–—-]\s*/); return '<li>' + (w ? tagsHTML([w[1]]) + linkify(x.slice(w[0].length)) : linkify(x)) + '</li>'; }).join("") + '</ul></details>'; }
+      var w = x.match(/^\s*([A-Z][a-z]+)\s*[–—-]\s*/), rest = w ? x.slice(w[0].length) : x;
+      var sv = rest.match(/^([^:]{1,40}?)\s*(\([^)]*\))?\s*:\s*(?!\/\/)/);   // "Doodle: …" → the service in its own grey box, so the long list scans quickly
+      var body = sv ? '<span class="svc">' + esc(sv[1]) + '</span>' + (sv[2] ? '<small class="svcw">' + esc(sv[2].slice(1, -1)) + '</small>' : '') + '<span class="svcd">' + linkify(rest.slice(sv[0].length)) + '</span>' : linkify(rest);
+      return '<li>' + (w ? tagsHTML([w[1]]) : '') + body + '</li>'; }).join("") + '</ul></details>'; }
   function schedDay(){ var t = iso(); if(S.tday === t) return; var any = S.own.some(function(o){ return o.got; }); S.tday = t;
     any = any || S.own.some(function(o){ return o.pt && Object.keys(o.pt).length; });
     if(any){ S.own.forEach(function(o){ o.got = false; delete o.pt; }); save(); } else { try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} } }   // a new day: every tick box empty again
