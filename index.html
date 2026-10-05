@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v106 -->
+<!-- DoByToday v107 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -235,6 +235,23 @@ body.searching #shopBox[hidden]{display:block}
 .steps.bytime .mrow .it>span:last-child{flex:1;min-width:0}
 .steps.bytime .mrow .it .nm{width:100%}
 .steps.bytime [data-mvup],.steps.bytime [data-mvdn]{display:none}
+.sico{margin-right:6px;font-size:.95em}
+.steps.bytl{display:block}
+.tl{display:flex;gap:0;margin:8px 0 4px;overflow-x:auto}
+.tlaxis{flex:none;width:44px}
+.tlcols{flex:1;display:flex;gap:4px;min-width:0}
+.tlcol{flex:1;min-width:84px}
+.tlhead{height:28px;display:flex;align-items:center;justify-content:center}
+.tlbody{position:relative;border-left:1px solid var(--line)}
+.tlaxis .tlbody{border-left:0}
+.tlh{position:absolute;left:0;right:0;border-top:1px dashed var(--line)}
+.tlh span{position:absolute;top:-8px;left:0;font-size:.72rem;color:var(--muted);font-variant-numeric:tabular-nums;background:var(--card,#fff);padding-right:4px}
+.tlcols .tlbody{background:repeating-linear-gradient(to bottom,transparent 0,transparent 68px,var(--line) 68px,var(--line) 69px)}
+.tlb{position:absolute;box-sizing:border-box;border-radius:6px;padding:2px 5px;font-size:.74rem;line-height:1.25;overflow:hidden;border:1px solid rgba(0,0,0,.08);color:#2a211c}
+@media (max-width:520px){.tlaxis{width:36px}.tlcol{min-width:56px}.tlcols{gap:2px}.tlb{font-size:.68rem;padding:2px 3px}}
+.tlb b{font-weight:700;font-variant-numeric:tabular-nums;margin-right:2px}
+.tlb.got{opacity:.5;text-decoration:line-through}
+.tlnote{margin-top:6px}
 .swhobar{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);margin:2px 0 6px}
 .swhobar .fchip{padding:4px 11px;font-size:.82rem}
 .ntag{display:inline-block;padding:1px 8px;margin:0 6px 2px 0;border-radius:999px;font-size:.78rem;font-weight:700;color:#3a2f2a;vertical-align:1px;white-space:nowrap}
@@ -793,7 +810,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v106</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v107</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1181,7 +1198,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var h = +m[1], mi = +(m[2] || 0), ap = (m[3] || "").toLowerCase(); if(h > 23 || mi > 59) return -1;
     if(ap === "pm" && h < 12) h += 12; else if(ap === "am" && h === 12) h = 0; else if(!ap && h >= 1 && h <= 7) h += 12;   // "3:15" on a school day is the afternoon
     return h * 60 + mi; }
-  function layoutOf(){ if(S.layout === "time" || S.layout === "plain") return S.layout; var n = S.own.length, t = S.own.filter(function(o){ return stepMins(o.n) >= 0; }).length;
+  function layoutOf(){ if(S.layout === "time" || S.layout === "plain" || S.layout === "timeline") return S.layout; var n = S.own.length, t = S.own.filter(function(o){ return stepMins(o.n) >= 0; }).length;
     return n && t >= 3 && t >= n * 0.6 ? "time" : "plain"; }
   // ---------- Family schedule: a card format for a family's day ----------
   // Grouped Morning / Afternoon / Evening / Anytime in time order; the time in its own column, names as coloured tags,
@@ -1210,7 +1227,16 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var w = t.match(/^\s*((?:[A-Z][a-z]+|All three|Everyone)(?:\s*(?:&|and|,|·)\s*(?:[A-Z][a-z]+))*)\s*:\s*/), tags = "";
     if(w){ var ns = w[1].split(/\s*(?:&|\band\b|,|·)\s*/); tags = SCUR ? ptHTML(SCUR.o, SCUR.i, ns) : tagsHTML(ns); t = t.slice(w[0].length); }
     t = t.charAt(0).toUpperCase() + t.slice(1);
-    return '<span class="stime">' + (time || "") + '</span><span class="sbody"><span class="stxt">' + esc(t) + '</span></span><span class="swho">' + tags + '</span>'; }
+    var ic = iconFor(t);
+    return '<span class="stime">' + (time || "") + '</span><span class="sbody"><span class="stxt">' + (ic ? '<span class="sico" aria-hidden="true">' + ic + '</span>' : '') + esc(t) + '</span></span><span class="swho">' + tags + '</span>'; }
+  // a small symbol for each kind of step, picked from its words
+  var ICONS = [[/breakfast/, "🥣"], [/dinner|lunch|supper/, "🍽️"], [/pick ?up|drop|collect/, "🚗"], [/piano/, "🎹"], [/choir|singing|voices/, "🎤"],
+    [/netball/, "🏐"], [/football/, "⚽"], [/gymnast/, "🤸"], [/swim/, "🏊"], [/tennis/, "🎾"], [/taekwondo|karate|martial/, "🥋"], [/dance|ballet/, "💃"],
+    [/emily|tutor|catherine/, "📚"], [/hindi|arabic|jaya|language/, "🗣️"], [/tween the lines|drama|theatre/, "🎭"], [/times tables|ttrs|maths|reasoning/, "🔢"],
+    [/spelling|english|prep\b|homework|planner/, "✏️"], [/reading|read\b/, "📖"], [/exercise/, "🏃"], [/make your bed|bed\b/, "🛏️"], [/teeth/, "🪥"],
+    [/shower|bath/, "🚿"], [/dining table|breakfast table|set the|clear the|wipe/, "🍽️"], [/laundry|washing/, "🧺"], [/tidy|clean/, "🧹"],
+    [/snack/, "🥪"], [/uniform|clothes/, "👕"], [/bag|pack|kit/, "🎒"], [/desk/, "🪑"], [/school/, "🏫"]];
+  function iconFor(t){ t = String(t).toLowerCase(); for(var k = 0; k < ICONS.length; k++) if(ICONS[k][0].test(t)) return ICONS[k][1]; return ""; }
   function linkify(x){ return esc(x).replace(/https?:\/\/[^\s<]+?(?=[\s·]|$)/g, function(u){ return '<a href="' + u + '" target="_blank" rel="noopener">Open ↗</a>'; }); }
   var INFOOPEN = false;   // the links row is folded until you open it (remembered while the page is open)
   function infoHTML(o){ return '<details class="tcat schinfo"' + (INFOOPEN ? ' open' : '') + '><summary>🔑 ' + esc(o.n.replace(/\s*and\s*/i, " & ")) + ' <small>' + o.d.length + '</small></summary><ul>' + o.d.filter(function(x){ var w = x.match(/^\s*([A-Z][a-z]+)\s*[–—-]/); return !SWHO || !w || w[1].toLowerCase() === SWHO.toLowerCase(); }).map(function(x){
@@ -1218,14 +1244,36 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function schedDay(){ var t = iso(); if(S.tday === t) return; var any = S.own.some(function(o){ return o.got; }); S.tday = t;
     any = any || S.own.some(function(o){ return o.pt && Object.keys(o.pt).length; });
     if(any){ S.own.forEach(function(o){ o.got = false; delete o.pt; }); save(); } else { try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} } }   // a new day: every tick box empty again
+  // Timeline: the day drawn as a calendar – a column for each person (and one for the family), each timed thing a block at its time
+  function spanOf(n){ var t = String(n), a = -1, b = -1;
+    var m = t.match(/^\s*(\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?)\s*(?:[–—-]\s*(\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?))?\s*[–—-]\s*/i);
+    if(!m) return null; a = stepMins(m[1]); if(a < 0) return null; b = m[2] ? stepMins(m[2]) : -1; if(b >= 0 && b < a) b += 720; if(b <= a) b = a + 30;
+    return {a:a, b:b, t:t.slice(m[0].length)}; }
+  function timelineHTML(){ schedDay(); var items = [], lanes = [], FAM = "Family";
+    S.own.forEach(function(o, i){ if(infoStep(o)) return; var sp = spanOf(o.n); if(!sp) return; var w = sp.t.match(/^\s*((?:[A-Z][a-z]+|All three|Everyone)(?:\s*(?:&|and|,|·)\s*(?:[A-Z][a-z]+))*)\s*:\s*/), who = w ? w[1].split(/\s*(?:&|\band\b|,|·)\s*/) : [FAM];
+      var txt = w ? sp.t.slice(w[0].length) : sp.t; txt = txt.charAt(0).toUpperCase() + txt.slice(1);
+      who.forEach(function(p){ p = p.trim(); if(/^(all three|everyone)$/i.test(p)) p = FAM; if(SWHO && SWHO !== "*general" && p !== FAM && p.toLowerCase() !== SWHO.toLowerCase()) return; if(SWHO === "*general" && p !== FAM) return;
+        if(lanes.indexOf(p) < 0) lanes.push(p); items.push({p:p, a:sp.a, b:sp.b, t:txt, i:i, got:p === FAM ? !!o.got : ptOn(o, p)}); }); });
+    if(!items.length) return '<p class="small">Nothing on this card has a time yet. Steps that start with a time (like “15:15 – …”) show up here.</p>';
+    lanes.sort(function(x, y){ return (x === FAM) - (y === FAM) || x.localeCompare(y); });
+    var lo = Math.floor(Math.min.apply(null, items.map(function(x){ return x.a; })) / 60) * 60, hi = Math.ceil(Math.max.apply(null, items.map(function(x){ return x.b; })) / 60) * 60, K = 1.15, H = (hi - lo) * K;
+    var axis = ""; for(var h = lo; h <= hi; h += 60) axis += '<div class="tlh" style="top:' + ((h - lo) * K) + 'px"><span>' + hm(h) + '</span></div>';
+    var cols = lanes.map(function(p){ var its = items.filter(function(x){ return x.p === p; }).sort(function(x, y){ return x.a - y.a; }), ends = [];
+      its.forEach(function(x){ var c = 0; while(ends[c] > x.a) c++; ends[c] = x.b; x.c = c; }); var nc = Math.max(1, ends.length);
+      return '<div class="tlcol"><div class="tlhead"><span class="ntag" style="background:' + (p === FAM ? "#eee" : tagCol(p.toLowerCase())) + '">' + esc(p) + '</span></div><div class="tlbody" style="height:' + H + 'px">'
+        + its.map(function(x){ var ic = iconFor(x.t), ht = Math.max(20, (x.b - x.a) * K - 2);
+          return '<div class="tlb' + (x.got ? ' got' : '') + '" style="top:' + ((x.a - lo) * K) + 'px;height:' + ht + 'px;left:' + (x.c * 100 / nc) + '%;width:' + (100 / nc) + '%;background:' + (p === FAM ? "#f1eeea" : tagCol(p.toLowerCase())) + '" title="' + esc(hm(x.a) + "–" + hm(x.b) + " " + x.t) + '"><b>' + hm(x.a) + '</b> ' + (ic ? ic + ' ' : '') + esc(x.t) + '</div>'; }).join("") + '</div></div>'; }).join("");
+    return '<div class="tl"><div class="tlaxis"><div class="tlhead"></div><div class="tlbody" style="height:' + H + 'px">' + axis + '</div></div><div class="tlcols">' + cols + '</div></div><p class="small tlnote">Chores and anything without a time are in the Family schedule view.</p>'; }
   function timeSteps(){ var g = [["Morning", []], ["Afternoon", []], ["Evening", []], ["Anytime", []]], info = "";
     schedDay(); SCHED = true;
     S.own.map(function(o, i){ return {o:o, i:i, m:stepMins(o.n)}; }).sort(function(a, b){ return (a.m < 0) - (b.m < 0) || a.m - b.m || a.i - b.i; })
       .forEach(function(x){ if(infoStep(x.o)){ info += infoHTML(x.o); return; } if(!forWho(x.o.n)) return; SCUR = x; var h = mineOwn(x.o, x.i); if(SEXP[x.i]) h = h.replace(/^<div class="mrow/, '<div class="mrow exp'); g[x.m < 0 ? 3 : x.m < 720 ? 0 : x.m < 1020 ? 1 : 2][1].push(h); SCUR = null; });
     SCHED = false;
-    var people = []; S.own.forEach(function(o){ if(infoStep(o)) return; namesOf(o.n).forEach(function(x){ x = x.trim(); if(/^(all three|everyone)$/i.test(x)) return; if(people.indexOf(x) < 0) people.push(x); }); });
-    var who = people.length > 1 ? '<div class="swhobar" role="group" aria-label="Show"><span>Show:</span><button type="button" class="fchip" data-who="" aria-pressed="' + !SWHO + '">Everyone</button><button type="button" class="fchip" data-who="*general" aria-pressed="' + (SWHO === "*general") + '">General timings</button>' + people.map(function(x){ return '<button type="button" class="fchip" data-who="' + esc(x) + '" aria-pressed="' + (SWHO === x) + '">' + esc(x) + '</button>'; }).join("") + '</div>' : "";
+    var who = showBar();
     return who + g.filter(function(x){ return x[1].length; }).map(function(x){ return '<h3 class="tgroup">' + x[0] + '</h3>' + x[1].join(""); }).join("") + info; }
+  function showBar(){ var people = []; S.own.forEach(function(o){ if(infoStep(o)) return; namesOf(o.n).forEach(function(x){ x = x.trim(); if(/^(all three|everyone)$/i.test(x)) return; if(people.indexOf(x) < 0) people.push(x); }); });
+    var who = people.length > 1 ? '<div class="swhobar" role="group" aria-label="Show"><span>Show:</span><button type="button" class="fchip" data-who="" aria-pressed="' + !SWHO + '">Everyone</button><button type="button" class="fchip" data-who="*general" aria-pressed="' + (SWHO === "*general") + '">General timings</button>' + people.map(function(x){ return '<button type="button" class="fchip" data-who="' + esc(x) + '" aria-pressed="' + (SWHO === x) + '">' + esc(x) + '</button>'; }).join("") + '</div>' : "";
+    return who; }
   function isProj(){ return S.keep && TABS.active !== "today" && S.kind !== "links"; }
   // Drag a step by its grip to a new place in the project
   var DRAG = null;
@@ -1332,8 +1380,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(mine && S.keep){
       html = projHTML(); var steps = S.own.map(function(o, i){ return mineOwn(o, i); }).join("") + items.filter(function(it){ return S.picked[it.n]; }).map(mineBtn).join("");
       if(PEDIT === "new") return html;
-      var lay = isProj() ? layoutOf() : "plain"; if(lay === "time") steps = timeSteps();
-      if(steps) html += '<h2 class="aisle dsec"><span class="c"></span>Steps <span class="sub">– ' + nGot() + " of " + nPicked() + ' done</span></h2>' + (isProj() ? '<div class="layrow" role="group" aria-label="Layout"><span>Layout:</span><button type="button" class="fchip" data-lay="plain" aria-pressed="' + (lay === "plain") + '">List</button><button type="button" class="fchip" data-lay="time" aria-pressed="' + (lay === "time") + '">Family schedule</button></div>' : '') + '<div class="grid steps' + (lay === "time" ? ' bytime' : '') + '">' + steps + "</div>";
+      var lay = isProj() ? layoutOf() : "plain"; if(lay === "time") steps = timeSteps(); else if(lay === "timeline") steps = timelineHTML();
+      if(steps) html += '<h2 class="aisle dsec"><span class="c"></span>Steps <span class="sub">– ' + nGot() + " of " + nPicked() + ' done</span></h2>' + (isProj() ? '<div class="layrow" role="group" aria-label="Layout"><span>Layout:</span><button type="button" class="fchip" data-lay="plain" aria-pressed="' + (lay === "plain") + '">List</button><button type="button" class="fchip" data-lay="time" aria-pressed="' + (lay === "time") + '">Family schedule</button><button type="button" class="fchip" data-lay="timeline" aria-pressed="' + (lay === "timeline") + '">Timeline</button></div>' : '') + '<div class="grid steps' + (lay === "time" ? ' bytime' : lay === "timeline" ? ' bytl' : '') + '">' + (lay === "timeline" ? showBar() : '') + steps + "</div>";
       else html += '<h2 class="aisle dsec"><span class="c"></span>Steps</h2><p class="small">No steps yet.</p>';
       html += '<div class="stepadd"><textarea id="stepIn" rows="1" placeholder="Add a step (paste several, one per line)"></textarea><button type="button" class="btn" data-addstep="1">Add</button></div>';
       if(S.after) html += '<div class="proj pafter"><div class="pbody">' + fmtNotes(S.after) + "</div></div>";
@@ -1766,7 +1814,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       var all2 = namesOf(o2.n).map(function(x){ return x.trim(); }), me = all2.filter(function(x){ return SWHO && x.toLowerCase() === SWHO.toLowerCase(); })[0];
       if(me){ o2.pt = o2.pt || {}; if(o2.got) all2.forEach(function(x){ o2.pt[x] = 1; }); if(o2.pt[me]) delete o2.pt[me]; else o2.pt[me] = 1; o2.got = all2.every(function(x){ return o2.pt[x]; }); if(!Object.keys(o2.pt).length) delete o2.pt; save(); render(); return; }   // a child's view: their box is their own tick
       o2.got = !o2.got; if(o2.got){ o2.pt = {}; all2.forEach(function(x){ o2.pt[x] = 1; }); } else delete o2.pt; save(); render(); } }, true);
-  $("mine").addEventListener("click", function(e){ var b = e.target.closest("[data-lay]"); if(!b) return; e.stopPropagation(); S.layout = b.dataset.lay; save(); render(); toast(S.layout === "time" ? "Family schedule" : "Shown as a plain list"); }, true);
+  $("mine").addEventListener("click", function(e){ var b = e.target.closest("[data-lay]"); if(!b) return; e.stopPropagation(); S.layout = b.dataset.lay; save(); render(); toast(S.layout === "time" ? "Family schedule" : S.layout === "timeline" ? "Timeline" : "Shown as a plain list"); }, true);
   $("out").addEventListener("click", onListClick); $("mine").addEventListener("click", onListClick);
   $("mine").addEventListener("input", function(e){ var i = e.target.closest(".qc"); if(!i) return; var n = ctlKey(i.closest(".mctl")); if(!n) return; S.note = S.note || {}; var v = i.value.trim(); if(v) S.note[n] = v; else delete S.note[n]; save(); $("paper").textContent = nPicked() ? asText() : "Nothing on the list yet"; });
   $("mine").addEventListener("input", function(e){ var a = e.target.closest(".ansbox"); if(!a) return; var o = S.own[+a.dataset.ans]; if(!o) return;
