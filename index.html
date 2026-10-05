@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v104 -->
+<!-- DoByToday v105 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -248,7 +248,30 @@ body.searching #shopBox[hidden]{display:block}
 .schinfo a{font-weight:700;color:var(--main-deep, #9a4320)}
 .steps.bytime .mrow .nm::before{content:none}
 #mine .uplinks{display:none}
-@media (max-width:520px){.steps.bytime .mrow .it .nm{display:grid;grid-template-columns:1fr auto;column-gap:8px}.steps.bytime .stime{grid-column:1;width:auto;font-size:.8rem;line-height:1.2;margin:0 0 1px}.steps.bytime .stime:empty{display:none}.steps.bytime .sbody{grid-column:1}.steps.bytime .swho{grid-column:2;grid-row:1 / span 2;width:auto;min-width:64px;flex-direction:column;align-items:flex-end;justify-content:center}.steps.bytime .mrow .sdetw{margin-left:36px}}
+/* one line per step, whatever the screen: long words fade into "…" – tap the words to read it all */
+.steps.bytime .mrow{flex-wrap:nowrap}
+.steps.bytime .mrow .it .nm{display:flex;flex-wrap:nowrap;align-items:center;gap:8px}
+.steps.bytime .sbody{overflow:hidden}
+.steps.bytime .stxt{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;cursor:pointer}
+.steps.bytime .swho{flex-wrap:nowrap}
+.ntag .ini{display:none}
+.steps.bytime .mrow.exp{flex-wrap:wrap}
+.steps.bytime .mrow.exp .stxt{white-space:normal}
+.steps.bytime .mrow.exp .it .nm{flex-wrap:wrap}
+@media (max-width:520px){
+  .steps.bytime .stime{width:40px;font-size:.78rem}
+  .steps.bytime .stime .t2{display:none}
+  .steps.bytime .swho{width:auto}
+  .steps.bytime .swho .ntag{min-width:26px;padding:1px 5px;text-align:center}
+  .steps.bytime .swho .full{display:none}
+  .steps.bytime .swho .ini{display:inline}
+  .steps.bytime .mrow.exp .stime{width:auto}
+  .steps.bytime .mrow.exp .stime .t2{display:inline}
+  .steps.bytime .mrow.exp .swho .full{display:inline}
+  .steps.bytime .mrow.exp .swho .ini{display:none}
+  .steps.bytime .mrow.exp .swho{flex-wrap:wrap;justify-content:flex-start;width:100%}
+  .steps.bytime .mrow .sdetw{margin-left:36px}
+}
 #mine .mrow.low .it .nm{color:var(--muted);font-weight:500}
 #mine .mctl .lowb{flex:none;display:inline-flex;align-items:center;gap:4px;cursor:pointer;padding:5px 0 5px 8px;color:var(--muted);font-size:.85rem;user-select:none}
 #mine .mctl .urgb{flex:none;display:inline-flex;align-items:center;gap:4px;cursor:pointer;padding:5px 0 5px 5px;color:#b42318;font-size:.85rem;user-select:none}
@@ -770,7 +793,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v104</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v105</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1169,11 +1192,12 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function tagCol(nm){ var h = 0; for(var i = 0; i < nm.length; i++) h = (h * 39 + nm.charCodeAt(i)) % 997; return ["#fde2e4", "#e2ecfd", "#e3f4e1", "#f6e6fb", "#fff1d6", "#dff4f4"][h % 6]; }
   function tagsHTML(names){ return names.map(function(x){ x = x.trim(); return '<span class="ntag" role="button" data-who="' + esc(x) + '" title="Show ' + esc(x) + ' only" style="background:' + tagCol(x.toLowerCase()) + '">' + esc(x) + '</span>'; }).join(""); }
   function hm(mi){ var h = Math.floor(mi / 60) % 24, m = mi % 60; return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m; }   // 24-hour: 07:55, 15:15
-  var SWHO = "", SCUR = null;
+  var SWHO = "", SCUR = null, SEXP = {};
+  try{ SWHO = localStorage.getItem("dobytoday-who") || ""; }catch(e){}   // the person picked on this phone stays picked (a child's tablet opens on their own things)
   // each name on a step is that person's own tick; the step is done when everyone on it is
   function ptOn(o, nm){ return !!(o.got || (o.pt || {})[nm]); }
   function ptHTML(o, i, names){ return names.map(function(x){ x = x.trim(); var on = ptOn(o, x);
-    return '<span class="ntag pt' + (on ? ' on' : '') + '" role="button" data-pt="' + i + '|' + esc(x) + '" aria-pressed="' + on + '" title="' + esc(x) + (on ? ' – done' : ' – tap when done') + '" style="background:' + tagCol(x.toLowerCase()) + '">' + (on ? '✓ ' : '') + esc(x) + '</span>'; }).join(""); }   // tap a name: show just that person's part of the day
+    return '<span class="ntag pt' + (on ? ' on' : '') + '" role="button" data-pt="' + i + '|' + esc(x) + '" aria-pressed="' + on + '" title="' + esc(x) + (on ? ' – done' : ' – tap when done') + '" style="background:' + tagCol(x.toLowerCase()) + '"><span class="full">' + (on ? '✓ ' : '') + esc(x) + '</span><span class="ini">' + (on ? '✓' : esc(x.slice(0, 2))) + '</span></span>'; }).join(""); }   // tap a name: show just that person's part of the day
   function namesOf(n){ var t = String(n).replace(/^\s*(?:morning|before school|afternoon|after school|evening|bedtime|night|sunday night)\s*[–—-]\s*/i, "").replace(/^\s*\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?\s*(?:[–—-]\s*\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?)?\s*[–—-]\s*/i, "");
     var w = t.match(/^\s*((?:[A-Z][a-z]+|All three|Everyone)(?:\s*(?:&|and|,|·)\s*(?:[A-Z][a-z]+))*)\s*:\s*/); return w ? w[1].split(/\s*(?:&|\band\b|,|·)\s*/) : []; }
   function forWho(n){ if(!SWHO) return true; var ns = namesOf(n).map(function(x){ return x.toLowerCase(); }); return ns.indexOf(SWHO.toLowerCase()) > -1 || /^all three|^everyone/i.test(ns[0] || "") || (!ns.length && new RegExp("\\b" + SWHO + "\\b", "i").test(n)); }
@@ -1181,7 +1205,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     t = t.replace(/^\s*(?:morning|before school|afternoon|after school|evening|bedtime|night|sunday night)\s*[–—-]\s*/i, "");
     var m = t.match(/^\s*(\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?)\s*(?:[–—-]\s*(\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?))?\s*[–—-]\s*/i);
     if(m && stepMins(m[1]) >= 0){ var b = m[2] ? stepMins(m[2]) : -1; if(b >= 0 && b < a) b += 720;
-      time = b >= 0 ? hm(a) + "–" + hm(b) : hm(a); t = t.slice(m[0].length); }
+      time = '<span class="t1">' + hm(a) + '</span>' + (b >= 0 ? '<span class="t2">–' + hm(b) + '</span>' : ''); t = t.slice(m[0].length); }
     var w = t.match(/^\s*((?:[A-Z][a-z]+|All three|Everyone)(?:\s*(?:&|and|,|·)\s*(?:[A-Z][a-z]+))*)\s*:\s*/), tags = "";
     if(w){ var ns = w[1].split(/\s*(?:&|\band\b|,|·)\s*/); tags = SCUR ? ptHTML(SCUR.o, SCUR.i, ns) : tagsHTML(ns); t = t.slice(w[0].length); }
     t = t.charAt(0).toUpperCase() + t.slice(1);
@@ -1196,7 +1220,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function timeSteps(){ var g = [["Morning", []], ["Afternoon", []], ["Evening", []], ["Anytime", []]], info = "";
     schedDay(); SCHED = true;
     S.own.map(function(o, i){ return {o:o, i:i, m:stepMins(o.n)}; }).sort(function(a, b){ return (a.m < 0) - (b.m < 0) || a.m - b.m || a.i - b.i; })
-      .forEach(function(x){ if(infoStep(x.o)){ info += infoHTML(x.o); return; } if(!forWho(x.o.n)) return; SCUR = x; g[x.m < 0 ? 3 : x.m < 720 ? 0 : x.m < 1020 ? 1 : 2][1].push(mineOwn(x.o, x.i)); SCUR = null; });
+      .forEach(function(x){ if(infoStep(x.o)){ info += infoHTML(x.o); return; } if(!forWho(x.o.n)) return; SCUR = x; var h = mineOwn(x.o, x.i); if(SEXP[x.i]) h = h.replace(/^<div class="mrow/, '<div class="mrow exp'); g[x.m < 0 ? 3 : x.m < 720 ? 0 : x.m < 1020 ? 1 : 2][1].push(h); SCUR = null; });
     SCHED = false;
     var people = []; S.own.forEach(function(o){ if(infoStep(o)) return; namesOf(o.n).forEach(function(x){ x = x.trim(); if(/^(all three|everyone)$/i.test(x)) return; if(people.indexOf(x) < 0) people.push(x); }); });
     var who = people.length > 1 ? '<div class="swhobar" role="group" aria-label="Show"><span>Show:</span><button type="button" class="fchip" data-who="" aria-pressed="' + !SWHO + '">Everyone</button>' + people.map(function(x){ return '<button type="button" class="fchip" data-who="' + esc(x) + '" aria-pressed="' + (SWHO === x) + '">' + esc(x) + '</button>'; }).join("") + '</div>' : "";
@@ -1727,7 +1751,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     save(); render();
   }
   $("mine").addEventListener("toggle", function(e){ if(e.target.classList && e.target.classList.contains("schinfo")) INFOOPEN = e.target.open; }, true);
-  $("mine").addEventListener("click", function(e){ var t = e.target.closest("[data-who]"); if(!t) return; e.stopImmediatePropagation(); e.preventDefault(); SWHO = SWHO === t.dataset.who ? "" : t.dataset.who; render(); }, true);
+  $("mine").addEventListener("click", function(e){ var t = e.target.closest("[data-who]"); if(!t) return; e.stopImmediatePropagation(); e.preventDefault(); SWHO = SWHO === t.dataset.who ? "" : t.dataset.who; try{ localStorage.setItem("dobytoday-who", SWHO); }catch(x){} render(); }, true);
+  $("mine").addEventListener("click", function(e){ var x = e.target.closest(".steps.bytime .sbody, .steps.bytime .stime"); if(!x) return; var it = x.closest(".it[data-own]"); if(!it) return;
+    e.stopImmediatePropagation(); e.preventDefault(); var k = it.dataset.own; if(SEXP[k]) delete SEXP[k]; else SEXP[k] = 1; var row = it.closest(".mrow"); if(row) row.classList.toggle("exp", !!SEXP[k]); }, true);
   $("mine").addEventListener("click", function(e){ var p = e.target.closest("[data-pt]"), it = !p && e.target.closest(".steps.bytime .it[data-own]");
     if(p){ e.stopImmediatePropagation(); e.preventDefault(); var k = p.dataset.pt.split("|"), o = S.own[+k[0]]; if(!o) return; var names = namesOf(o.n).map(function(x){ return x.trim(); });
       o.pt = o.pt || {}; if(o.got){ names.forEach(function(x){ o.pt[x] = 1; }); }
