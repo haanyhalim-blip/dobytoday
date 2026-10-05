@@ -71,7 +71,7 @@ async function loadSite(token, site) {
   return d;
 }
 // The fields a DobyToday list (or page) shares through its link – the same as the site's own snapshot
-const SHARED = ["picked", "got", "own", "bag", "removed", "note", "day", "later", "past", "title", "notes", "after", "keep", "kind", "urg", "secs", "low", "at", "layout"];
+const SHARED = ["picked", "got", "own", "bag", "removed", "note", "day", "later", "past", "title", "notes", "after", "keep", "kind", "urg", "secs", "low", "at", "layout", "ppl"];
 function sharedCopy(S) { const o = {}; SHARED.forEach((k) => { if (S[k] !== undefined) o[k] = S[k]; }); o.t = Date.now(); return o; }
 async function saveSite(token, site, d) {
   d.t = Date.now();   // newer than the phone's copy, so the site takes these changes when it next opens
@@ -322,14 +322,14 @@ const TOOLS = [
   },
   {
     name: "update_page", title: "Change a page or project",
-    description: "Change a DobyToday page or project: tick or untick steps, add new steps, remove steps, add a dated update to a step (e.g. 'Rang PWC, waiting on the account number'), add details under a step, answer a step that asks a question, or rename a step. Refer to steps by number or name. Shared pages update for everyone who has the link.",
+    description: "Change a DobyToday page or project: tick or untick steps, add new steps, remove steps, add a dated update to a step (e.g. 'Rang PWC, waiting on the account number'), add details under a step, answer a step that asks a question, or rename a step, or set_people to add extra people (e.g. parents) to the card's Show buttons. Refer to steps by number or name. Shared pages update for everyone who has the link.",
     inputSchema: {
       type: "object", required: ["name", "action"],
       properties: {
         name: PAGE_PROP,
-        action: { type: "string", enum: ["tick", "untick", "add_steps", "remove", "add_update", "add_details", "answer", "rename"] },
+        action: { type: "string", enum: ["tick", "untick", "add_steps", "remove", "add_update", "add_details", "answer", "rename", "set_people"] },
         steps: { type: "array", items: { type: "string" }, description: "Step numbers or names; for add_steps, the new steps" },
-        text: { type: "string", description: "For add_update, add_details (one per line), answer or rename" },
+        text: { type: "string", description: "For add_update, add_details (one per line), answer or rename; for set_people, first names separated by commas (extra people for the card's Show buttons, e.g. parents with nothing on it yet; empty clears them)" },
         who: { type: "string", description: "For add_update: whose update (first name)" },
       },
     },
@@ -367,6 +367,10 @@ function pageTool(S, a) {
     const fresh = add.filter((n) => !have.has(low(n)));
     fresh.forEach((n) => S.own.push({ n, a: "other", b: "any", got: false }));
     return fresh.length ? "Added " + fresh.length + (fresh.length === 1 ? " step: " : " steps: ") + fresh.join(", ") + "." : "Already on the page: " + add.join(", ") + ".";
+  }
+  if (act === "set_people") {
+    const ppl = String(a.text || "").split(/\s*,\s*/).map((x) => x.trim().slice(0, 20)).filter(Boolean).slice(0, 12);
+    S.ppl = ppl; return ppl.length ? "Show buttons now include: " + ppl.join(", ") + "." : "Took the extra people off the Show buttons.";
   }
   const { hit, miss } = findSteps(S, a.steps);
   if (!hit.length) return "None of those steps are on the page" + (miss.length ? ": " + miss.join(", ") : "") + ". Use the step number or its name from get_page.";
@@ -410,7 +414,7 @@ async function callTool(token, name, a) {
     const S = await loadPage(token, f.l);
     if (name === "get_page") return describePage(f.l, S, true);
     const msg = pageTool(S, a);
-    if (!/^(Added|Ticked|Unticked|Removed|Answered|Renamed)/.test(msg)) return msg;
+    if (!/^(Added|Ticked|Unticked|Removed|Answered|Renamed|Show buttons|Took the extra)/.test(msg)) return msg;
     await savePage(token, d, f.l, S);
     return msg + " (" + pageName(f.l, S) + " on dobytoday.com)";
   }

@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v110 -->
+<!-- DoByToday v111 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -255,6 +255,8 @@ body.searching #shopBox[hidden]{display:block}
 .tlnote{margin-top:6px}
 .swhobar{grid-column:1/-1;display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:.85rem;color:var(--muted);margin:2px 0 6px}
 .swhobar .fchip{padding:4px 11px;font-size:.82rem}
+.swhobar .pplplus{border-style:dashed}
+.swhobar .pplx{padding:4px 8px;margin-left:-4px}
 .ntag{display:inline-block;padding:1px 8px;margin:0 6px 2px 0;border-radius:999px;font-size:.78rem;font-weight:700;color:#3a2f2a;vertical-align:1px;white-space:nowrap}
 .steps.bytime .mrow.got .stxt{text-decoration:line-through;color:var(--muted)}
 .steps.bytime .mrow .sdetw{margin-left:132px}
@@ -812,7 +814,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v110</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v111</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -859,7 +861,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function keyOf(id){ return id === "today" ? "dobytoday-v1" : "dobytoday-v1:" + id; }
   function ckeyOf(id){ return id === "today" ? "dobytoday-code-v1" : "dobytoday-code-v1:" + id; }
   function saveTabs(){ try{ localStorage.setItem(LKEY, JSON.stringify(TABS)); }catch(e){} }
-  function freshS(){ return {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}, day:"", later:[], past:[], seen:[], title:"", notes:"", after:"", keep:false, kind:"", urg:{}, secs:null, low:{}, at:{}, layout:""}; }
+  function freshS(){ return {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}, day:"", later:[], past:[], seen:[], title:"", notes:"", after:"", keep:false, kind:"", urg:{}, secs:null, low:{}, at:{}, layout:"", ppl:[]}; }
   function readList(id){ var d; try{ d = JSON.parse(localStorage.getItem(keyOf(id)) || "{}") || {}; }catch(e){ d = {}; } var f = freshS(); Object.keys(f).forEach(function(k){ if(d[k] == null) d[k] = f[k]; }); return d; }
   // Do something to the Today list even while a project is open
   function withToday(fn){ if(TABS.active === "today"){ fn(S); save(); render(); return; }
@@ -908,7 +910,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function doneWord(b){ return "done"; }
 
   function save(){ try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} if(typeof syncPush === "function") syncPush(); if(typeof acctPush === "function") acctPush(); }
-  function load(){ try{ var r = localStorage.getItem(KEY); if(r){ var v = JSON.parse(r); if(v && typeof v === "object"){ S.picked = v.picked || {}; S.got = v.got || {}; S.own = v.own || []; S.bag = v.bag || {}; S.removed = v.removed || []; S.note = v.note || {}; S.day = v.day || ""; S.later = v.later || []; S.past = v.past || []; S.seen = v.seen || []; S.title = v.title || ""; S.notes = v.notes || ""; S.after = v.after || ""; S.keep = !!v.keep; S.kind = v.kind || ""; S.urg = v.urg || {}; S.secs = v.secs || null; S.low = v.low || {}; S.at = v.at || {}; S.layout = v.layout || ""; } } }catch(e){}
+  function load(){ try{ var r = localStorage.getItem(KEY); if(r){ var v = JSON.parse(r); if(v && typeof v === "object"){ S.picked = v.picked || {}; S.got = v.got || {}; S.own = v.own || []; S.bag = v.bag || {}; S.removed = v.removed || []; S.note = v.note || {}; S.day = v.day || ""; S.later = v.later || []; S.past = v.past || []; S.seen = v.seen || []; S.title = v.title || ""; S.notes = v.notes || ""; S.after = v.after || ""; S.keep = !!v.keep; S.kind = v.kind || ""; S.urg = v.urg || {}; S.secs = v.secs || null; S.low = v.low || {}; S.at = v.at || {}; S.layout = v.layout || ""; S.ppl = v.ppl || []; } } }catch(e){}
     applySecs(); newDay();
     try{ var o = localStorage.getItem(OKEY); if(o) OPEN = JSON.parse(o) || OPEN; }catch(e){}
     Object.keys(OPEN).forEach(function(k){ if(k !== "pf") delete OPEN[k]; });   // rows start closed each visit (only the My saved lists filter is remembered)
@@ -1212,7 +1214,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function tagsHTML(names){ return names.map(function(x){ x = x.trim(); return '<span class="ntag" role="button" data-who="' + esc(x) + '" title="Show ' + esc(x) + ' only" style="background:' + tagCol(x.toLowerCase()) + '">' + esc(x) + '</span>'; }).join(""); }
   function hm(mi){ var h = Math.floor(mi / 60) % 24, m = mi % 60; return (h < 10 ? "0" : "") + h + ":" + (m < 10 ? "0" : "") + m; }   // 24-hour: 07:55, 15:15
   var SWHO = "", SCUR = null, SEXP = {};
-  try{ SWHO = localStorage.getItem("dobytoday-who") || ""; }catch(e){}   // the person picked on this phone stays picked (a child's tablet opens on their own things)
+  try{ SWHO = localStorage.getItem("dobytoday-who") || ""; }catch(e){} if(SWHO === "*general") SWHO = "";   // the person picked on this phone stays picked (a child's tablet opens on their own things)
   // each name on a step is that person's own tick; the step is done when everyone on it is
   function ptOn(o, nm){ return !!(o.got || (o.pt || {})[nm]); }
   function ptHTML(o, i, names){ if(SWHO && SWHO !== "*general" && names.some(function(x){ return x.trim().toLowerCase() === SWHO.toLowerCase(); })) names = names.filter(function(x){ return x.trim().toLowerCase() === SWHO.toLowerCase(); });
@@ -1220,7 +1222,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     return '<span class="ntag pt' + (on ? ' on' : '') + '" role="button" data-pt="' + i + '|' + esc(x) + '" aria-pressed="' + on + '" title="' + esc(x) + (on ? ' – done' : ' – tap when done') + '" style="background:' + tagCol(x.toLowerCase()) + '"><span class="full">' + (on ? '✓ ' : '') + esc(x) + '</span><span class="ini">' + (on ? '✓' : esc(x.slice(0, 2))) + '</span></span>'; }).join(""); }   // tap a name: show just that person's part of the day
   function namesOf(n){ var t = String(n).replace(/^\s*(?:morning|before school|afternoon|after school|evening|bedtime|night|sunday night)\s*[–—-]\s*/i, "").replace(/^\s*\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?\s*(?:[–—-]\s*\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?)?\s*[–—-]\s*/i, "");
     var w = t.match(/^\s*((?:[A-Z][a-z]+|All three|Everyone)(?:\s*(?:&|and|,|·)\s*(?:[A-Z][a-z]+))*)\s*:\s*/); return w ? w[1].split(/\s*(?:&|\band\b|,|·)\s*/) : []; }
-  function forWho(n){ if(!SWHO) return true; if(SWHO === "*general") return !namesOf(n).length; var ns = namesOf(n).map(function(x){ return x.toLowerCase(); }); return ns.indexOf(SWHO.toLowerCase()) > -1 || /^all three|^everyone/i.test(ns[0] || "") || (!ns.length && new RegExp("\\b" + SWHO + "\\b", "i").test(n)); }
+  function forWho(n){ if(!SWHO) return true; if(SWHO === "*general") return !namesOf(n).length; var ns = namesOf(n).map(function(x){ return x.toLowerCase(); }); return ns.indexOf(SWHO.toLowerCase()) > -1 || /^all three|^everyone/i.test(ns[0] || "") || (!ns.length && (new RegExp("\\b" + SWHO + "\\b", "i").test(n) || (S.ppl || []).some(function(x){ return x.toLowerCase() === SWHO.toLowerCase(); }))); }   // an added person (a parent) also sees the family things – pick-ups, meals
   function schedHTML(n){ var t = String(n), time = "", a = stepMins(t);
     t = t.replace(/^\s*(?:morning|before school|afternoon|after school|evening|bedtime|night|sunday night)\s*[–—-]\s*/i, "");
     var m = t.match(/^\s*(\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?)\s*(?:[–—-]\s*(\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?))?\s*[–—-]\s*/i);
@@ -1289,6 +1291,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
         t = fit(t); if(t > 1290 && rank(f) !== 5){ var u = fit(Math.min(w[0], firstPm)); if(u < t) t = u; }   // a full evening: use any earlier gap that day
         busy.push([t, t + f.d]); items.push({p:p, a:t, b:t + f.d, t:f.t, i:f.i, got:f.got, flex:true}); }); });
     items = items.filter(function(x){ return show(x.p); }); items.forEach(function(x){ lane(x.p); });
+    if(!items.length && SWHO) return '<p class="small">Nothing for ' + esc(SWHO) + ' on this card yet.</p>';
     if(!items.length) return '<p class="small">Nothing on this card has a time yet. Steps that start with a time (like “15:15 – …”) show up here.</p>';
     lanes.sort(function(x, y){ return (x === FAM) - (y === FAM) || x.localeCompare(y); });
     var lo = Math.floor(Math.min.apply(null, items.map(function(x){ return x.a; })) / 60) * 60, hi = Math.ceil(Math.max.apply(null, items.map(function(x){ return x.b; })) / 60) * 60, K = 1.15, H = (hi - lo) * K;
@@ -1308,9 +1311,13 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     SCHED = false;
     var who = showBar();
     return who + g.filter(function(x){ return x[1].length; }).map(function(x){ return '<h3 class="tgroup">' + x[0] + '</h3>' + x[1].join(""); }).join("") + info; }
-  function showBar(){ var people = []; S.own.forEach(function(o){ if(infoStep(o)) return; namesOf(o.n).forEach(function(x){ x = x.trim(); if(/^(all three|everyone)$/i.test(x)) return; if(people.indexOf(x) < 0) people.push(x); }); });
-    var who = people.length > 1 ? '<div class="swhobar" role="group" aria-label="Show"><span>Show:</span><button type="button" class="fchip" data-who="" aria-pressed="' + !SWHO + '">Everyone</button><button type="button" class="fchip" data-who="*general" aria-pressed="' + (SWHO === "*general") + '">General timings</button>' + people.map(function(x){ return '<button type="button" class="fchip" data-who="' + esc(x) + '" aria-pressed="' + (SWHO === x) + '">' + esc(x) + '</button>'; }).join("") + '</div>' : "";
-    return who; }
+  // Show: everyone, or one person – the names used on the card plus anyone added with "+ Person" (e.g. a parent with nothing on it yet)
+  function showBar(){ var people = [], extra = (S.ppl || []).slice(); S.own.forEach(function(o){ if(infoStep(o)) return; namesOf(o.n).forEach(function(x){ x = x.trim(); if(/^(all three|everyone)$/i.test(x)) return; if(people.indexOf(x) < 0) people.push(x); }); });
+    extra.forEach(function(x){ if(people.indexOf(x) < 0) people.push(x); });
+    if(!people.length) return "";
+    return '<div class="swhobar" role="group" aria-label="Show"><span>Show:</span><button type="button" class="fchip" data-who="" aria-pressed="' + !SWHO + '">Everyone</button>' + people.map(function(x){ var mine = extra.indexOf(x) > -1;
+        return '<button type="button" class="fchip" data-who="' + esc(x) + '" aria-pressed="' + (SWHO === x) + '">' + esc(x) + '</button>' + (mine && SWHO === x ? '<button type="button" class="fchip pplx" data-pplx="' + esc(x) + '" title="Take ' + esc(x) + ' off this list">✕</button>' : ''); }).join("")
+      + '<button type="button" class="fchip pplplus" data-pplplus="1">+ Person</button></div>'; }
   function isProj(){ return S.keep && TABS.active !== "today" && S.kind !== "links"; }
   // Drag a step by its grip to a new place in the project
   var DRAG = null;
@@ -1840,6 +1847,10 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   }
   $("mine").addEventListener("toggle", function(e){ if(e.target.classList && e.target.classList.contains("schinfo")) INFOOPEN = e.target.open; }, true);
   $("mine").addEventListener("click", function(e){ var b = e.target.closest(".tlb"); if(b && b.title) toast(b.title); }, true);   // tap a timeline block to read it in full
+  $("mine").addEventListener("click", function(e){ var t = e.target.closest("[data-pplplus], [data-pplx]"); if(!t) return; e.stopImmediatePropagation(); e.preventDefault();
+    if(t.dataset.pplx){ S.ppl = (S.ppl || []).filter(function(x){ return x !== t.dataset.pplx; }); SWHO = ""; try{ localStorage.setItem("dobytoday-who", ""); }catch(x){} save(); render(); return; }
+    var nm = (prompt("Add a person to the Show buttons on this card (first name):") || "").replace(/\s+/g, " ").trim().slice(0, 20); if(!nm) return; nm = nm.charAt(0).toUpperCase() + nm.slice(1);
+    S.ppl = (S.ppl || []).filter(function(x){ return x.toLowerCase() !== nm.toLowerCase(); }).concat([nm]); save(); render(); }, true);
   $("mine").addEventListener("click", function(e){ var t = e.target.closest("[data-who]"); if(!t) return; e.stopImmediatePropagation(); e.preventDefault(); SWHO = SWHO === t.dataset.who ? "" : t.dataset.who; try{ localStorage.setItem("dobytoday-who", SWHO); }catch(x){} render(); }, true);
   $("mine").addEventListener("click", function(e){ var x = e.target.closest(".steps.bytime .sbody, .steps.bytime .stime"); if(!x) return; var it = x.closest(".it[data-own]"); if(!it) return;
     e.stopImmediatePropagation(); e.preventDefault(); var k = it.dataset.own; if(SEXP[k]) delete SEXP[k]; else SEXP[k] = 1; var row = it.closest(".mrow"); if(row) row.classList.toggle("exp", !!SEXP[k]); }, true);
@@ -1914,7 +1925,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     return btoa(unescape(encodeURIComponent(j))).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, ""); }catch(e){ return ""; } }
   function unpackPage(){ var m = location.hash.match(/[#&]d=([A-Za-z0-9_-]+)/); if(!m) return null;
     try{ var d = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, "+").replace(/_/g, "/"))))); return d && typeof d === "object" ? d : null; }catch(e){ return null; } }
-  function snapshot(){ return JSON.stringify({picked:S.picked, got:S.got, own:S.own, bag:S.bag, removed:S.removed, note:S.note || {}, day:S.day, later:S.later || [], past:S.past || [], title:S.title || "", notes:S.notes || "", after:S.after || "", keep:!!S.keep, kind:S.kind || "", urg:S.urg || {}, secs:S.secs || null, low:S.low || {}, at:S.at || {}, layout:S.layout || ""}); }
+  function snapshot(){ return JSON.stringify({picked:S.picked, got:S.got, own:S.own, bag:S.bag, removed:S.removed, note:S.note || {}, day:S.day, later:S.later || [], past:S.past || [], title:S.title || "", notes:S.notes || "", after:S.after || "", keep:!!S.keep, kind:S.kind || "", urg:S.urg || {}, secs:S.secs || null, low:S.low || {}, at:S.at || {}, layout:S.layout || "", ppl:S.ppl || []}); }
   var SAVED = "", SAVEERR = false, lastT = 0, BKEY = "dobytoday-backup-v1";
   function countOf(d){ return Object.keys(d.picked || {}).length + (d.own || []).length + (d.later || []).length + (d.title || d.notes ? 1 : 0); }
   function mergeInto(d){ var r = {picked:Object.assign({}, d.picked || {}, S.picked || {}), got:Object.assign({}, d.got || {}, S.got || {}), bag:Object.assign({}, d.bag || {}, S.bag || {}), note:Object.assign({}, d.note || {}, S.note || {}), own:(d.own || []).slice(), removed:(d.removed || []).slice(), day:S.day || d.day || "", title:S.title || d.title || "", notes:S.notes || d.notes || "", after:S.after || d.after || "", keep:!!(S.keep || d.keep), kind:S.kind || d.kind || "", later:(d.later || []).slice(), past:(d.past || []).slice()};
@@ -1925,12 +1936,12 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var here = countOf(S), there = countOf(d);
     if(!there && here){ lastSent = ""; syncPush(true); return; }
     var merged = false; if(viaJoin && here && there){ d = mergeInto(d); merged = true; }
-    var j = JSON.stringify({picked:d.picked || {}, got:d.got || {}, own:d.own || [], bag:d.bag || {}, removed:d.removed || [], note:d.note || {}, day:d.day || "", later:d.later || [], past:d.past || [], title:d.title || "", notes:d.notes || "", after:d.after || "", keep:!!d.keep, kind:d.kind || "", urg:("urg" in d ? d.urg : S.urg) || {}, secs:("secs" in d ? d.secs : S.secs) || null, low:("low" in d ? d.low : S.low) || {}, at:("at" in d ? d.at : S.at) || {}, layout:("layout" in d ? d.layout : S.layout) || ""}); if(j === snapshot()) return;
+    var j = JSON.stringify({picked:d.picked || {}, got:d.got || {}, own:d.own || [], bag:d.bag || {}, removed:d.removed || [], note:d.note || {}, day:d.day || "", later:d.later || [], past:d.past || [], title:d.title || "", notes:d.notes || "", after:d.after || "", keep:!!d.keep, kind:d.kind || "", urg:("urg" in d ? d.urg : S.urg) || {}, secs:("secs" in d ? d.secs : S.secs) || null, low:("low" in d ? d.low : S.low) || {}, at:("at" in d ? d.at : S.at) || {}, layout:("layout" in d ? d.layout : S.layout) || "", ppl:("ppl" in d ? d.ppl : S.ppl) || []}); if(j === snapshot()) return;
     var before = snapshot(), lost = here - there;
     try{ localStorage.setItem(BKEY, before); }catch(e){}
     var fa = document.activeElement, typing = fa && fa.classList && fa.classList.contains("ansbox") ? {n:(S.own[+fa.dataset.ans] || {}).n, v:fa.value} : null;
     if(typing) (d.own || []).forEach(function(o){ if(o.n === typing.n){ o.ans = typing.v; o.got = !!typing.v.trim(); } });
-    applying = true; S.picked = d.picked || {}; S.got = d.got || {}; S.own = d.own || []; S.bag = d.bag || {}; S.removed = d.removed || []; S.note = d.note || {}; S.day = d.day || ""; S.later = d.later || []; S.past = d.past || []; S.title = d.title || ""; S.notes = d.notes || ""; S.after = d.after || ""; S.keep = !!d.keep; S.kind = d.kind || ""; if("urg" in d) S.urg = d.urg || {}; if("low" in d) S.low = d.low || {}; if("at" in d) S.at = d.at || {}; if("layout" in d) S.layout = d.layout || ""; if("secs" in d){ S.secs = d.secs || null; applySecs(); } if(d.t) lastT = d.t; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} lastSent = snapshot(); render(); applying = false;
+    applying = true; S.picked = d.picked || {}; S.got = d.got || {}; S.own = d.own || []; S.bag = d.bag || {}; S.removed = d.removed || []; S.note = d.note || {}; S.day = d.day || ""; S.later = d.later || []; S.past = d.past || []; S.title = d.title || ""; S.notes = d.notes || ""; S.after = d.after || ""; S.keep = !!d.keep; S.kind = d.kind || ""; if("urg" in d) S.urg = d.urg || {}; if("low" in d) S.low = d.low || {}; if("at" in d) S.at = d.at || {}; if("layout" in d) S.layout = d.layout || ""; if("ppl" in d) S.ppl = d.ppl || []; if("secs" in d){ S.secs = d.secs || null; applySecs(); } if(d.t) lastT = d.t; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} lastSent = snapshot(); render(); applying = false;
     if(merged){ lastSent = ""; syncPush(true); }
     if(!viaJoin && lost > 0){ toast("List updated from the shared link (" + lost + " fewer)", function(){ try{ var b = JSON.parse(before); applying = true; S.picked = b.picked || {}; S.got = b.got || {}; S.own = b.own || []; S.bag = b.bag || {}; S.removed = b.removed || []; S.note = b.note || {}; S.day = b.day || ""; S.later = b.later || []; S.past = b.past || []; S.title = b.title || ""; S.notes = b.notes || ""; S.after = b.after || ""; S.keep = !!b.keep; S.kind = b.kind || ""; S.urg = b.urg || {}; S.secs = b.secs || null; S.low = b.low || {}; S.at = b.at || {}; applySecs(); applying = false; save(); render(); lastSent = ""; syncPush(true); }catch(e){} }); } }
   function syncPush(now){ if(!CODE || applying) return; clearTimeout(pushT); var go = function(){
