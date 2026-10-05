@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v95 -->
+<!-- DoByToday v96 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -314,6 +314,9 @@ h2.aisle.rm .ah{color:var(--muted)}
 .it .bag:hover{background:var(--main);color:#fff}
 .empty{color:var(--muted);text-align:center;padding:40px 10px}
 .empty .qaddb{margin-top:12px}
+.empty .qoneb{margin-top:12px}
+.qsplit{list-style:none;margin:10px auto 0;padding:0;max-width:440px;text-align:left}
+.qsplit li{padding:6px 10px;margin:4px 0;border:1px dashed var(--line);border-radius:8px;background:#fff;font-size:.95rem}
 .grid.srch{margin-top:6px}
 .it .al{color:var(--muted)}
 .srchadd{padding:12px 0 4px}
@@ -730,7 +733,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v95</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v96</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1188,7 +1191,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
         return html;
       }
       return (splitRaw(query).length > 1
-        ? '<div class="empty"><b>That looks like a list</b>All '+splitRaw(query).length+' jobs go on the list.<br><button class="btn primary qaddb" type="button">Add all '+splitRaw(query).length+'</button>'+LATERQ+'</div>'
+        ? '<div class="empty"><b>That looks like '+splitRaw(query).length+' jobs</b><ul class="qsplit">'+splitRaw(query).map(function(x){ return '<li>'+esc(x)+'</li>'; }).join("")+'</ul><button class="btn primary qaddb" type="button">Add as '+splitRaw(query).length+' jobs</button> <button class="btn qoneb" type="button">Keep as 1 job</button>'+LATERQ+'</div>'
         : '<div class="empty"><b>Not in the list yet</b>No problem – add it to today.<br><button class="btn primary qaddb" type="button">Add “'+esc(query.trim())+'”</button>'+LATERQ+'</div>');
     }
     if(mine && S.keep && S.kind === "links"){
@@ -1450,8 +1453,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function addTypedLater(v, d){ if(!d) return; if(d <= iso()){ addTyped(v); return; } var names = splitRaw(v).map(function(x){ return x.trim().replace(/^[-*\u2022\u2610\u2611\u2612\[\]x ]+/i, "").trim(); }).filter(Boolean); if(!names.length) return;
     names.forEach(function(n){ var hit = find(n); addLater(hit ? hit.n : n, d); });
     toast((names.length === 1 ? names[0] : names.length + " jobs") + " → " + dayLabel(d)); query = ""; $("q").value = ""; $("qClear").hidden = true; document.body.classList.remove("searching"); save(); render(); }
-  function addTyped(v){
-    if(splitRaw(v).length > 1){ addMany(v); return; }
+  function addTyped(v, one){
+    if(!one && splitRaw(v).length > 1){ addMany(v); return; }
+    if(one) v = String(v).replace(/\s+/g, " ").trim();
     unknown = []; var r = addOne(v); if(!r) return;
     toast("Added " + r);
     query = ""; $("q").value = ""; $("qClear").hidden = true; document.body.classList.remove("searching"); save(); render(); askBag(unknown);
@@ -1560,6 +1564,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       if(e.target.closest(".mv")){ var mn = ctlKey(mc); if(mn){ askBag([mn], true); $("sortbox").scrollIntoView({block:"center"}); } return; }
       return; }
     if(e.target.closest(".qaddb")){ addTyped($("q").value); return; }
+    if(e.target.closest(".qoneb")){ addTyped($("q").value, true); return; }   // what you typed is one job, even with "and" in it
     if(e.target.closest(".qaddl")){ addTypedLater($("q").value, isoIn(1)); return; }
     if(e.target.closest(".qdate")){ var qd = e.target.closest(".qdate"); qd.min = isoIn(1); if(!qd.dataset.on){ qd.dataset.on = 1; qd.addEventListener("change", function(){ addTypedLater($("q").value, qd.value); }); } return; }
     var ln = e.target.closest("[data-lnow]"); if(ln){ e.stopPropagation(); var jn = (S.later || []).filter(function(x){ return x.id === ln.dataset.lnow; })[0]; if(jn){ S.later = S.later.filter(function(x){ return x !== jn; }); bringBack(jn); save(); render(); toast(jn.n + " is on today's list"); } return; }
