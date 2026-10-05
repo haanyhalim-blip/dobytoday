@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v116 -->
+<!-- DoByToday v117 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -820,7 +820,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v116</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v117</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1269,7 +1269,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   var FLEXDUR = [[/shower/i, 15], [/clean your bedroom/i, 30], [/exercise/i, 30], [/reading/i, 20], [/homework|prep\b|spelling|maths|english|reasoning/i, 20], [/tidy/i, 15], [/times tables/i, 10]];
   function flexDur(t){ for(var k = 0; k < FLEXDUR.length; k++) if(FLEXDUR[k][0].test(t)) return FLEXDUR[k][1]; return 10; }
   var TL_GUESS = false;   // chores without a time stay out of the Timeline (they live in the Family schedule view); true brings the suggested-time blocks back
-  function timelineHTML(){ schedDay(); var items = [], lanes = [], FAM = "Family", flex = [], meal = {};
+  function timelineHTML(){ schedDay(); var items = [], lanes = [], FAM = "Parents", flex = [], meal = {};   // pick-ups, meals and parents' jobs share the Parents column
     function show(p){ if(SWHO === "*general") return p === FAM; if(SWHO === "*chores") return false; if(SWHO === "*parents") return p === FAM || isParent(p); return !SWHO || p === FAM || p.toLowerCase() === SWHO.toLowerCase(); }
     function lane(p){ if(lanes.indexOf(p) < 0) lanes.push(p); }
     S.own.forEach(function(o, i){ if(infoStep(o)) return; var sp = spanOf(o.n);
@@ -1277,11 +1277,11 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
         if(!TL_GUESS || (!who.length && !dp)) return;   // a general note with no time and no-one named stays in the list views
         var tx = String(o.n).replace(/^\s*(?:morning|before school|afternoon|after school|evening|bedtime|night|sunday night)\s*[–—-]\s*/i, "").replace(/^\s*[^:]{1,60}:\s*/, function(x){ return who.length ? "" : x; });
         tx = tx.charAt(0).toUpperCase() + tx.slice(1);
-        (who.length ? who : [FAM]).forEach(function(p){ p = p.trim(); if(/^(all three|everyone)$/i.test(p)) p = FAM; flex.push({p:p, dp:dp, t:tx, i:i, d:flexDur(tx), got:who.length ? ptOn(o, p) : !!o.got}); }); return; }
+        (who.length ? who : [FAM]).forEach(function(p){ p = p.trim(); if(/^(all three|everyone)$/i.test(p) || isParent(p)) p = FAM; flex.push({p:p, dp:dp, t:tx, i:i, d:flexDur(tx), got:who.length ? ptOn(o, p) : !!o.got}); }); return; }
       var w = sp.t.match(/^\s*((?:[A-Z][a-z]+|All three|Everyone)(?:\s*(?:&|and|,|·)\s*(?:[A-Z][a-z]+))*)\s*:\s*/), who = w ? w[1].split(/\s*(?:&|\band\b|,|·)\s*/) : [FAM];
       var txt = w ? sp.t.slice(w[0].length) : sp.t; txt = txt.charAt(0).toUpperCase() + txt.slice(1);
       if(!w && /breakfast/i.test(txt)) meal.b = sp; if(!w && /dinner|supper|tea\b/i.test(txt)) meal.d = sp;
-      who.forEach(function(p){ p = p.trim(); if(/^(all three|everyone)$/i.test(p)) p = FAM; items.push({p:p, a:sp.a, b:sp.b, e:sp.e, t:txt, i:i, got:p === FAM ? !!o.got : ptOn(o, p)}); }); });
+      who.forEach(function(p){ p = p.trim(); if(/^(all three|everyone)$/i.test(p) || isParent(p)) p = FAM; items.push({p:p, a:sp.a, b:sp.b, e:sp.e, t:txt, i:i, got:p === FAM ? !!o.got : ptOn(o, p)}); }); });
     // place the guesses, one child at a time, into the gaps between their own timed things and the meals
     var bySp = {}; flex.forEach(function(f){ (bySp[f.p] = bySp[f.p] || []).push(f); });
     Object.keys(bySp).forEach(function(p){ var busy = items.filter(function(x){ return x.p === p || (x.p === FAM && ((new RegExp("\\b" + p + "\\b|^(breakfast|dinner|supper|tea)\\b", "i")).test(x.t))); }).map(function(x){ return [x.a, x.p === FAM && !x.e && !/^(breakfast|dinner|supper|tea)\b/i.test(x.t) ? x.a + 15 : x.b]; });   // a pick-up only takes a child a few minutes
@@ -1325,7 +1325,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       its.forEach(function(x){ var c = 0; while(ends[c] > x.a) c++; ends[c] = x.b; x.c = c; }); var nc = Math.max(1, ends.length);
       return '<div class="tlcol"><div class="tlhead"><span class="ntag" style="background:' + (p === FAM ? "#eee" : tagCol(p.toLowerCase())) + '">' + esc(p) + '</span></div><div class="tlbody" style="height:' + H + 'px">' + lines
         + its.map(function(x){ var ic = iconFor(x.t), ht = Math.max(18, Y(x.b) - Y(x.a) - 2);
-          return '<div class="tlb' + (x.got ? ' got' : '') + (x.flex ? ' flex' : '') + '" style="top:' + Y(x.a) + 'px;height:' + ht + 'px;left:' + (x.c * 100 / nc) + '%;width:' + (100 / nc) + '%;background:' + (p === FAM ? "#f1eeea" : tagCol(p.toLowerCase())) + '" title="' + esc((p === FAM ? "" : p + " · ") + (x.flex ? "suggested ≈" : "") + hm(x.a) + "–" + hm(x.b) + " · " + x.t) + '">' + (ic ? ic + ' ' : '') + esc(x.t) + '</div>'; }).join("") + '</div></div>'; }).join("");
+          return '<div class="tlb' + (x.got ? ' got' : '') + (x.flex ? ' flex' : '') + '" style="top:' + Y(x.a) + 'px;height:' + ht + 'px;left:' + (x.c * 100 / nc) + '%;width:' + (100 / nc) + '%;background:' + (p === FAM ? "#f1eeea" : tagCol(p.toLowerCase())) + '" title="' + esc(p + " · " + (x.flex ? "suggested ≈" : "") + hm(x.a) + "–" + hm(x.b) + " · " + x.t) + '">' + (ic ? ic + ' ' : '') + esc(x.t) + '</div>'; }).join("") + '</div></div>'; }).join("");
     return '<div class="tl"><div class="tlaxis"><div class="tlhead"></div><div class="tlbody" style="height:' + H + 'px">' + axis + '</div></div><div class="tlcols">' + cols + '</div></div>'
       + '<p class="small tlnote">Tap a block to see who it’s for and when. ' + (anyFlex ? 'Dashed blocks are suggested times for jobs that don’t have a set time – to fix one, give that step a time (⋯ → Edit step).' : 'Chores and anything without a time are in the Family schedule view.') + '</p>'; }
   function timeSteps(){ var g = [["Morning", []], ["Afternoon", []], ["Evening", []], ["Anytime", []]], info = "";
