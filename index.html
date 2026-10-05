@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v109 -->
+<!-- DoByToday v110 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -812,7 +812,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v109</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v110</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1298,9 +1298,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       its.forEach(function(x){ var c = 0; while(ends[c] > x.a) c++; ends[c] = x.b; x.c = c; }); var nc = Math.max(1, ends.length);
       return '<div class="tlcol"><div class="tlhead"><span class="ntag" style="background:' + (p === FAM ? "#eee" : tagCol(p.toLowerCase())) + '">' + esc(p) + '</span></div><div class="tlbody" style="height:' + H + 'px">'
         + its.map(function(x){ var ic = iconFor(x.t), ht = Math.max(20, (x.b - x.a) * K - 2);
-          return '<div class="tlb' + (x.got ? ' got' : '') + (x.flex ? ' flex' : '') + '" style="top:' + ((x.a - lo) * K) + 'px;height:' + ht + 'px;left:' + (x.c * 100 / nc) + '%;width:' + (100 / nc) + '%;background:' + (p === FAM ? "#f1eeea" : tagCol(p.toLowerCase())) + '" title="' + esc((x.flex ? "Suggested time ≈" : "") + hm(x.a) + "–" + hm(x.b) + " " + x.t) + '"><b>' + (x.flex ? '≈' : '') + hm(x.a) + '</b> ' + (ic ? ic + ' ' : '') + esc(x.t) + '</div>'; }).join("") + '</div></div>'; }).join("");
+          return '<div class="tlb' + (x.got ? ' got' : '') + (x.flex ? ' flex' : '') + '" style="top:' + ((x.a - lo) * K) + 'px;height:' + ht + 'px;left:' + (x.c * 100 / nc) + '%;width:' + (100 / nc) + '%;background:' + (p === FAM ? "#f1eeea" : tagCol(p.toLowerCase())) + '" title="' + esc((x.flex ? "Suggested time ≈" : "") + hm(x.a) + "–" + hm(x.b) + " " + x.t) + '">' + (ic ? ic + ' ' : '') + esc(x.t) + '</div>'; }).join("") + '</div></div>'; }).join("");
     return '<div class="tl"><div class="tlaxis"><div class="tlhead"></div><div class="tlbody" style="height:' + H + 'px">' + axis + '</div></div><div class="tlcols">' + cols + '</div></div>'
-      + '<p class="small tlnote">' + (anyFlex ? 'Dashed blocks with ≈ are suggested times for jobs that don’t have a set time. To fix one, give that step a time (⋯ → Edit step).' : '') + '</p>'; }
+      + '<p class="small tlnote">' + (anyFlex ? 'Tap a block to see its time. Dashed blocks are suggested times for jobs that don’t have a set time – to fix one, give that step a time (⋯ → Edit step).' : '') + '</p>'; }
   function timeSteps(){ var g = [["Morning", []], ["Afternoon", []], ["Evening", []], ["Anytime", []]], info = "";
     schedDay(); SCHED = true;
     S.own.map(function(o, i){ return {o:o, i:i, m:stepMins(o.n)}; }).sort(function(a, b){ return (a.m < 0) - (b.m < 0) || a.m - b.m || a.i - b.i; })
