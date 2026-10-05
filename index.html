@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v100 -->
+<!-- DoByToday v101 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -222,6 +222,19 @@ body.searching #shopBox[hidden]{display:block}
 #mine .steps.bytime .grip{display:none!important}
 .steps .tgroup{grid-column:1/-1;margin:14px 0 2px;font-size:.78rem;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
 .steps .tgroup:first-child{margin-top:2px}
+.steps.bytime .mrow .it .nm{display:flex;align-items:baseline;gap:10px;font-size:1rem}
+.steps.bytime .stime{flex:none;width:136px;font-weight:700;font-variant-numeric:tabular-nums;color:var(--ink);white-space:nowrap}
+.steps.bytime .sbody{flex:1;min-width:0}
+.ntag{display:inline-block;padding:1px 8px;margin:0 6px 2px 0;border-radius:999px;font-size:.78rem;font-weight:700;color:#3a2f2a;vertical-align:1px;white-space:nowrap}
+.steps.bytime .mrow.got .stxt{text-decoration:line-through;color:var(--muted)}
+.steps.bytime .mrow .sdetw{margin-left:132px}
+.schinfo{grid-column:1/-1;margin:6px 0 2px}
+.schinfo ul{list-style:none;margin:6px 0 0;padding:0}
+.schinfo li{padding:8px 10px;margin:4px 0;border:1px solid var(--line);border-radius:10px;background:#fff;font-size:.92rem;line-height:1.45;overflow-wrap:anywhere}
+.schinfo a{font-weight:700;color:var(--main-deep, #9a4320)}
+.steps.bytime .mrow .nm::before{content:none}
+.steps.bytime .uplinks{display:none}
+@media (max-width:520px){.steps.bytime .mrow .it .nm{display:block}.steps.bytime .stime{display:block;width:auto;font-size:.86rem;line-height:1.2;margin:0 0 2px}.steps.bytime .stime:empty{display:none}.steps.bytime .mrow .sdetw{margin-left:36px}}
 #mine .mrow.low .it .nm{color:var(--muted);font-weight:500}
 #mine .mctl .lowb{flex:none;display:inline-flex;align-items:center;gap:4px;cursor:pointer;padding:5px 0 5px 8px;color:var(--muted);font-size:.85rem;user-select:none}
 #mine .mctl .urgb{flex:none;display:inline-flex;align-items:center;gap:4px;cursor:pointer;padding:5px 0 5px 5px;color:#b42318;font-size:.85rem;user-select:none}
@@ -743,7 +756,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v100</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v101</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1133,10 +1146,35 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     return h * 60 + mi; }
   function layoutOf(){ if(S.layout === "time" || S.layout === "plain") return S.layout; var n = S.own.length, t = S.own.filter(function(o){ return stepMins(o.n) >= 0; }).length;
     return n && t >= 3 && t >= n * 0.6 ? "time" : "plain"; }
-  function timeSteps(){ var g = [["Morning", []], ["Afternoon", []], ["Evening", []], ["Anytime", []]];
+  // ---------- Family schedule: a card format for a family's day ----------
+  // Grouped Morning / Afternoon / Evening / Anytime in time order; the time in its own column, names as coloured tags,
+  // "Morning –" style prefixes dropped (the heading says it), ticks start fresh each day, and a "Class links and logins"
+  // step shown at the bottom as an open section with tap-able links. The words of each step are never changed.
+  var SCHED = false;
+  function infoStep(o){ return /\b(links?|logins?|passwords?)\b/i.test(o.n) && o.d && o.d.length; }
+  function tagCol(nm){ var h = 0; for(var i = 0; i < nm.length; i++) h = (h * 31 + nm.charCodeAt(i)) % 997; return ["#fde2e4", "#e2ecfd", "#e3f4e1", "#f6e6fb", "#fff1d6", "#dff4f4"][h % 6]; }
+  function tagsHTML(names){ return names.map(function(x){ x = x.trim(); return '<span class="ntag" style="background:' + tagCol(x.toLowerCase()) + '">' + esc(x) + '</span>'; }).join(""); }
+  function hm(mi, ap){ var h = Math.floor(mi / 60) % 24, m = mi % 60, h12 = h % 12 || 12; return h12 + ":" + (m < 10 ? "0" : "") + m + (ap ? (h < 12 ? "am" : "pm") : ""); }
+  function schedHTML(n){ var t = String(n), time = "", a = stepMins(t);
+    t = t.replace(/^\s*(?:morning|before school|afternoon|after school|evening|bedtime|night|sunday night)\s*[–—-]\s*/i, "");
+    var m = t.match(/^\s*(\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?)\s*(?:[–—-]\s*(\d{1,2}(?:[:.]\d{2})?\s*(?:am|pm)?))?\s*[–—-]\s*/i);
+    if(m && stepMins(m[1]) >= 0){ var b = m[2] ? stepMins(m[2]) : -1; if(b >= 0 && b < a) b += 720;
+      time = b >= 0 ? (Math.floor(a / 720) === Math.floor(b / 720) ? hm(a) + "–" + hm(b, 1) : hm(a, 1) + "–" + hm(b, 1)) : hm(a, 1); t = t.slice(m[0].length); }
+    var w = t.match(/^\s*((?:[A-Z][a-z]+|All three|Everyone)(?:\s*(?:&|and|,|·)\s*(?:[A-Z][a-z]+))*)\s*:\s*/), tags = "";
+    if(w){ tags = tagsHTML(w[1].split(/\s*(?:&|\band\b|,|·)\s*/)); t = t.slice(w[0].length); }
+    t = t.charAt(0).toUpperCase() + t.slice(1);
+    return '<span class="stime">' + (time || "") + '</span><span class="sbody">' + tags + '<span class="stxt">' + esc(t) + '</span></span>'; }
+  function linkify(x){ return esc(x).replace(/https?:\/\/[^\s<]+?(?=[\s·]|$)/g, function(u){ return '<a href="' + u + '" target="_blank" rel="noopener">Open ↗</a>'; }); }
+  function infoHTML(o){ return '<div class="schinfo"><h3 class="tgroup">' + esc(o.n.replace(/\s*and\s*/i, " & ")) + '</h3><ul>' + o.d.map(function(x){
+      var w = x.match(/^\s*([A-Z][a-z]+)\s*[–—-]\s*/); return '<li>' + (w ? tagsHTML([w[1]]) + linkify(x.slice(w[0].length)) : linkify(x)) + '</li>'; }).join("") + '</ul></div>'; }
+  function schedDay(){ var t = iso(); if(S.tday === t) return; var any = S.own.some(function(o){ return o.got; }); S.tday = t;
+    if(any){ S.own.forEach(function(o){ o.got = false; }); save(); } else { try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} } }   // a new day: every tick box empty again
+  function timeSteps(){ var g = [["Morning", []], ["Afternoon", []], ["Evening", []], ["Anytime", []]], info = "";
+    schedDay(); SCHED = true;
     S.own.map(function(o, i){ return {o:o, i:i, m:stepMins(o.n)}; }).sort(function(a, b){ return (a.m < 0) - (b.m < 0) || a.m - b.m || a.i - b.i; })
-      .forEach(function(x){ g[x.m < 0 ? 3 : x.m < 720 ? 0 : x.m < 1020 ? 1 : 2][1].push(mineOwn(x.o, x.i)); });
-    return g.filter(function(x){ return x[1].length; }).map(function(x){ return '<h3 class="tgroup">' + x[0] + '</h3>' + x[1].join(""); }).join(""); }
+      .forEach(function(x){ if(infoStep(x.o)){ info += infoHTML(x.o); return; } g[x.m < 0 ? 3 : x.m < 720 ? 0 : x.m < 1020 ? 1 : 2][1].push(mineOwn(x.o, x.i)); });
+    SCHED = false;
+    return g.filter(function(x){ return x[1].length; }).map(function(x){ return '<h3 class="tgroup">' + x[0] + '</h3>' + x[1].join(""); }).join("") + info; }
   function isProj(){ return S.keep && TABS.active !== "today" && S.kind !== "links"; }
   // Drag a step by its grip to a new place in the project
   var DRAG = null;
@@ -1166,7 +1204,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   // One tidy row per item: the tick box, the name, and a "⋯" button that opens everything else
   var MOREN = "";
   function moreBtn(k){ return '<button type="button" class="more" data-more="'+esc(k)+'" aria-label="More options" aria-expanded="'+(MOREN === k)+'"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>'; }
-  function mineRow(n, ref, got, cls, b, link){ var mk = cls + "|" + n; return '<div class="mrow'+(got?" got":"")+(isUrg(n) && !S.keep ? " urg" : "")+(isLow(n) && !S.keep ? " low" : "")+(!got && MOREN === mk ? " open" : "")+'"><button class="it'+cls+(got?" got":"")+'" '+ref+' aria-pressed="'+got+'"><span class="box"></span><span><span class="nm" data-done="'+doneWord(b)+'">'+esc(n)+'</span>'+(got ? noteTag(n) : ''+((S.note || {})[n] ? '<small class="cnote">'+esc((S.note || {})[n])+'</small>' : '')+'')+'</span></button>'+(link ? '<a class="jlink rowlink" href="'+esc(link)+'" target="_blank" rel="noopener">Open list ↗</a>' : '')+(got ? '' : moreBtn(mk) + ctl(n, ref))+'</div>'; }
+  function mineRow(n, ref, got, cls, b, link){ var mk = cls + "|" + n; return '<div class="mrow'+(got?" got":"")+(isUrg(n) && !S.keep ? " urg" : "")+(isLow(n) && !S.keep ? " low" : "")+(!got && MOREN === mk ? " open" : "")+'"><button class="it'+cls+(got?" got":"")+'" '+ref+' aria-pressed="'+got+'"><span class="box"></span><span><span class="nm" data-done="'+doneWord(b)+'">'+(SCHED ? schedHTML(n) : esc(n))+'</span>'+(got ? noteTag(n) : ''+((S.note || {})[n] ? '<small class="cnote">'+esc((S.note || {})[n])+'</small>' : '')+'')+'</span></button>'+(link ? '<a class="jlink rowlink" href="'+esc(link)+'" target="_blank" rel="noopener">Open list ↗</a>' : '')+(got ? '' : moreBtn(mk) + ctl(n, ref))+'</div>'; }
   function mineBtn(it){ return mineRow(it.n, 'data-n="'+esc(it.n)+'"', !!S.got[it.n], '', bagOf(it)); }
   function mineOwn(o, i){ var r = mineRow(o.n, 'data-own="'+i+'"', !!o.got, ' own', o.b, o.link);
     if(o.d && o.d.length && S.keep) r = r.replace(/<\/div>$/, '<details class="sdetw" data-det="' + esc(o.n) + '"' + (DETOPEN[o.n] ? " open" : "") + '><summary>Details <small>(' + o.d.length + ')</small></summary><ul class="sdet">' + o.d.map(function(x){ return "<li>" + esc(x) + "</li>"; }).join("") + "</ul></details></div>");
@@ -1241,7 +1279,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       html = projHTML(); var steps = S.own.map(function(o, i){ return mineOwn(o, i); }).join("") + items.filter(function(it){ return S.picked[it.n]; }).map(mineBtn).join("");
       if(PEDIT === "new") return html;
       var lay = isProj() ? layoutOf() : "plain"; if(lay === "time") steps = timeSteps();
-      if(steps) html += '<h2 class="aisle dsec"><span class="c"></span>Steps <span class="sub">– ' + nGot() + " of " + nPicked() + ' done</span></h2>' + (isProj() ? '<div class="layrow" role="group" aria-label="Layout"><span>Layout:</span><button type="button" class="fchip" data-lay="plain" aria-pressed="' + (lay === "plain") + '">List</button><button type="button" class="fchip" data-lay="time" aria-pressed="' + (lay === "time") + '">By time of day</button></div>' : '') + '<div class="grid steps' + (lay === "time" ? ' bytime' : '') + '">' + steps + "</div>";
+      if(steps) html += '<h2 class="aisle dsec"><span class="c"></span>Steps <span class="sub">– ' + nGot() + " of " + nPicked() + ' done</span></h2>' + (isProj() ? '<div class="layrow" role="group" aria-label="Layout"><span>Layout:</span><button type="button" class="fchip" data-lay="plain" aria-pressed="' + (lay === "plain") + '">List</button><button type="button" class="fchip" data-lay="time" aria-pressed="' + (lay === "time") + '">Family schedule</button></div>' : '') + '<div class="grid steps' + (lay === "time" ? ' bytime' : '') + '">' + steps + "</div>";
       else html += '<h2 class="aisle dsec"><span class="c"></span>Steps</h2><p class="small">No steps yet.</p>';
       html += '<div class="stepadd"><textarea id="stepIn" rows="1" placeholder="Add a step (paste several, one per line)"></textarea><button type="button" class="btn" data-addstep="1">Add</button></div>';
       if(S.after) html += '<div class="proj pafter"><div class="pbody">' + fmtNotes(S.after) + "</div></div>";
@@ -1661,7 +1699,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     else { takeOff(b); return; }
     save(); render();
   }
-  $("mine").addEventListener("click", function(e){ var b = e.target.closest("[data-lay]"); if(!b) return; e.stopPropagation(); S.layout = b.dataset.lay; save(); render(); toast(S.layout === "time" ? "Grouped by time of day" : "Shown as a plain list"); }, true);
+  $("mine").addEventListener("click", function(e){ var b = e.target.closest("[data-lay]"); if(!b) return; e.stopPropagation(); S.layout = b.dataset.lay; save(); render(); toast(S.layout === "time" ? "Family schedule" : "Shown as a plain list"); }, true);
   $("out").addEventListener("click", onListClick); $("mine").addEventListener("click", onListClick);
   $("mine").addEventListener("input", function(e){ var i = e.target.closest(".qc"); if(!i) return; var n = ctlKey(i.closest(".mctl")); if(!n) return; S.note = S.note || {}; var v = i.value.trim(); if(v) S.note[n] = v; else delete S.note[n]; save(); $("paper").textContent = nPicked() ? asText() : "Nothing on the list yet"; });
   $("mine").addEventListener("input", function(e){ var a = e.target.closest(".ansbox"); if(!a) return; var o = S.own[+a.dataset.ans]; if(!o) return;
