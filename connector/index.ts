@@ -71,7 +71,7 @@ async function loadSite(token, site) {
   return d;
 }
 // The fields a DobyToday list (or page) shares through its link – the same as the site's own snapshot
-const SHARED = ["picked", "got", "own", "bag", "removed", "note", "day", "later", "past", "title", "notes", "after", "keep", "kind", "urg", "secs"];
+const SHARED = ["picked", "got", "own", "bag", "removed", "note", "day", "later", "past", "title", "notes", "after", "keep", "kind", "urg", "secs", "low", "at"];
 function sharedCopy(S) { const o = {}; SHARED.forEach((k) => { if (S[k] !== undefined) o[k] = S[k]; }); o.t = Date.now(); return o; }
 async function saveSite(token, site, d) {
   d.t = Date.now();   // newer than the phone's copy, so the site takes these changes when it next opens
@@ -148,17 +148,14 @@ function entries(S) {   // every item on the list: {n, got, own index or null, k
 }
 function describe(site, d) {
   const S = d.s, all = entries(S), lines = [];
-  const tick = (e) => (e.got ? "☑ " : "☐ ") + (site === "dobytoday" && (S.urg || {})[e.n] ? "❗ " : "") + (e.who ? e.who + ": " : "") + e.n
+  const tick = (e) => (e.got ? "☑ " : "☐ ") + (site === "dobytoday" && (S.urg || {})[e.n] ? "❗ " : "") + (site === "dobytoday" && (S.low || {})[e.n] ? "↓ " : "") + (e.who ? e.who + ": " : "") + e.n
     + ((S.note || {})[e.n] ? "  [note: " + S.note[e.n] + "]" : "") + (e.link ? "  [link: " + e.link + "]" : "");
   if (site === "dobytoday") {
-    const secs = sections(S), live = (k) => (secs.some((s) => s[0] === k) ? k : (secs.find((s) => s[0] === "any") || secs[0])[0]);
-    lines.push("DobyToday – My to-do list (sections: " + secs.map((s) => s[1]).join(", ") + ")");
-    secs.forEach(([k, l]) => {
-      const rows = all.filter((e) => (e.own !== null || e.key) && live(e.key || "any") === k);
-      if (rows.length) { lines.push("  " + l + ":"); rows.forEach((e) => lines.push("    " + tick(e))); }
-    });
-    const ready = all.filter((e) => e.own === null && !e.key);   // ready-made jobs sit in the section the site gives them
-    if (ready.length) { lines.push("  Also on today's list:"); ready.forEach((e) => lines.push("    " + tick(e))); }
+    // One list, as the site shows it: ❗ urgent first, ↓ not urgent last, newest first in between
+    const pr = (n) => ((S.urg || {})[n] ? 0 : (S.low || {})[n] ? 2 : 1), at = S.at || {};
+    const rows = all.map((e, i) => [e, i]).sort((a, b) => pr(a[0].n) - pr(b[0].n) || (at[b[0].n] || 0) - (at[a[0].n] || 0) || a[1] - b[1]).map((x) => x[0]);
+    lines.push("DobyToday – My to-do list (one list: ❗ urgent at the top, ↓ not urgent at the bottom, newest first in between)");
+    rows.forEach((e) => lines.push("  " + tick(e)));
     if (!all.length) lines.push("  (nothing on today's list)");
     const later = (S.later || []).slice().sort((a, b) => (a.d < b.d ? -1 : 1));
     if (later.length) { lines.push("  Coming up on later days:"); later.forEach((j) => lines.push("    " + j.d + " – " + j.n)); }
@@ -223,7 +220,7 @@ function addItems(site, S, a) {
     if (site === "listbyaisle") S.own.push({ n, a: "", got: false, org: false });
     else if (site === "packbybag") { const o = { n, a: "", b: p.key || "", got: false }; if (a.person) o.w = String(a.person).slice(0, 20); S.own.push(o); }
     else S.own.push({ n, a: "other", b: p.key || "any", got: false });
-    if (site === "dobytoday" && a.urgent) { S.urg = S.urg || {}; S.urg[n] = 1; }
+    if (site === "dobytoday") { S.at = S.at || {}; S.at[n] = Date.now(); if (a.urgent) { S.urg = S.urg || {}; S.urg[n] = 1; } else if (a.not_urgent) { S.low = S.low || {}; S.low[n] = 1; } }
     added.push(n);
   });
   const where = later ? " for " + later : p.label ? " to " + p.label : "";
@@ -236,15 +233,17 @@ function updateItems(site, S, a) {
   if (!hit.length) return "None of those are on the list" + (miss.length ? ": " + miss.join(", ") : "") + ".";
   let p = { key: "" };
   if (act === "move" && !(site === "dobytoday" && a.day)) { p = resolvePlace(site, S, a.section || a.bag); if (p.error) return p.error; if (!p.key) return "Say which " + (site === "dobytoday" ? "section" : "bag") + " to move them to."; }
-  if ((act === "mark_urgent" || act === "unmark_urgent" || act === "set_link") && site !== "dobytoday") return "Urgent marks and links are only on DobyToday.";
+  if ((/urgent/.test(act || "") || act === "set_link") && site !== "dobytoday") return "Urgent marks and links are only on DobyToday.";
   if (act === "set_link" && hit.some((e) => e.own === null)) return "Links can only go on jobs you added yourself (not ready-made ones).";
   hit.forEach((e) => {
     const o = e.own === null ? null : S.own[e.own];
     if (act === "tick") { if (o) o.got = true; else S.got[e.n] = 1; }
     else if (act === "untick") { if (o) o.got = false; else delete S.got[e.n]; }
     else if (act === "remove") removeEntry(S, e);
-    else if (act === "mark_urgent") { S.urg = S.urg || {}; S.urg[e.n] = 1; }
+    else if (act === "mark_urgent") { S.urg = S.urg || {}; S.urg[e.n] = 1; if (S.low) delete S.low[e.n]; }
     else if (act === "unmark_urgent") { if (S.urg) delete S.urg[e.n]; }
+    else if (act === "mark_not_urgent") { S.low = S.low || {}; S.low[e.n] = 1; if (S.urg) delete S.urg[e.n]; }
+    else if (act === "unmark_not_urgent") { if (S.low) delete S.low[e.n]; }
     else if (act === "set_note") { S.note = S.note || {}; const t = String((map && map[e.q] !== undefined ? map[e.q] : a.text) || "").trim(); if (t) S.note[e.n] = t.slice(0, 300); else delete S.note[e.n]; }
     else if (act === "set_link") { if (o) { const u = String((map && map[e.q] !== undefined ? map[e.q] : a.link) || "").trim(); if (/^https:\/\//.test(u)) o.link = u; else delete o.link; } }
     else if (act === "move") {
@@ -253,7 +252,7 @@ function updateItems(site, S, a) {
     }
   });
   tidy(S);
-  const verb = { tick: "Ticked off", untick: "Unticked", remove: "Removed", mark_urgent: "Marked urgent", unmark_urgent: "No longer urgent", move: "Moved", set_note: "Updated the note on", set_link: "Updated the link on" }[act] || act;
+  const verb = { tick: "Ticked off", untick: "Unticked", remove: "Removed", mark_urgent: "Marked urgent", unmark_urgent: "No longer urgent", mark_not_urgent: "Marked not urgent", unmark_not_urgent: "Back to normal", move: "Moved", set_note: "Updated the note on", set_link: "Updated the link on" }[act] || act;
   return verb + (act === "move" ? (a.day ? " to " + a.day : " to " + p.label) : "") + ": " + hit.map((e) => e.n).join(", ") + "." + (miss.length ? " Not found: " + miss.join(", ") + "." : "");
 }
 function saveCopy(site, d, a) {
@@ -276,13 +275,13 @@ const PAGE_PROP = { type: "string", description: "The page's name (or part of it
 const TOOLS = [
   {
     name: "get_my_lists", title: "See my lists",
-    description: "Show what is on the signed-in person's lists: their DobyToday to-do list (with its sections, ❗ urgent jobs and jobs for later days), their PackbyBag packing list and their ListbyAisle shopping list, plus the names of their saved lists. Call this first to see exact item and section names.",
+    description: "Show what is on the signed-in person's lists: their DobyToday to-do list (❗ urgent and ↓ not-urgent jobs, notes, links and jobs for later days), their PackbyBag packing list and their ListbyAisle shopping list, plus the names of their saved lists. Call this first to see exact item and section names.",
     inputSchema: { type: "object", properties: { site: { type: "string", enum: ["all", "dobytoday", "packbybag", "listbyaisle"], description: "Which list to show (default all)" } } },
     annotations: { readOnlyHint: true },
   },
   {
     name: "add_items", title: "Add to a list",
-    description: "Add items to one of the person's lists. DobyToday: jobs go into a section (use the person's own section names from get_my_lists, e.g. 'Today'); give a future day (YYYY-MM-DD) to put them on that day instead; urgent=true marks them ❗. PackbyBag: optionally a bag (e.g. 'Hand luggage') and a person (a child's first name). ListbyAisle: just the items – they sort themselves into aisles.",
+    description: "Add items to one of the person's lists. DobyToday: new jobs go to the top of the to-do list; give a future day (YYYY-MM-DD) to put them on that day instead; urgent=true marks them ❗ (top), not_urgent=true marks them ↓ (bottom). PackbyBag: optionally a bag (e.g. 'Hand luggage') and a person (a child's first name). ListbyAisle: just the items – they sort themselves into aisles.",
     inputSchema: {
       type: "object", required: ["site", "items"],
       properties: {
@@ -290,20 +289,21 @@ const TOOLS = [
         items: { type: "array", items: { type: "string" }, description: "Short names, one item or job each, e.g. 'Pay the football club', 'Sun cream', 'Milk'" },
         section: { type: "string", description: "DobyToday section or PackbyBag bag to put them in (optional)" },
         day: { type: "string", description: "DobyToday only: a later day, YYYY-MM-DD (optional)" },
-        urgent: { type: "boolean", description: "DobyToday only: mark them ❗ urgent" },
+        urgent: { type: "boolean", description: "DobyToday only: mark them ❗ urgent (they go to the top)" },
+        not_urgent: { type: "boolean", description: "DobyToday only: mark them ↓ not urgent (they go to the bottom)" },
         person: { type: "string", description: "PackbyBag only: whose bag (first name, optional)" },
       },
     },
   },
   {
     name: "update_items", title: "Tick, move or remove",
-    description: "Change items already on a list: tick them off, untick them, remove them, mark or unmark them ❗ urgent (DobyToday), move them to another section/bag (or, on DobyToday, to a later day), or give them a short note or (DobyToday) a link. Use the item names as they appear in get_my_lists. For steps on a DobyToday page or project, use update_page instead.",
+    description: "Change items already on a list: tick them off, untick them, remove them, mark them ❗ urgent or ↓ not urgent, or undo either (DobyToday), move them to another section/bag (or, on DobyToday, to a later day), or give them a short note or (DobyToday) a link. Use the item names as they appear in get_my_lists. For steps on a DobyToday page or project, use update_page instead.",
     inputSchema: {
       type: "object", required: ["site", "items", "action"],
       properties: {
         site: SITE_PROP,
         items: { type: "array", items: { type: "string" } },
-        action: { type: "string", enum: ["tick", "untick", "remove", "mark_urgent", "unmark_urgent", "move", "set_note", "set_link"] },
+        action: { type: "string", enum: ["tick", "untick", "remove", "mark_urgent", "unmark_urgent", "mark_not_urgent", "unmark_not_urgent", "move", "set_note", "set_link"] },
         text: { type: "string", description: "For set_note: a short note shown under the item (empty removes it)" },
         link: { type: "string", description: "For set_link (DobyToday): an https link opened by the job's 'Open ↗' button" },
         notes: { type: "object", additionalProperties: { type: "string" }, description: "For set_note: a different note for each item, as {item name: note} (items can then be left empty)" },
@@ -437,7 +437,7 @@ async function callTool(token, name, a) {
   else if (name === "update_items") msg = updateItems(site, d.s, a);
   else if (name === "save_list") msg = saveCopy(site, d, a);
   else return null;
-  if (!/^(Added|Already|Ticked|Unticked|Removed|Marked|No longer|Moved|Saved|Updated)/.test(msg)) return msg;   // nothing changed
+  if (!/^(Added|Already|Ticked|Unticked|Removed|Marked|No longer|Back to normal|Moved|Saved|Updated)/.test(msg)) return msg;   // nothing changed
   await saveSite(token, site, d);
   return msg + " (" + SITES[site].url.replace("https://", "") + ")";
 }
