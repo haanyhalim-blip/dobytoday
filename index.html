@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v124 -->
+<!-- DoByToday v125 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -833,7 +833,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v124</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v125</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -2216,8 +2216,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   var SW_SITES = [{h:"dobytoday.com", n:"DoByToday", d:"To-do lists, by when", i:"\u2705", c:"#f7e3d6"},
     {h:"packbybag.com", n:"PackByBag", d:"Packing lists, by bag", i:"\uD83E\uDDF3", c:"#dfeee6"},
     {h:"listbyaisle.com", n:"ListByAisle", d:"Shopping lists, by aisle", i:"\uD83D\uDED2", c:"#e3e8f6"},
-    {h:"dueareset.com", n:"DueAReset", d:"A page of your own to change a habit", i:"\uD83C\uDF31", c:"#e6efe0", plain:1},
-    {h:"watchbyvalues.com", n:"WatchByValues", d:"Films, by the values they show", i:"\uD83C\uDFAC", c:"#ece6f5", plain:1}];
+    {h:"watchbyvalues.com", n:"WatchByValues", d:"Films, by values", i:"\uD83C\uDFAC", c:"#ece6f5", plain:1},
+    {h:"dueareset.com", n:"DueAReset", d:"A page of your own to change a habit", i:"\uD83C\uDF31", c:"#e6efe0", plain:1}];
   function swDraw(){ $("swCard").innerHTML = SW_SITES.map(function(x){ var on = x.h === SW_ME;
       return '<a ' + (on ? 'class="on" aria-current="page"' : 'href="https://' + x.h + '/" data-sw="' + x.h + '"' + (x.plain ? ' data-plain="1"' : '')) + '><span class="sic" style="background:' + x.c + '">' + x.i + '</span><span><b>' + x.n + '</b><small>' + x.d + '</small></span>' + (on ? '<span class="stk" aria-hidden="true">\u2713</span>' : '') + '</a>'; }).join("")
       + '<div class="snote">' + (AUSER ? "You stay signed in when you switch." : "Sign in once here and you\u2019ll stay signed in when you switch.") + '</div>'; }
