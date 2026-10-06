@@ -227,7 +227,7 @@ function addItems(site, S, a) {
   return ((added.length ? "Added " + added.length + where + ": " + added.join(", ") + "." : "") + (skipped.length ? " Already on the list" + (site === "dobytoday" && a.urgent ? " (now marked ❗ urgent)" : "") + ": " + skipped.join(", ") + "." : "")).trim();
 }
 function updateItems(site, S, a) {
-  const act = a.action, map = act === "set_note" ? a.notes : act === "set_link" ? a.links : null;
+  const act = a.action, map = act === "set_note" ? a.notes : act === "set_link" ? a.links : act === "rename" ? a.names : null;
   if (map && typeof map === "object" && !(a.items || []).length) a.items = Object.keys(map);   // many notes or links in one go
   const { hit, miss } = findItems(S, (a.items || []).map(String));
   if (!hit.length) return "None of those are on the list" + (miss.length ? ": " + miss.join(", ") : "") + ".";
@@ -235,6 +235,19 @@ function updateItems(site, S, a) {
   if (act === "move" && !(site === "dobytoday" && a.day)) { p = resolvePlace(site, S, a.section || a.bag); if (p.error) return p.error; if (!p.key) return "Say which " + (site === "dobytoday" ? "section" : "bag") + " to move them to."; }
   if ((/urgent/.test(act || "") || act === "set_link") && site !== "dobytoday") return "Urgent marks and links are only on DobyToday.";
   if (act === "set_link" && hit.some((e) => e.own === null)) return "Links can only go on jobs you added yourself (not ready-made ones).";
+  if (act === "rename") {   // new wording, same item: keeps its tick, place, note, link, urgency and when it was added
+    const done = [], clash = [];
+    hit.forEach((e) => {
+      const nn = String((map && map[e.q] !== undefined ? map[e.q] : a.text) || "").replace(/\s+/g, " ").trim().slice(0, 200);
+      if (!nn || nn === e.n) return;
+      if (entries(S).some((x) => low(x.n) === low(nn) && low(x.n) !== low(e.n))) { clash.push(nn); return; }
+      if (e.own !== null) S.own[e.own].n = nn;
+      else { S.picked[nn] = S.picked[e.n]; delete S.picked[e.n]; ["got", "bag"].forEach((f) => { if (S[f] && e.n in S[f]) { S[f][nn] = S[f][e.n]; delete S[f][e.n]; } }); }
+      ["note", "qty", "urg", "low", "at"].forEach((f) => { if (S[f] && e.n in S[f]) { S[f][nn] = S[f][e.n]; delete S[f][e.n]; } });
+      done.push(e.n + " → " + nn);
+    });
+    return (done.length ? "Renamed " + done.length + ": " + done.join("; ") + "." : "Nothing renamed.") + (clash.length ? " Already a job called: " + clash.join(", ") + "." : "") + (miss.length ? " Not found: " + miss.join(", ") + "." : "");
+  }
   hit.forEach((e) => {
     const o = e.own === null ? null : S.own[e.own];
     if (act === "tick") { if (o) o.got = true; else S.got[e.n] = 1; }
@@ -297,17 +310,18 @@ const TOOLS = [
   },
   {
     name: "update_items", title: "Tick, move or remove",
-    description: "Change items already on a list: tick them off, untick them, remove them, mark them ❗ urgent or ↓ not urgent, or undo either (DobyToday), move them to another section/bag (or, on DobyToday, to a later day), or give them a short note or (DobyToday) a link. Use the item names as they appear in get_my_lists. For steps on a DobyToday page or project, use update_page instead.",
+    description: "Change items already on a list: tick them off, untick them, remove them, mark them ❗ urgent or ↓ not urgent, or undo either (DobyToday), move them to another section/bag (or, on DobyToday, to a later day), give them a short note or (DobyToday) a link, or rename them (reword them, keeping everything else). Use the item names as they appear in get_my_lists. For steps on a DobyToday page or project, use update_page instead.",
     inputSchema: {
       type: "object", required: ["site", "items", "action"],
       properties: {
         site: SITE_PROP,
         items: { type: "array", items: { type: "string" } },
-        action: { type: "string", enum: ["tick", "untick", "remove", "mark_urgent", "unmark_urgent", "mark_not_urgent", "unmark_not_urgent", "move", "set_note", "set_link"] },
+        action: { type: "string", enum: ["tick", "untick", "remove", "mark_urgent", "unmark_urgent", "mark_not_urgent", "unmark_not_urgent", "move", "set_note", "set_link", "rename"] },
         text: { type: "string", description: "For set_note: a short note shown under the item (empty removes it)" },
         link: { type: "string", description: "For set_link (DobyToday): an https link opened by the job's 'Open ↗' button" },
         notes: { type: "object", additionalProperties: { type: "string" }, description: "For set_note: a different note for each item, as {item name: note} (items can then be left empty)" },
         links: { type: "object", additionalProperties: { type: "string" }, description: "For set_link: a different link for each item, as {item name: link}" },
+        names: { type: "object", additionalProperties: { type: "string" }, description: "For rename: the new wording for each item, as {current name: new name}. The item keeps its tick, place, note, link and urgency." },
         section: { type: "string", description: "For move: the DobyToday section or PackbyBag bag" },
         day: { type: "string", description: "For move on DobyToday: a later day, YYYY-MM-DD" },
       },
