@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v131 -->
+<!-- DoByToday v132 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -570,6 +570,12 @@ h2.dsec .sub{text-transform:none;letter-spacing:0;font-weight:400}
 .tcat .tin{padding:0 10px 10px}
 .pgrp{border:1px solid var(--line);border-radius:10px;background:var(--card);margin:8px 0}
 .pgrp .plist,.pgrp .mylgrid{padding:0 10px 10px}
+.porgb{margin-left:auto}
+.porg{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
+.porg h3{margin:6px 0 4px;font-size:1rem}
+.porow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 0;border-top:1px solid var(--line)}
+.porow input{font:inherit;font-size:.92rem;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;flex:1 1 160px;min-width:0;background:var(--card);color:var(--ink)}
+.porow .pon{flex:1 1 140px;min-width:0;font-weight:700;font-size:.92rem}
 .plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px;margin:8px 0}
 .prow{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:8px;width:100%;min-height:92px;text-align:left;padding:12px 13px;border:1.5px solid var(--line);border-left:5px solid var(--main);border-radius:10px;background:var(--card);font:inherit;cursor:pointer}
 .prow .pn{font-weight:700;line-height:1.3;overflow-wrap:anywhere}
@@ -843,7 +849,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v131</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v132</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1062,22 +1068,43 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function pageInfo(l){ var d = l.id === TABS.active ? S : readList(l.id), n = (d.own || []).length + Object.keys(d.picked || {}).length, g = (d.own || []).filter(function(o){ return o.got; }).length + Object.keys(d.got || {}).filter(function(k){ return (d.picked || {})[k]; }).length;
     return {l:l, title:d.title || l.name || "Untitled", n:n, g:g, done:d.kind !== "links" && n > 0 && g === n, links:d.kind === "links"}; }
   function prow(p){ return '<button type="button" class="prow" data-proj="' + esc(p.l.id) + '"><span class="pn">' + (p.l.pin ? '<i class="ppin" aria-label="Pinned">📌</i> ' : "") + esc(p.title) + '</span><span class="pc">' + (p.links ? p.n + (p.n === 1 ? " link" : " links") : p.n ? p.g + " of " + p.n : "–") + (p.n && !p.links ? '<i class="pbar"><i style="width:' + Math.round(p.g / p.n * 100) + '%"></i></i>' : "") + "</span></button>"; }
+  // Categories on My saved lists: a page can be in several ("Kids, Sahara"); "All" shows each category as a folder; Organise renames and moves them
+  function groupsOf(l){ var out = []; String((l && l.group) || "").split(",").forEach(function(g){ g = g.trim(); if(g && out.indexOf(g) < 0) out.push(g); }); return out; }
+  var ORG = false;
   function pfold(key, label, n, inner){ var o = !!OPEN["pg:" + key]; return '<details class="pgrp" data-pg="' + esc(key) + '"' + (o ? " open" : "") + '><summary>' + esc(label) + " <small>" + n + "</small></summary>" + inner + "</details>"; }
+  function orgHTML(ps){ var all = []; ps.forEach(function(p){ groupsOf(p.l).forEach(function(g){ if(all.indexOf(g) < 0) all.push(g); }); }); all.sort(function(a, b){ return a.localeCompare(b); });
+    return '<div class="porg"><h3>Categories</h3>' + (all.length ? '<p class="small">Rename a category and every page in it follows. Clear the name to take it off its pages – the pages stay.</p>' + all.map(function(g){ var n = ps.filter(function(p){ return groupsOf(p.l).indexOf(g) > -1; }).length;
+        return '<div class="porow"><input class="pocat" data-old="' + esc(g) + '" value="' + esc(g) + '" maxlength="30" aria-label="Category name"><span class="small">' + n + (n === 1 ? " page" : " pages") + '</span></div>'; }).join("") : '<p class="small">No categories yet – give a page one below.</p>')
+      + '<h3>Pages</h3><p class="small">Type one or more categories for each page, with commas between – e.g. Kids, Sahara.</p>'
+      + ps.map(function(p){ return '<div class="porow"><span class="pon">' + esc(p.title) + '</span><input class="popage" data-id="' + esc(p.l.id) + '" value="' + esc(groupsOf(p.l).join(", ")) + '" list="poCats" maxlength="80" placeholder="No category" aria-label="Categories for ' + esc(p.title) + '"></div>'; }).join("")
+      + '<datalist id="poCats">' + all.map(function(g){ return '<option value="' + esc(g) + '">'; }).join("") + '</datalist></div>'; }
+  function regroup(){ saveTabs(); if(typeof acctPush === "function") acctPush(); projCards(); }
   function projCards(){ var el = $("projSec"); if(!el) return;
     var ps = TABS.lists.filter(function(l){ return l.id !== "today"; }).map(pageInfo);
-    if(LASTPG){ ps.forEach(function(p){ if(p.l.id !== LASTPG) return; var want = p.done ? "done" : (p.l.group || "").trim() ? "g:" + p.l.group.trim() : "all"; if(OPEN.pf && OPEN.pf !== "all" && OPEN.pf !== want) OPEN.pf = want; }); LASTPG = ""; saveOpen(); }   // coming back from a page: you can see it
+    if(LASTPG){ ps.forEach(function(p){ if(p.l.id !== LASTPG) return; var want = p.done ? "done" : groupsOf(p.l).length ? "g:" + groupsOf(p.l)[0] : "all"; if(OPEN.pf && OPEN.pf !== "all" && OPEN.pf !== want) OPEN.pf = want; }); LASTPG = ""; saveOpen(); }   // coming back from a page: you can see it
     var live = ps.filter(function(p){ return !p.done; }), done = ps.filter(function(p){ return p.done; }), gs = [];
-    live.forEach(function(p){ var g = (p.l.group || "").trim(); if(g && gs.indexOf(g) < 0) gs.push(g); }); gs.sort(function(a, b){ return a.localeCompare(b); });
+    live.forEach(function(p){ groupsOf(p.l).forEach(function(g){ if(gs.indexOf(g) < 0) gs.push(g); }); }); gs.sort(function(a, b){ return a.localeCompare(b); });
     var saved = (MYL || []).length, f = OPEN.pf || "all";
     var chips = [["all", "All"]].concat(gs.map(function(g){ return ["g:" + g, g]; })).concat(saved ? [["saved", "Saved days"]] : []).concat(done.length ? [["done", "✓ Done"]] : []);
     if(!chips.some(function(c){ return c[0] === f; })) f = "all"; PF = f;
-    var h = chips.length > 1 ? '<div class="filt" role="group" aria-label="Show">' + chips.map(function(c){ return '<button type="button" class="fchip" data-pf="' + esc(c[0]) + '" aria-pressed="' + (f === c[0]) + '">' + esc(c[1]) + "</button>"; }).join("") + "</div>" : "";
-    var show = f === "all" ? live.slice().sort(function(a, b){ return (b.l.pin ? 1 : 0) - (a.l.pin ? 1 : 0); }) : f === "done" ? done : f === "saved" ? [] : live.filter(function(p){ return "g:" + (p.l.group || "").trim() === f; });
-    h += '<div class="plist">' + (f === "done" || f === "saved" ? "" : '<button type="button" class="prow pnew" data-newproj="1"><span class="pn">+ Create your own</span><span class="pc">a list, a plan or a project – paste or type it</span></button>') + show.map(prow).join("") + "</div>";
+    var h = '<div class="filt" role="group" aria-label="Show">' + (ORG ? "" : chips.map(function(c){ return '<button type="button" class="fchip" data-pf="' + esc(c[0]) + '" aria-pressed="' + (f === c[0]) + '">' + esc(c[1]) + "</button>"; }).join("")) + (ps.length ? '<button type="button" class="fchip porgb" data-porg="1" aria-pressed="' + ORG + '">' + (ORG ? "✓ Done organising" : "⚙ Organise") + '</button>' : '') + "</div>";
+    if(ORG){ el.innerHTML = h + orgHTML(ps); drawMy(); return; }
+    var newb = '<button type="button" class="prow pnew" data-newproj="1"><span class="pn">+ Create your own</span><span class="pc">a list, a plan or a project – paste or type it</span></button>';
+    if(f === "all"){   // pinned and uncategorised pages first, then one folder per category
+      var top = live.filter(function(p){ return p.l.pin || !groupsOf(p.l).length; }).sort(function(a, b){ return (b.l.pin ? 1 : 0) - (a.l.pin ? 1 : 0); });
+      h += '<div class="plist">' + newb + top.map(prow).join("") + "</div>";
+      gs.forEach(function(g){ var inG = live.filter(function(p){ return groupsOf(p.l).indexOf(g) > -1; }); h += pfold("g:" + g, g, inG.length, '<div class="plist">' + inG.map(prow).join("") + "</div>"); }); }
+    else { var show = f === "done" ? done : f === "saved" ? [] : live.filter(function(p){ return groupsOf(p.l).indexOf(f.slice(2)) > -1; });
+      h += '<div class="plist">' + (f === "done" || f === "saved" ? "" : newb) + show.map(prow).join("") + "</div>"; }
     if(f === "done" && !done.length) h += '<p class="small">Nothing finished yet.</p>';
     el.innerHTML = h; drawMy(); }
-  $("projSec").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.pf){ OPEN.pf = b.dataset.pf; saveOpen(); projCards(); return; } if(b.dataset.newproj){ newProject(); return; } if(b.dataset.proj){ switchTo(b.dataset.proj); window.scrollTo(0, 0); return; }
+  $("projSec").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.pf){ OPEN.pf = b.dataset.pf; saveOpen(); projCards(); return; } if(b.dataset.porg){ ORG = !ORG; projCards(); return; } if(b.dataset.newproj){ newProject(); return; } if(b.dataset.proj){ switchTo(b.dataset.proj); window.scrollTo(0, 0); return; }
     if(b.dataset.favgo){ var t = TRIPS.filter(function(x){ return x.id === b.dataset.favgo; })[0]; if(!t) return; if(t.slug){ try{ sessionStorage.setItem("dobytoday-back", t.id); }catch(x){} location.href = "/lists/" + t.slug; } else { if($("tripBox").hidden) $("tripBtn").click(); openPick(t.id); } } });
+  $("projSec").addEventListener("change", function(e){ var t = e.target;
+    if(t.classList.contains("pocat")){ var old = t.dataset.old, nv = t.value.replace(/,/g, " ").trim(); if(nv === old) return;
+      TABS.lists.forEach(function(l){ var gs = groupsOf(l), i = gs.indexOf(old); if(i < 0) return; if(nv) gs[i] = nv; else gs.splice(i, 1); l.group = groupsOf({group:gs.join(",")}).join(", "); });
+      regroup(); toast(nv ? "Renamed to " + nv : "Category taken off – the pages are still here"); return; }
+    if(t.classList.contains("popage")){ var l = TABS.lists.filter(function(x){ return x.id === t.dataset.id; })[0]; if(!l) return; l.group = groupsOf({group:t.value}).join(", "); regroup(); } });
   $("projBox").addEventListener("toggle", function(e){ var d = e.target; if(!d.classList || !d.classList.contains("pgrp")) return; if(d.open) OPEN["pg:" + d.dataset.pg] = 1; else delete OPEN["pg:" + d.dataset.pg]; saveOpen(); }, true);
   function deleteProject(){ var id = TABS.active; if(id === "today") return; if(!confirm("Delete “" + (S.title || "this page") + "”" + (CODE ? " from this phone? The shared link keeps working for anyone else." : "?"))) return;
     try{ localStorage.removeItem(keyOf(id)); localStorage.removeItem(ckeyOf(id)); }catch(e){} TABS.lists = TABS.lists.filter(function(l){ return l.id !== id; }); saveTabs(); switchTo("today"); if(typeof acctPush === "function") acctPush(); toast("Page deleted"); }
@@ -1175,8 +1202,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   var NOPEN = true, PEDIT = false, BACKTOP = false, LASTPG = "", PF = "all", PMODE = "fields";
   var AIPROMPT = "Turn the message below into a to-do page. Give me: a short title on the first line; then a short description (keep any figures, names, phone numbers and addresses); then a line that says Steps, followed by the steps to do, one per line, numbered, in order. Put anything useful about a step (who to ask, what to say) on the same line after a dash. Leave out anything that isn't needed.";
   function curTab(){ return TABS.lists.filter(function(l){ return l.id === TABS.active; })[0] || {}; }
-  function groupField(v){ var gs = []; TABS.lists.forEach(function(l){ var g = (l.group || "").trim(); if(g && gs.indexOf(g) < 0) gs.push(g); });
-    return '<label for="pGroup">Group <small>– optional, e.g. Kids, House, Money</small></label><input id="pGroup" maxlength="30" list="pGroups" value="' + esc(v) + '" placeholder="No group"><datalist id="pGroups">' + gs.map(function(g){ return '<option value="' + esc(g) + '">'; }).join("") + "</datalist>"
+  function groupField(v){ var gs = []; TABS.lists.forEach(function(l){ groupsOf(l).forEach(function(g){ if(gs.indexOf(g) < 0) gs.push(g); }); });
+    return '<label for="pGroup">Category <small>– optional; several with commas, e.g. Kids, Sahara</small></label><input id="pGroup" maxlength="80" list="pGroups" value="' + esc(v) + '" placeholder="No group"><datalist id="pGroups">' + gs.map(function(g){ return '<option value="' + esc(g) + '">'; }).join("") + "</datalist>"
       + (gs.length ? '<div class="gchips">' + gs.map(function(g){ return '<button type="button" class="chip" data-gpick="' + esc(g) + '">' + esc(g) + "</button>"; }).join("") + "</div>" : ""); }
   function projHTML(){ var has = S.title || S.notes;
     if(PEDIT === "new") return '<div class="pedit"><b class="ph">Create your own</b>'
@@ -1870,10 +1897,10 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(e.target.closest("[data-pedit]")){ e.stopPropagation(); PEDIT = true; render(); var ti = $("pTitle"); if(ti) ti.focus(); return; }
     if(e.target.closest("[data-px]")){ e.stopPropagation(); PEDIT = false; render(); return; }
     if(e.target.closest("[data-pdel]")){ e.stopPropagation(); if(PEDIT === "new" && !S.title && !nPicked()){ dropProject(); return; } deleteProject(); return; }
-    var gp = e.target.closest("[data-gpick]"); if(gp){ e.stopPropagation(); $("pGroup").value = gp.dataset.gpick; return; }
+    var gp = e.target.closest("[data-gpick]"); if(gp){ e.stopPropagation(); var cg = groupsOf({group:$("pGroup").value}); if(cg.indexOf(gp.dataset.gpick) < 0) cg.push(gp.dataset.gpick); $("pGroup").value = cg.join(", "); return; }
     var pm = e.target.closest("[data-pmode]"); if(pm){ e.stopPropagation(); keepNew(); PMODE = pm.dataset.pmode; render(); return; }
     if(e.target.closest("[data-copyprompt]")){ e.stopPropagation(); (navigator.clipboard ? navigator.clipboard.writeText(AIPROMPT) : Promise.reject()).then(function(){ toast("Copied – paste it into your AI, then your message"); }, function(){ prompt("Copy this:", AIPROMPT); }); return; }
-    if(e.target.closest("[data-pmake]")){ e.stopPropagation(); curTab().group = ($("pGroup").value || "").trim(); saveTabs(); var pr = PMODE === "paste" ? parsePaste($("pPaste").value) : fromFields(); if(!pr.title && !pr.notes && !pr.steps.length){ toast("Paste or type something first"); return; }
+    if(e.target.closest("[data-pmake]")){ e.stopPropagation(); curTab().group = groupsOf({group:$("pGroup").value}).join(", "); saveTabs(); var pr = PMODE === "paste" ? parsePaste($("pPaste").value) : fromFields(); if(!pr.title && !pr.notes && !pr.steps.length){ toast("Paste or type something first"); return; }
       S.title = pr.title || "Untitled page"; S.notes = pr.notes; S.after = pr.steps.length ? pr.after : ""; if(!pr.steps.length && pr.after) S.notes = (S.notes + "\n\n" + pr.after).trim(); S.keep = true; S.day = today();
       if(pr.links.length){ S.kind = "links"; S.own = pr.links.map(function(l){ return {n:l.n, url:l.url, a:"other", b:"any", got:false}; }); }
       else S.own = pr.steps.map(function(n){ var d = (pr.details || {})[n]; return d && d.length ? {n:n, d:d, a:"other", b:"any", got:false} : {n:n, a:"other", b:"any", got:false}; });
@@ -1884,7 +1911,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
         if(S.kind === "links") S.own = pi.value.split("\n").map(linkOf).filter(Boolean).map(function(l){ var was = old[l.n]; return {n:l.n, url:l.url, a:"other", b:"any", got:false}; });
         else S.own = splitSteps(pi.value).map(function(n){ var was = old[n]; return was ? was : {n:n, a:"other", b:"any", got:false}; }); }
       pr2.steps.forEach(function(n){ if(!S.own.some(function(o){ return o.n === n; })){ S.own.push({n:n, a:"other", b:"any", got:false}); nAdd++; } });
-      if(TABS.active !== "today"){ S.keep = true; curTab().group = ($("pGroup").value || "").trim(); curTab().pin = !!($("pPin") && $("pPin").checked); saveTabs(); } else { var kp = $("pKeep") && $("pKeep").checked; S.keep = !!kp; }
+      if(TABS.active !== "today"){ S.keep = true; curTab().group = groupsOf({group:$("pGroup").value}).join(", "); curTab().pin = !!($("pPin") && $("pPin").checked); saveTabs(); } else { var kp = $("pKeep") && $("pKeep").checked; S.keep = !!kp; }
       PEDIT = false; save(); render(); toast(nAdd ? "Saved – " + nAdd + " steps found in the notes, now below" : "Saved"); return; }
     if(e.target.closest("[data-addstep]")){ e.stopPropagation(); addStep(); return; }
     var lc = e.target.closest("[data-lcopy]"); if(lc){ e.stopPropagation(); var lo = S.own[+lc.dataset.lcopy]; if(lo){ (navigator.clipboard ? navigator.clipboard.writeText(lo.url) : Promise.reject()).then(function(){ toast("Link copied – paste it in a message"); }, function(){ prompt("Copy this link:", lo.url); }); } return; }
