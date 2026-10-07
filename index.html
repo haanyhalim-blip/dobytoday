@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v128 -->
+<!-- DoByToday v129 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -833,7 +833,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v128</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v129</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -2213,6 +2213,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function acctState(t){ var el = $("acState"); if(el) el.textContent = t; }
   // Your account keeps every list in one bundle. Before saving it, look at the bundle online: if another phone or Claude saved since this phone
   // last synced, merge their changes in (merge3) instead of overwriting them.
+  // the same shared page can be saved under a different id on another phone (same share code): treat it as the same page, not a new one
+  function sameShared(l){ if(!l || !l.c) return false; return TABS.lists.some(function(x){ if(x.id === l.id) return false; try{ return localStorage.getItem(ckeyOf(x.id)) === l.c; }catch(e){ return false; } }); }
   function aBase(id){ try{ return JSON.parse(localStorage.getItem(ATKEY + "-base:" + id) || "null"); }catch(e){ return null; } }
   function setABase(id, st){ try{ localStorage.setItem(ATKEY + "-base:" + id, JSON.stringify(st)); }catch(e){} }
   function aBaseT(){ try{ return +localStorage.getItem(ATKEY + "-baset") || 0; }catch(e){ return 0; } }
@@ -2221,7 +2223,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function acctMerge(d){ var before = JSON.stringify(readList(TABS.active)), added = false;
     [{id:"today", s:d.s}].concat((d.L || []).filter(function(l){ return l && l.id && l.id !== "today"; })).forEach(function(l){
       var have = l.id === "today" || TABS.lists.some(function(x){ return x.id === l.id; }), base = aBase(l.id);
-      if(!have && base) return;   // a page removed on this phone stays removed
+      if(!have && (base || sameShared(l))) return;   // a page removed on this phone stays removed; a second copy of a shared page isn't added
       var out = have ? merge3(base, readList(l.id), l.s || {}) : (l.s || {});
       try{ localStorage.setItem(keyOf(l.id), JSON.stringify(out)); if(l.c && !localStorage.getItem(ckeyOf(l.id))) localStorage.setItem(ckeyOf(l.id), l.c); }catch(e){}
       if(!have){ TABS.lists.push({id:l.id, name:l.name || "Page", group:l.group || "", pin:!!l.pin}); added = true; } });
@@ -2241,9 +2243,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       var blank = !nPicked() && TABS.lists.length === 1 && !(typeof myLoad === "function" && myLoad().length); // a new phone with nothing on it never overwrites your account
       if(d && d.s && (first || (blank && !(S.later || []).length) || (d.t || 0) > lt)){ // just signed in: the list saved in your account wins
         aApplying = true; try{ localStorage.setItem(keyOf("today"), JSON.stringify(d.s)); }catch(e){}
-        (d.L || []).forEach(function(l){ if(!l || !l.id) return; try{ localStorage.setItem(keyOf(l.id), JSON.stringify(l.s || {})); if(l.c) localStorage.setItem(ckeyOf(l.id), l.c); }catch(e){}
+        var dup = false; (d.L || []).forEach(function(l){ if(!l || !l.id) return; if(!TABS.lists.some(function(x){ return x.id === l.id; }) && sameShared(l)){ dup = true; return; } try{ localStorage.setItem(keyOf(l.id), JSON.stringify(l.s || {})); if(l.c) localStorage.setItem(ckeyOf(l.id), l.c); }catch(e){}
           var have = TABS.lists.filter(function(x){ return x.id === l.id; })[0]; if(!have){ have = {id:l.id}; TABS.lists.push(have); } have.name = l.name || have.name || "Page"; have.group = l.group || ""; have.pin = !!l.pin; }); if(Array.isArray(d.f)) TABS.favs = d.f; saveTabs(); drawTrips();
-        if(d.m){ var mine0 = myLoad(), ids = {}; d.m.forEach(function(x){ ids[x.id] = 1; }); MYL = first ? d.m.concat(mine0.filter(function(x){ return !ids[x.id]; })) : d.m; try{ localStorage.setItem(MKEY, JSON.stringify(MYL)); }catch(e){} drawMy(); } setLocalT(d.t || Date.now()); switchTo(TABS.active, true); aApplying = false; aBaseFrom(d); acctState("✓ Saved to your account"); }
+        if(d.m){ var mine0 = myLoad(), ids = {}; d.m.forEach(function(x){ ids[x.id] = 1; }); MYL = first ? d.m.concat(mine0.filter(function(x){ return !ids[x.id]; })) : d.m; try{ localStorage.setItem(MKEY, JSON.stringify(MYL)); }catch(e){} drawMy(); } setLocalT(d.t || Date.now()); switchTo(TABS.active, true); aApplying = false; aBaseFrom(d); acctState("✓ Saved to your account"); if(dup) acctPush(); }
       else if(!d || lt > (d.t || 0)){ acctPush(); }
       else { if(d && (d.t || 0) > aBaseT()) aBaseFrom(d); acctState("✓ Saved to your account"); } inboxFromSites(); }); }
   function inboxFromSites(){ if(!AUSER || !asb) return; [["listbyaisle","ListbyAisle"],["packbybag","PackbyBag"]].forEach(function(st){
