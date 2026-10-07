@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v130 -->
+<!-- DoByToday v131 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -843,7 +843,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v130</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v131</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1038,7 +1038,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     try{ CODE = localStorage.getItem(CKEY) || ""; }catch(e){ CODE = ""; } lastSent = ""; lastT = 0;
     history.replaceState(null, "", CODE ? (id === "today" ? "#l=" : "#page=") + CODE : location.pathname + location.search);
     showShared(); render(); dayBanner();
-    if(CODE) rpc("get_list", {code:CODE}).then(function(d){ if(d) applyRemote(d); }).catch(function(){}).then(listen); }
+    if(CODE){ var sb = syncBase(); if(sb && JSON.stringify(sb) !== snapshot() && countOf(S)) syncPush(true); else rpc("get_list", {code:CODE}).then(function(d){ if(d) applyRemote(d); }).catch(function(){}); listen(); } }
   // an old Today list that was given a title: its title, notes and own jobs become a project of their own; picked everyday jobs stay on Today
   function moveToProject(){ var d = freshS(), names = joinWrap(S.own.map(function(o){ return o.n; })), got = {};
     S.own.forEach(function(o){ if(o.got) got[o.n] = 1; });
@@ -2050,22 +2050,25 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var here = countOf(S), there = countOf(d);
     if(!there && here){ lastSent = ""; syncPush(true); return; }
     var merged = false; if(viaJoin && here && there){ d = mergeInto(d); merged = true; }
-    var j = JSON.stringify({picked:d.picked || {}, got:d.got || {}, own:d.own || [], bag:d.bag || {}, removed:d.removed || [], note:d.note || {}, day:d.day || "", later:d.later || [], past:d.past || [], title:d.title || "", notes:d.notes || "", after:d.after || "", keep:!!d.keep, kind:d.kind || "", urg:("urg" in d ? d.urg : S.urg) || {}, secs:("secs" in d ? d.secs : S.secs) || null, low:("low" in d ? d.low : S.low) || {}, at:("at" in d ? d.at : S.at) || {}, layout:("layout" in d ? d.layout : S.layout) || "", ppl:("ppl" in d ? d.ppl : S.ppl) || []}); if(j === snapshot()){ lastSent = j; if(d.t) lastT = d.t; return; }   // already the same: remember it as the last synced copy
+    var j = JSON.stringify({picked:d.picked || {}, got:d.got || {}, own:d.own || [], bag:d.bag || {}, removed:d.removed || [], note:d.note || {}, day:d.day || "", later:d.later || [], past:d.past || [], title:d.title || "", notes:d.notes || "", after:d.after || "", keep:!!d.keep, kind:d.kind || "", urg:("urg" in d ? d.urg : S.urg) || {}, secs:("secs" in d ? d.secs : S.secs) || null, low:("low" in d ? d.low : S.low) || {}, at:("at" in d ? d.at : S.at) || {}, layout:("layout" in d ? d.layout : S.layout) || "", ppl:("ppl" in d ? d.ppl : S.ppl) || []}); if(j === snapshot()){ lastSent = j; setSyncBase(j); if(d.t) lastT = d.t; return; }   // already the same: remember it as the last synced copy
     var before = snapshot(), lost = here - there;
     try{ localStorage.setItem(BKEY, before); }catch(e){}
     var fa = document.activeElement, typing = fa && fa.classList && fa.classList.contains("ansbox") ? {n:(S.own[+fa.dataset.ans] || {}).n, v:fa.value} : null;
     if(typing) (d.own || []).forEach(function(o){ if(o.n === typing.n){ o.ans = typing.v; o.got = !!typing.v.trim(); } });
-    applying = true; S.picked = d.picked || {}; S.got = d.got || {}; S.own = d.own || []; S.bag = d.bag || {}; S.removed = d.removed || []; S.note = d.note || {}; S.day = d.day || ""; S.later = d.later || []; S.past = d.past || []; S.title = d.title || ""; S.notes = d.notes || ""; S.after = d.after || ""; S.keep = !!d.keep; S.kind = d.kind || ""; if("urg" in d) S.urg = d.urg || {}; if("low" in d) S.low = d.low || {}; if("at" in d) S.at = d.at || {}; if("layout" in d) S.layout = d.layout || ""; if("ppl" in d) S.ppl = d.ppl || []; if("secs" in d){ S.secs = d.secs || null; applySecs(); } if(d.t) lastT = d.t; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} lastSent = snapshot(); render(); applying = false;
+    applying = true; S.picked = d.picked || {}; S.got = d.got || {}; S.own = d.own || []; S.bag = d.bag || {}; S.removed = d.removed || []; S.note = d.note || {}; S.day = d.day || ""; S.later = d.later || []; S.past = d.past || []; S.title = d.title || ""; S.notes = d.notes || ""; S.after = d.after || ""; S.keep = !!d.keep; S.kind = d.kind || ""; if("urg" in d) S.urg = d.urg || {}; if("low" in d) S.low = d.low || {}; if("at" in d) S.at = d.at || {}; if("layout" in d) S.layout = d.layout || ""; if("ppl" in d) S.ppl = d.ppl || []; if("secs" in d){ S.secs = d.secs || null; applySecs(); } if(d.t) lastT = d.t; try{ localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} lastSent = snapshot(); setSyncBase(lastSent); render(); applying = false;
     if(merged){ lastSent = ""; syncPush(true); }
     if(!viaJoin && lost > 0){ toast("List updated from the shared link (" + lost + " fewer)", function(){ try{ var b = JSON.parse(before); applying = true; S.picked = b.picked || {}; S.got = b.got || {}; S.own = b.own || []; S.bag = b.bag || {}; S.removed = b.removed || []; S.note = b.note || {}; S.day = b.day || ""; S.later = b.later || []; S.past = b.past || []; S.title = b.title || ""; S.notes = b.notes || ""; S.after = b.after || ""; S.keep = !!b.keep; S.kind = b.kind || ""; S.urg = b.urg || {}; S.secs = b.secs || null; S.low = b.low || {}; S.at = b.at || {}; applySecs(); applying = false; save(); render(); lastSent = ""; syncPush(true); }catch(e){} }); } }
+  // What this device last knew was online for this shared list – kept across reloads, so a merge always knows what changed here
+  function syncBase(){ try{ var v = CODE && localStorage.getItem("dobytoday-sync:" + CODE); return v ? JSON.parse(v) : null; }catch(e){ return null; } }
+  function setSyncBase(j){ if(!CODE || !j) return; try{ localStorage.setItem("dobytoday-sync:" + CODE, j); }catch(e){} }
   function syncPush(now){ if(!CODE || applying) return; clearTimeout(pushT); var go = function(){
-    if(snapshot() === lastSent) return; var sc = CODE, base = lastSent ? JSON.parse(lastSent) : null, baseT = lastT;
+    if(snapshot() === lastSent) return; var sc = CODE, base = lastSent ? JSON.parse(lastSent) : syncBase(), baseT = lastT;
     rpc("get_list", {code:sc}).then(function(d){ if(sc !== CODE) return;
       if(d && typeof d === "object" && countOf(d) && (!base || (d.t || 0) > baseT)){ var m = merge3(base, JSON.parse(snapshot()), d); delete m.t; lastT = 0; applyRemote(m); lastSent = ""; }
       send(); }, function(){ if(sc === CODE) send(); }); };
   var send = function(){
     var j = snapshot(); if(j === lastSent) return; lastSent = j; lastT = Date.now(); var payload = JSON.parse(j); payload.t = lastT;
-    var sc = CODE; rpc("save_list", {code:CODE, payload:payload}).then(function(){ SAVEERR = false; SAVED = sc; if(sc === CODE && /&d=/.test(location.hash)) history.replaceState(null, "", "#page=" + CODE); var w = document.querySelector("#shared .shon"); if(w) w.textContent = "✓ Shared – anyone with the link sees your changes as you make them."; }, function(er){ lastSent = ""; SAVEERR = true; var w = document.querySelector("#shared .shon"); if(w) w.textContent = "⚠ Not saved online yet, so changes won't show up for others. The Copy link still opens the page for them. (" + (er && er.message || "no connection") + ")"; });
+    var sc = CODE; rpc("save_list", {code:CODE, payload:payload}).then(function(){ SAVEERR = false; SAVED = sc; if(sc === CODE) setSyncBase(j); if(sc === CODE && /&d=/.test(location.hash)) history.replaceState(null, "", "#page=" + CODE); var w = document.querySelector("#shared .shon"); if(w) w.textContent = "✓ Shared – anyone with the link sees your changes as you make them."; }, function(er){ lastSent = ""; SAVEERR = true; var w = document.querySelector("#shared .shon"); if(w) w.textContent = "⚠ Not saved online yet, so changes won't show up for others. The Copy link still opens the page for them. (" + (er && er.message || "no connection") + ")"; });
     if(SAVED !== CODE && TABS.active !== "today" && /^#page=/.test(location.hash)) history.replaceState(null, "", "#page=" + CODE + "&d=" + packPage());   // the address bar link works on its own too
     if(chan) chan.send({type:"broadcast", event:"update", payload:payload});
   }; if(now) go(); else pushT = setTimeout(go, 350); }
@@ -2113,6 +2116,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       CODE = code; }
     else { try{ CODE = localStorage.getItem(CKEY) || ""; }catch(e){} }
     if(!CODE) return; showShared();
+    var sb0 = syncBase(); if(!m && sb0 && JSON.stringify(sb0) !== snapshot() && countOf(S)){ syncPush(true); listen(); return; }   // changes made here while offline: merge them in
     rpc("get_list", {code:CODE}).then(function(d){ if(d) applyRemote(d, !!m); else if(countOf(S)){ lastSent = ""; syncPush(true); } }).catch(function(){}).then(function(){ listen(); });
   }
   joinFromHash(); window.addEventListener("hashchange", function(){ joinFromHash(true); });
