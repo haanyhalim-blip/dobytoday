@@ -98,6 +98,7 @@ function findPage(d, name) {
   if (!q) return { error: "Say which page." };
   let m = L.filter((l) => low(l.name) === q || low((l.s || {}).title) === q);
   if (!m.length) m = L.filter((l) => low(l.name).includes(q) || low((l.s || {}).title).includes(q) || q.includes(low(l.name)));
+  if (m.length > 1 && m[0].c && m.every((l) => l.c === m[0].c)) m = [m.find((l) => l.group) || m[0]];   // the same shared page saved twice (same link) is one page
   if (m.length === 1) return { l: m[0] };
   return { error: m.length ? "More than one page matches “" + name + "”: " + m.map((l) => l.name).join(", ") + "." : "There's no page called “" + name + "”. Your pages: " + L.map((l) => l.name).join(", ") + "." };
 }
@@ -227,7 +228,7 @@ function addItems(site, S, a) {
   return ((added.length ? "Added " + added.length + where + ": " + added.join(", ") + "." : "") + (skipped.length ? " Already on the list" + (site === "dobytoday" && a.urgent ? " (now marked ❗ urgent)" : "") + ": " + skipped.join(", ") + "." : "")).trim();
 }
 function updateItems(site, S, a) {
-  const act = a.action, map = act === "set_note" ? a.notes : act === "set_link" ? a.links : act === "rename" ? a.names : null;
+  const act = a.action, map = act === "set_note" ? a.notes : act === "set_link" ? a.links : act === "rename" ? (a.names || a.notes) : null;   // rename also takes {current name: new name} in notes, for older clients
   if (map && typeof map === "object" && !(a.items || []).length) a.items = Object.keys(map);   // many notes or links in one go
   const { hit, miss } = findItems(S, (a.items || []).map(String));
   if (!hit.length) return "None of those are on the list" + (miss.length ? ": " + miss.join(", ") : "") + ".";
@@ -455,7 +456,7 @@ async function callTool(token, name, a) {
   else if (name === "update_items") msg = updateItems(site, d.s, a);
   else if (name === "save_list") msg = saveCopy(site, d, a);
   else return null;
-  if (!/^(Added|Already|Ticked|Unticked|Removed|Marked|No longer|Back to normal|Moved|Saved|Updated)/.test(msg)) return msg;   // nothing changed
+  if (!/^(Added|Already|Ticked|Unticked|Removed|Marked|No longer|Back to normal|Moved|Saved|Updated|Renamed)/.test(msg)) return msg;   // nothing changed
   await saveSite(token, site, d);
   return msg + " (" + SITES[site].url.replace("https://", "") + ")";
 }
