@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v125 -->
+<!-- DoByToday v126 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -833,7 +833,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v125</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v126</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -918,6 +918,15 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     Object.keys(S.at).forEach(function(n){ if(!here[n]){ delete S.at[n]; ch = true; } }); return ch; }
   function ordered(rows){ return rows.map(function(r, i){ return [r, i]; }).sort(function(a, b){ var x = a[0].n, y = b[0].n;
     return prio(x) - prio(y) || ((S.at || {})[y] || 0) - ((S.at || {})[x] || 0) || a[1] - b[1]; }).map(function(p){ return p[0]; }); }
+  // To-do list order: within its group (❗ urgent / normal / ↓ not urgent) a job can be moved up, down or to the top – by re-stamping that group in the new order
+  function tdBand(n){ var p = prio(n), all = Object.keys(S.picked).filter(function(x){ return !S.got[x]; }).concat(S.own.filter(function(o){ return !o.got; }).map(function(o){ return o.n; }));
+    return ordered(all.map(function(x){ return {n:x}; })).map(function(r){ return r.n; }).filter(function(x){ return prio(x) === p; }); }
+  function tdMoves(n){ if(S.keep || !FLAT) return ""; var L = tdBand(n), i = L.indexOf(n); if(i < 0 || L.length < 2) return "";
+    var b = function(d, ic, t){ return '<span class="mvst" role="button" data-tdmv="' + d + '"><span aria-hidden="true">' + ic + '</span><span class="lbl">' + t + '</span></span>'; };
+    return (i > 1 ? b("top", "⤒", "Move to top") : "") + (i > 0 ? b("up", "↑", "Move up") : "") + (i < L.length - 1 ? b("dn", "↓", "Move down") : ""); }
+  function tdMove(n, d){ var L = tdBand(n), i = L.indexOf(n); if(i < 0) return false; var j = d === "top" ? 0 : d === "up" ? i - 1 : i + 1; if(j < 0 || j >= L.length || j === i) return false;
+    var top = 0; L.forEach(function(x){ top = Math.max(top, (S.at || {})[x] || 0); }); L.splice(i, 1); L.splice(j, 0, n);
+    S.at = S.at || {}; L.forEach(function(x, k){ S.at[x] = top - k; }); return true; }
   var items = [], byNorm = {};
   CATS.forEach(function(c){ var a = c[0]; (CAT[a] || []).forEach(function(n){ var it = {n:n, a:a, b: BAGOF[n] || BAGOF[a] || "hold"}; items.push(it); byNorm[norm(n)] = it; }); });
   function bagOf(it){ return S.bag[it.n] || it.b; }
@@ -1390,7 +1399,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     return (i > 0 ? '<span class="mvst" role="button" data-mvup="' + i + '" title="Move this step up"><span aria-hidden="true">↑</span><span class="lbl">Move up</span></span>' : "")
       + (i < S.own.length - 1 ? '<span class="mvst" role="button" data-mvdn="' + i + '" title="Move this step down"><span aria-hidden="true">↓</span><span class="lbl">Move down</span></span>' : "")
       + '<span class="mvst" role="button" data-upadd="' + i + '" title="Add an update"><span aria-hidden="true">+</span><span class="lbl">Add update</span></span><span class="mvst" role="button" data-sted="' + i + '" title="Edit this step"><span aria-hidden="true">✎</span><span class="lbl">Edit step</span></span>'; }
-  function ctl(n, ref){ var c = (S.note || {})[n] || ""; return '<div class="mctl" '+ref+'><span class="cmt'+(c ? ' has' : '')+'" role="button" title="Add a comment" aria-label="Add a comment"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span><input class="qc" type="text" maxlength="60" value="'+esc(c)+'" aria-label="Comment" placeholder="Add a comment">'+(FLAT || S.keep ? '' : MV.replace('</svg></span>', '</svg><span class="lbl">Change time</span></span>'))+(S.keep && TABS.active !== "today" ? '' : DAYB + '<span class="urgb" role="button">' + (isUrg(n) ? '❗ Remove urgent' : '❗ Urgent') + '</span><span class="lowb" role="button">' + (isLow(n) ? '↕ Back to normal' : '↓ Not urgent') + '</span>')+moveBtns(ref)+RMV.replace('</svg></span>', '</svg><span class="lbl">Remove</span></span>')+'</div>'; }
+  function ctl(n, ref){ var c = (S.note || {})[n] || ""; return '<div class="mctl" '+ref+'><span class="cmt'+(c ? ' has' : '')+'" role="button" title="Add a comment" aria-label="Add a comment"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span><input class="qc" type="text" maxlength="60" value="'+esc(c)+'" aria-label="Comment" placeholder="Add a comment">'+(FLAT || S.keep ? '' : MV.replace('</svg></span>', '</svg><span class="lbl">Change time</span></span>'))+(S.keep && TABS.active !== "today" ? '' : DAYB + '<span class="urgb" role="button">' + (isUrg(n) ? '❗ Remove urgent' : '❗ Urgent') + '</span><span class="lowb" role="button">' + (isLow(n) ? '↕ Back to normal' : '↓ Not urgent') + '</span>')+moveBtns(ref)+tdMoves(n)+RMV.replace('</svg></span>', '</svg><span class="lbl">Remove</span></span>')+'</div>'; }
   // One tidy row per item: the tick box, the name, and a "⋯" button that opens everything else
   var MOREN = "", ONEEXP = {};   // ONEEXP: to-do rows opened to show their full text, note and link
   function moreBtn(k){ return '<button type="button" class="more" data-more="'+esc(k)+'" aria-label="More options" aria-expanded="'+(MOREN === k)+'"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>'; }
@@ -1824,6 +1833,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(mc){ e.stopPropagation(); var rb = mc.closest(".mrow").querySelector(".it"); if(!rb) return;
       if(e.target.closest(".rmv")){ takeOff(rb); return; }
       if(e.target.closest("[data-mvday]")){ moveLater(rb, isoIn(1)); return; }
+      var tdm = e.target.closest("[data-tdmv]"); if(tdm){ var tn = ctlKey(mc); if(tn && tdMove(tn, tdm.dataset.tdmv)){ save(); render(); } return; }   // the menu stays open, so it can be tapped again
       if(e.target.closest(".urgb")){ var un = ctlKey(mc); if(!un) return; S.urg = S.urg || {}; S.low = S.low || {}; if(S.urg[un]) delete S.urg[un]; else { S.urg[un] = 1; delete S.low[un]; } MOREN = ""; save(); render(); toast(S.urg[un] ? "❗ Marked urgent – it goes to the top" : "No longer urgent"); return; }
       if(e.target.closest(".lowb")){ var ln = ctlKey(mc); if(!ln) return; S.urg = S.urg || {}; S.low = S.low || {}; if(S.low[ln]) delete S.low[ln]; else { S.low[ln] = 1; delete S.urg[ln]; } MOREN = ""; save(); render(); toast(S.low[ln] ? "↓ Not urgent – it goes to the bottom" : "Back to normal"); return; }
       if(e.target.closest("[data-mvx]")){ render(); return; }
