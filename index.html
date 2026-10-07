@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v126 -->
+<!-- DoByToday v127 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -833,7 +833,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v126</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v127</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1996,6 +1996,25 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function snapshot(){ return JSON.stringify({picked:S.picked, got:S.got, own:S.own, bag:S.bag, removed:S.removed, note:S.note || {}, day:S.day, later:S.later || [], past:S.past || [], title:S.title || "", notes:S.notes || "", after:S.after || "", keep:!!S.keep, kind:S.kind || "", urg:S.urg || {}, secs:S.secs || null, low:S.low || {}, at:S.at || {}, layout:S.layout || "", ppl:S.ppl || []}); }
   var SAVED = "", SAVEERR = false, lastT = 0, BKEY = "dobytoday-backup-v1";
   function countOf(d){ return Object.keys(d.picked || {}).length + (d.own || []).length + (d.later || []).length + (d.title || d.notes ? 1 : 0); }
+  // Saving never overwrites someone else's changes: B = this device's copy when it last synced, L = this device now, R = the copy online now.
+  // Start from the online copy and replay only what changed on this device since B. With no B, only add (new jobs, ticks) – never take away.
+  function merge3(B, L, R){ var cl = function(x){ return x === undefined ? undefined : JSON.parse(JSON.stringify(x)); }, sj = function(x){ return JSON.stringify(x === undefined ? null : x); };
+    var out = cl(R) || {}; L = L || {};
+    ["picked", "got", "bag", "note", "urg", "low", "at"].forEach(function(k){ var b = B ? (B[k] || {}) : null, l = L[k] || {}, o = out[k] = out[k] || {};
+      Object.keys(l).forEach(function(n){ if(b){ if(sj(b[n]) !== sj(l[n])) o[n] = cl(l[n]); } else if(!(n in o)) o[n] = cl(l[n]); });
+      if(b) Object.keys(b).forEach(function(n){ if(!(n in l)) delete o[n]; }); });
+    var byN = function(a){ var m = {}; (a || []).forEach(function(o){ if(o && o.n != null) m[o.n] = o; }); return m; };
+    var bo = B ? byN(B.own) : null, lo = byN(L.own); out.own = out.own || []; var ro = byN(out.own);
+    (L.own || []).forEach(function(it){ var n = it.n, r = ro[n], b = bo && bo[n];
+      if(!r){ if(!b) out.own.push(cl(it)); return; }   // new on this device – add it; gone online since (removed or renamed there) – leave it gone
+      if(!b){ if(it.got && !r.got) r.got = true; return; }
+      Object.keys(it).concat(Object.keys(b)).forEach(function(f){ if(sj(it[f]) !== sj(b[f])){ if(it[f] === undefined) delete r[f]; else r[f] = cl(it[f]); } }); });
+    if(bo) out.own = out.own.filter(function(o){ return !(bo[o.n] && !lo[o.n]); });   // removed on this device
+    if(B && sj(B.later) !== sj(L.later)){ var bl = {}; (B.later || []).forEach(function(j){ bl[j.id] = 1; }); var ll = {}; (L.later || []).forEach(function(j){ ll[j.id] = 1; });
+      out.later = (out.later || []).filter(function(j){ return !(bl[j.id] && !ll[j.id]); }); (L.later || []).forEach(function(j){ if(!bl[j.id] && !out.later.some(function(x){ return x.id === j.id; })) out.later.push(cl(j)); }); }
+    else if(!B){ out.later = out.later || []; (L.later || []).forEach(function(j){ if(!out.later.some(function(x){ return x.id === j.id; })) out.later.push(cl(j)); }); }
+    ["removed", "day", "past", "title", "notes", "after", "keep", "kind", "secs", "layout", "ppl", "seen"].forEach(function(k){ if(B && sj(B[k]) !== sj(L[k])) out[k] = cl(L[k]); else if(!(k in out) && k in L) out[k] = cl(L[k]); });
+    return out; }
   function mergeInto(d){ var r = {picked:Object.assign({}, d.picked || {}, S.picked || {}), got:Object.assign({}, d.got || {}, S.got || {}), bag:Object.assign({}, d.bag || {}, S.bag || {}), note:Object.assign({}, d.note || {}, S.note || {}), own:(d.own || []).slice(), removed:(d.removed || []).slice(), day:S.day || d.day || "", title:S.title || d.title || "", notes:S.notes || d.notes || "", after:S.after || d.after || "", keep:!!(S.keep || d.keep), kind:S.kind || d.kind || "", later:(d.later || []).slice(), past:(d.past || []).slice()};
     (S.later || []).forEach(function(j){ if(!r.later.some(function(x){ return x.id === j.id; })) r.later.push(j); });
     S.own.forEach(function(o){ if(!r.own.some(function(x){ return norm(x.n) === norm(o.n); })) r.own.push(o); }); return r; }
@@ -2004,7 +2023,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var here = countOf(S), there = countOf(d);
     if(!there && here){ lastSent = ""; syncPush(true); return; }
     var merged = false; if(viaJoin && here && there){ d = mergeInto(d); merged = true; }
-    var j = JSON.stringify({picked:d.picked || {}, got:d.got || {}, own:d.own || [], bag:d.bag || {}, removed:d.removed || [], note:d.note || {}, day:d.day || "", later:d.later || [], past:d.past || [], title:d.title || "", notes:d.notes || "", after:d.after || "", keep:!!d.keep, kind:d.kind || "", urg:("urg" in d ? d.urg : S.urg) || {}, secs:("secs" in d ? d.secs : S.secs) || null, low:("low" in d ? d.low : S.low) || {}, at:("at" in d ? d.at : S.at) || {}, layout:("layout" in d ? d.layout : S.layout) || "", ppl:("ppl" in d ? d.ppl : S.ppl) || []}); if(j === snapshot()) return;
+    var j = JSON.stringify({picked:d.picked || {}, got:d.got || {}, own:d.own || [], bag:d.bag || {}, removed:d.removed || [], note:d.note || {}, day:d.day || "", later:d.later || [], past:d.past || [], title:d.title || "", notes:d.notes || "", after:d.after || "", keep:!!d.keep, kind:d.kind || "", urg:("urg" in d ? d.urg : S.urg) || {}, secs:("secs" in d ? d.secs : S.secs) || null, low:("low" in d ? d.low : S.low) || {}, at:("at" in d ? d.at : S.at) || {}, layout:("layout" in d ? d.layout : S.layout) || "", ppl:("ppl" in d ? d.ppl : S.ppl) || []}); if(j === snapshot()){ lastSent = j; if(d.t) lastT = d.t; return; }   // already the same: remember it as the last synced copy
     var before = snapshot(), lost = here - there;
     try{ localStorage.setItem(BKEY, before); }catch(e){}
     var fa = document.activeElement, typing = fa && fa.classList && fa.classList.contains("ansbox") ? {n:(S.own[+fa.dataset.ans] || {}).n, v:fa.value} : null;
@@ -2013,12 +2032,17 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(merged){ lastSent = ""; syncPush(true); }
     if(!viaJoin && lost > 0){ toast("List updated from the shared link (" + lost + " fewer)", function(){ try{ var b = JSON.parse(before); applying = true; S.picked = b.picked || {}; S.got = b.got || {}; S.own = b.own || []; S.bag = b.bag || {}; S.removed = b.removed || []; S.note = b.note || {}; S.day = b.day || ""; S.later = b.later || []; S.past = b.past || []; S.title = b.title || ""; S.notes = b.notes || ""; S.after = b.after || ""; S.keep = !!b.keep; S.kind = b.kind || ""; S.urg = b.urg || {}; S.secs = b.secs || null; S.low = b.low || {}; S.at = b.at || {}; applySecs(); applying = false; save(); render(); lastSent = ""; syncPush(true); }catch(e){} }); } }
   function syncPush(now){ if(!CODE || applying) return; clearTimeout(pushT); var go = function(){
+    if(snapshot() === lastSent) return; var sc = CODE, base = lastSent ? JSON.parse(lastSent) : null, baseT = lastT;
+    rpc("get_list", {code:sc}).then(function(d){ if(sc !== CODE) return;
+      if(d && typeof d === "object" && countOf(d) && (!base || (d.t || 0) > baseT)){ var m = merge3(base, JSON.parse(snapshot()), d); delete m.t; lastT = 0; applyRemote(m); lastSent = ""; }
+      send(); }, function(){ if(sc === CODE) send(); }); };
+  var send = function(){
     var j = snapshot(); if(j === lastSent) return; lastSent = j; lastT = Date.now(); var payload = JSON.parse(j); payload.t = lastT;
     var sc = CODE; rpc("save_list", {code:CODE, payload:payload}).then(function(){ SAVEERR = false; SAVED = sc; if(sc === CODE && /&d=/.test(location.hash)) history.replaceState(null, "", "#page=" + CODE); var w = document.querySelector("#shared .shon"); if(w) w.textContent = "✓ Shared – anyone with the link sees your changes as you make them."; }, function(er){ lastSent = ""; SAVEERR = true; var w = document.querySelector("#shared .shon"); if(w) w.textContent = "⚠ Not saved online yet, so changes won't show up for others. The Copy link still opens the page for them. (" + (er && er.message || "no connection") + ")"; });
     if(SAVED !== CODE && TABS.active !== "today" && /^#page=/.test(location.hash)) history.replaceState(null, "", "#page=" + CODE + "&d=" + packPage());   // the address bar link works on its own too
     if(chan) chan.send({type:"broadcast", event:"update", payload:payload});
   }; if(now) go(); else pushT = setTimeout(go, 350); }
-  // a change made here that hasn't gone online yet wins over the (older) online copy; it goes up on the next push
+  // a change made here that hasn't gone online yet goes up on the next push – merged with anything newer online, never over it
   function syncPull(){ if(!CODE) return Promise.resolve(); return rpc("get_list", {code:CODE}).then(function(d){ if(!d || DRAG) return; if(snapshot() !== lastSent){ syncPush(true); return; } applyRemote(d); }).catch(function(){}); }
   function listen(){ if(!CODE || chan) return;
     function go(){ try{ var sb = supabase.createClient(SB_URL, SB_KEY); chan = sb.channel("list-" + CODE);
@@ -2035,6 +2059,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   $("shareLink").addEventListener("click", sendLink);
   $("shareStop").addEventListener("click", stopShare);
   document.addEventListener("visibilitychange", function(){ if(!document.hidden) syncPull(); });
+  setInterval(function(){ if(!document.hidden && CODE && !DRAG) syncPull(); }, 30000);   // a page left open (e.g. a kitchen tablet) still picks up changes made elsewhere
   window.addEventListener("focus", syncPull);
   // While the page is open on a shared list, check for the other person's changes every few seconds
   setInterval(function(){ if(CODE && !document.hidden) syncPull(); }, 4000);
@@ -2176,9 +2201,30 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function localT(){ if(!ATKEY) return 0; try{ return +localStorage.getItem(ATKEY) || 0; }catch(e){ return 0; } }
   function setLocalT(t){ if(!ATKEY) return; try{ localStorage.setItem(ATKEY, String(t)); }catch(e){} }
   function acctState(t){ var el = $("acState"); if(el) el.textContent = t; }
-  function acctPush(){ if(aApplying) return; setLocalT(Date.now()); if(!AUSER || !asb) return; clearTimeout(apushT); apushT = setTimeout(function(){
+  // Your account keeps every list in one bundle. Before saving it, look at the bundle online: if another phone or Claude saved since this phone
+  // last synced, merge their changes in (merge3) instead of overwriting them.
+  function aBase(id){ try{ return JSON.parse(localStorage.getItem(ATKEY + "-base:" + id) || "null"); }catch(e){ return null; } }
+  function setABase(id, st){ try{ localStorage.setItem(ATKEY + "-base:" + id, JSON.stringify(st)); }catch(e){} }
+  function aBaseT(){ try{ return +localStorage.getItem(ATKEY + "-baset") || 0; }catch(e){ return 0; } }
+  function setABaseT(t){ try{ localStorage.setItem(ATKEY + "-baset", String(t)); }catch(e){} }
+  function aBaseFrom(d){ setABase("today", d.s || {}); (d.L || []).forEach(function(l){ if(l && l.id) setABase(l.id, l.s || {}); }); setABaseT(d.t || 0); }
+  function acctMerge(d){ var before = JSON.stringify(readList(TABS.active)), added = false;
+    [{id:"today", s:d.s}].concat((d.L || []).filter(function(l){ return l && l.id && l.id !== "today"; })).forEach(function(l){
+      var have = l.id === "today" || TABS.lists.some(function(x){ return x.id === l.id; }), base = aBase(l.id);
+      if(!have && base) return;   // a page removed on this phone stays removed
+      var out = have ? merge3(base, readList(l.id), l.s || {}) : (l.s || {});
+      try{ localStorage.setItem(keyOf(l.id), JSON.stringify(out)); if(l.c && !localStorage.getItem(ckeyOf(l.id))) localStorage.setItem(ckeyOf(l.id), l.c); }catch(e){}
+      if(!have){ TABS.lists.push({id:l.id, name:l.name || "Page", group:l.group || "", pin:!!l.pin}); added = true; } });
+    if(added){ saveTabs(); drawTrips(); }
+    if(JSON.stringify(readList(TABS.active)) !== before){ aApplying = true; switchTo(TABS.active, true); aApplying = false; } }
+  function acctSend(){ var t = Date.now(); setLocalT(t);
     var raw = readList("today"), L = TABS.lists.filter(function(l){ return l.id !== "today"; }).map(function(l){ var c = ""; try{ c = localStorage.getItem(ckeyOf(l.id)) || ""; }catch(e){} return {id:l.id, name:l.name, group:l.group || "", pin:!!l.pin, s:readList(l.id), c:c}; });
-    acctState("Saving…"); asb.rpc("hlt_save", {p_site:SITE, p_data:{s:raw, L:L, f:favs(), t:localT(), m:myLoad(), c:(function(){ try{ return localStorage.getItem(ckeyOf("today")) || ""; }catch(e){ return ""; } })()}}).then(function(res){ acctState(res.error ? "Saved on this phone – it'll save to your account when you're connected" : "✓ Saved to your account"); }); }, 1500); }
+    asb.rpc("hlt_save", {p_site:SITE, p_data:{s:raw, L:L, f:favs(), t:t, m:myLoad(), c:(function(){ try{ return localStorage.getItem(ckeyOf("today")) || ""; }catch(e){ return ""; } })()}}).then(function(res){
+      if(!res.error) aBaseFrom({s:raw, L:L, t:t});
+      acctState(res.error ? "Saved on this phone – it'll save to your account when you're connected" : "✓ Saved to your account"); }); }
+  function acctPush(){ if(aApplying) return; setLocalT(Date.now()); if(!AUSER || !asb) return; clearTimeout(apushT); apushT = setTimeout(function(){
+    acctState("Saving…");
+    asb.rpc("hlt_get", {p_site:SITE}).then(function(g){ var d = g && !g.error && g.data; if(d && d.s && (d.t || 0) > aBaseT()) acctMerge(d); acctSend(); }, function(){ acctSend(); }); }, 1500); }
   function acctPull(first){ if(!AUSER || !asb) return;
     asb.rpc("hlt_get", {p_site:SITE}).then(function(res){ if(res.error) return acctState("Saved on this phone – it'll save to your account when you're connected");
       var d = res.data, lt = localT();
@@ -2187,9 +2233,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
         aApplying = true; try{ localStorage.setItem(keyOf("today"), JSON.stringify(d.s)); }catch(e){}
         (d.L || []).forEach(function(l){ if(!l || !l.id) return; try{ localStorage.setItem(keyOf(l.id), JSON.stringify(l.s || {})); if(l.c) localStorage.setItem(ckeyOf(l.id), l.c); }catch(e){}
           var have = TABS.lists.filter(function(x){ return x.id === l.id; })[0]; if(!have){ have = {id:l.id}; TABS.lists.push(have); } have.name = l.name || have.name || "Page"; have.group = l.group || ""; have.pin = !!l.pin; }); if(Array.isArray(d.f)) TABS.favs = d.f; saveTabs(); drawTrips();
-        if(d.m){ var mine0 = myLoad(), ids = {}; d.m.forEach(function(x){ ids[x.id] = 1; }); MYL = first ? d.m.concat(mine0.filter(function(x){ return !ids[x.id]; })) : d.m; try{ localStorage.setItem(MKEY, JSON.stringify(MYL)); }catch(e){} drawMy(); } setLocalT(d.t || Date.now()); switchTo(TABS.active, true); aApplying = false; acctState("✓ Saved to your account"); }
+        if(d.m){ var mine0 = myLoad(), ids = {}; d.m.forEach(function(x){ ids[x.id] = 1; }); MYL = first ? d.m.concat(mine0.filter(function(x){ return !ids[x.id]; })) : d.m; try{ localStorage.setItem(MKEY, JSON.stringify(MYL)); }catch(e){} drawMy(); } setLocalT(d.t || Date.now()); switchTo(TABS.active, true); aApplying = false; aBaseFrom(d); acctState("✓ Saved to your account"); }
       else if(!d || lt > (d.t || 0)){ acctPush(); }
-      else acctState("✓ Saved to your account"); inboxFromSites(); }); }
+      else { if(d && (d.t || 0) > aBaseT()) aBaseFrom(d); acctState("✓ Saved to your account"); } inboxFromSites(); }); }
   function inboxFromSites(){ if(!AUSER || !asb) return; [["listbyaisle","ListbyAisle"],["packbybag","PackbyBag"]].forEach(function(st){
     asb.rpc("hlt_get", {p_site:st[0]}).then(function(res){ var o = res && res.data && res.data.o; if(!Array.isArray(o)) return; var got = [];
       withToday(function(T){ o.forEach(function(x){ if(x && x.i && x.n && (T.seen || []).indexOf(x.i) < 0){ T.seen = [x.i].concat(T.seen || []).slice(0, 200); var dd = x.d && x.d > iso() ? x.d : iso();
