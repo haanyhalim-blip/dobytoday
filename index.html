@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v127 -->
+<!-- DoByToday v128 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -833,7 +833,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v127</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v128</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -2059,7 +2059,17 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   $("shareLink").addEventListener("click", sendLink);
   $("shareStop").addEventListener("click", stopShare);
   document.addEventListener("visibilitychange", function(){ if(!document.hidden) syncPull(); });
-  setInterval(function(){ if(!document.hidden && CODE && !DRAG) syncPull(); }, 30000);   // a page left open (e.g. a kitchen tablet) still picks up changes made elsewhere
+  setInterval(function(){ if(!document.hidden && CODE && !DRAG) syncPull(); }, 30000);
+  // A page left open for days still gets new versions of DobyToday: every few minutes (and when you come back to it) it checks the site,
+  // and if a newer version is out it quietly reloads – never while you're typing, dragging or have a menu open. Your list is saved first.
+  (function(){ var vEl = document.querySelector(".ver"), mine = +(((vEl && vEl.textContent) || "").match(/v(\d+)/) || [])[1] || 0, last = 0;
+    function check(){ if(!mine || document.hidden || Date.now() - last < 120000) return; last = Date.now();
+      fetch(location.pathname + "?v=" + Date.now(), {cache:"no-store"}).then(function(r){ return r.ok ? r.text() : ""; }).then(function(t){
+        var v = +((t.match(/class="ver">v(\d+)</) || [])[1] || 0); if(v <= mine) return;
+        var a = document.activeElement, busy = DRAG || MOREN || (a && /^(INPUT|TEXTAREA|SELECT)$/.test(a.tagName)) || document.querySelector("dialog[open], .modal:not([hidden])");
+        if(busy) return; var tried = ""; try{ tried = sessionStorage.getItem("dobytoday-upd") || ""; }catch(e){} if(tried === String(v)) return;   // only once per version
+        try{ sessionStorage.setItem("dobytoday-upd", String(v)); localStorage.setItem(KEY, JSON.stringify(S)); }catch(e){} location.reload(); }).catch(function(){}); }
+    setInterval(check, 300000); document.addEventListener("visibilitychange", function(){ if(!document.hidden) setTimeout(check, 3000); }); })();   // a page left open (e.g. a kitchen tablet) still picks up changes made elsewhere
   window.addEventListener("focus", syncPull);
   // While the page is open on a shared list, check for the other person's changes every few seconds
   setInterval(function(){ if(CODE && !document.hidden) syncPull(); }, 4000);
