@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v132 -->
+<!-- DoByToday v133 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -849,7 +849,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v132</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v133</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1955,7 +1955,9 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   $("mine").addEventListener("click", function(e){
     var y = e.target.closest("[data-dyes],[data-dno]");
     if(y){ e.stopImmediatePropagation(); e.preventDefault(); var row = y.closest(".mrow"), bx = row && row.querySelector(".it .box"), ok = y.hasAttribute("data-dyes"); unask();
-      if(ok && bx){ OKTICK = true; bx.click(); OKTICK = false; toast("Done ✓ – it's in Done today"); } return; }
+      if(ok && bx){ var ib = bx.closest(".it"), sel = ib.dataset.own !== undefined ? '.it[data-own="' + ib.dataset.own + '"]' : '.it[data-n="' + CSS.escape(ib.dataset.n || "") + '"]';
+        OKTICK = true; bx.click(); OKTICK = false;
+        toast("Done ✓ – it's in Done today", function(){ var b2 = document.querySelector("#mine .donel " + sel + " .box"); if(b2){ OKTICK = true; b2.click(); OKTICK = false; } }); } return; }   // Undo puts it straight back
     if(S.keep || OKTICK) return; var it = e.target.closest(".oneline .mrow .it"); if(!it || it.closest(".donel")) return; var row = it.closest(".mrow"); if(row.classList.contains("got")) return;
     var nm = it.querySelector(".nm"); if(!e.target.closest(".box") && nm && (row.classList.contains("exp") || nm.scrollWidth > nm.clientWidth + 1 || row.querySelector(".cnote, .rowlink"))) return;   // tapping the words of a long job opens it instead
     e.stopImmediatePropagation(); e.preventDefault(); var again = row.classList.contains("asking"); unask(); if(again) return;
