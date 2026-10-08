@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v153 -->
+<!-- DoByToday v154 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -941,7 +941,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v153</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v154</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1748,23 +1748,26 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function keepFromLink(){ var m = location.hash.match(/^#keep=([a-z0-9-]+)/); if(!m) return; history.replaceState(null, "", location.pathname + location.search);
     if(keepTrip(m[1])){ OPEN.pf = "saved"; saveOpen(); projCards(); if($("projBox").hidden) $("projBtn").click(); setTimeout(function(){ $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 50); } }
   // dobytoday.com/#week (the Family week icon): opens today's card from your "Weekly timetable" group – Monday's card on a Monday – with the rest of the week in My saved lists
-  var WEEKWANT = false;
-  function weekFromLink(retry){ if(!retry && !/^#week$/.test(location.hash)) return; if(!retry) history.replaceState(null, "", location.pathname + location.search);
+  var WEEKWANT = false, WANTKEY = "dobytoday-want";
+  function wantSet(v){ try{ if(v) sessionStorage.setItem(WANTKEY, JSON.stringify({v:v, t:Date.now()})); else sessionStorage.removeItem(WANTKEY); }catch(e){} }
+  function wantGet(){ try{ var w = JSON.parse(sessionStorage.getItem(WANTKEY) || "null"); return w && Date.now() - w.t < 120000 ? w.v : ""; }catch(e){ return ""; } }   // asked for in the last 2 minutes – survives the page reloading itself for an update
+  function wantPoll(){ var n = 0, iv = setInterval(function(){ n++; if(WEEKWANT) weekFromLink(true); if(GROUPWANT) groupFromLink(true); if((!WEEKWANT && !GROUPWANT) || n > 20) clearInterval(iv); }, 750); }   // your cards may still be arriving from your account
+  function weekFromLink(retry){ if(!retry && !/^#week$/.test(location.hash)) return; if(!retry){ history.replaceState(null, "", location.pathname + location.search); wantSet("week"); }
     var day = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][new Date().getDay()],
       wk = TABS.lists.filter(function(l){ return l.id !== "today" && groupsOf(l).some(function(g){ return /timetable/i.test(g); }); }),
       t = wk.filter(function(l){ return (l.name || "").toLowerCase().indexOf(day.toLowerCase()) === 0; })[0];
-    if(t){ WEEKWANT = false; groupsOf(t).forEach(function(g){ OPEN["pg:g:" + g] = 1; }); saveOpen(); switchTo(t.id); window.scrollTo(0, 0); toast(day + "'s timetable"); return; }
-    if(retry) return; WEEKWANT = true; if($("projBox").hidden) $("projBtn").click();
-    setTimeout(function(){ if(WEEKWANT) toast("No weekly timetable here yet – sign in, or put your day cards in a group called Weekly timetable"); }, 4000); }
+    if(t){ WEEKWANT = false; wantSet(""); groupsOf(t).forEach(function(g){ OPEN["pg:g:" + g] = 1; }); saveOpen(); switchTo(t.id); window.scrollTo(0, 0); toast(day + "'s timetable"); return; }
+    if(retry) return; WEEKWANT = true; wantPoll(); if($("projBox").hidden) $("projBtn").click();
+    setTimeout(function(){ if(WEEKWANT) toast("No weekly timetable here yet – sign in, or put your day cards in a group called Weekly timetable"); }, 9000); }
   // dobytoday.com/#group=Weekly%20timetable: opens My saved lists showing just that group – its own page, to bookmark or open on any phone you're signed in on
   var GROUPWANT = "";
   function groupHas(g){ return TABS.lists.some(function(l){ return l.id !== "today" && groupsOf(l).indexOf(g) > -1; }); }
   function groupFromLink(retry){ var g;
     if(retry){ g = GROUPWANT; if(!g || !groupHas(g)) return; }
-    else { var m = location.hash.match(/^#group=(.+)$/); if(!m) return; try{ g = decodeURIComponent(m[1]).trim(); }catch(e){ return; } history.replaceState(null, "", location.pathname + location.search); if(!g) return; }
+    else { var m = location.hash.match(/^#group=(.+)$/); if(!m) return; try{ g = decodeURIComponent(m[1]).trim(); }catch(e){ return; } history.replaceState(null, "", location.pathname + location.search); if(!g) return; wantSet("g:" + g); }
     if(TABS.active !== "today") switchTo("today");
-    if(!groupHas(g)){ GROUPWANT = g; if($("projBox").hidden) $("projBtn").click(); setTimeout(function(){ if(GROUPWANT === g) toast("No group called " + g + " here yet – sign in to see your saved lists"); }, 4000); return; }
-    GROUPWANT = ""; OPEN.pf = "g:" + g; saveOpen(); projCards(); if($("projBox").hidden) $("projBtn").click();
+    if(!groupHas(g)){ if(retry) return; GROUPWANT = g; wantPoll(); if($("projBox").hidden) $("projBtn").click(); setTimeout(function(){ if(GROUPWANT === g) toast("No group called " + g + " here yet – sign in to see your saved lists"); }, 9000); return; }
+    GROUPWANT = ""; wantSet(""); OPEN.pf = "g:" + g; saveOpen(); projCards(); if($("projBox").hidden) $("projBtn").click();
     setTimeout(function(){ $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 50); }
   function groupLink(g){ var u = location.origin + "/#group=" + encodeURIComponent(g).replace(/%20/g, "%20");
     if(navigator.share){ navigator.share({title:g, url:u}).catch(function(){}); return; }
@@ -2173,7 +2176,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   $("mail").addEventListener("click", function(){ var t = asText(); if(!t) return; location.href = "mailto:?subject=" + encodeURIComponent("Today's list") + "&body=" + encodeURIComponent(t); });
 
   try{ if(/^\d{10,}$/.test(localStorage.getItem("undefined") || "")) localStorage.removeItem("undefined"); }catch(e){}   // tidy up after an old start-up mix-up
-  load(); drawTrips(); render(); dayBanner(); setTimeout(function(){ inboxFromLink(); projFromLink(); keepFromLink(); loadFromLink(); weekFromLink(); groupFromLink(); grpFromLink(); }, 0);
+  load(); drawTrips(); render(); dayBanner(); setTimeout(function(){ inboxFromLink(); projFromLink(); keepFromLink(); loadFromLink(); weekFromLink(); groupFromLink(); grpFromLink();
+    if(!location.hash){ var w0 = wantGet(); if(w0 === "week"){ WEEKWANT = true; weekFromLink(true); if(WEEKWANT) wantPoll(); } else if(w0.indexOf("g:") === 0){ GROUPWANT = w0.slice(2); groupFromLink(true); if(GROUPWANT) wantPoll(); } } }, 0);
   window.addEventListener("hashchange", function(){ inboxFromLink(); projFromLink(); keepFromLink(); loadFromLink(); weekFromLink(); groupFromLink(); grpFromLink(); });
   document.addEventListener("visibilitychange", function(){ if(!document.hidden && S.day !== today()){ newDay(); render(); dayBanner(); } });
   (function(){
@@ -2478,7 +2482,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
           var have = TABS.lists.filter(function(x){ return x.id === l.id; })[0]; if(!have){ have = {id:l.id}; TABS.lists.push(have); } have.name = l.name || have.name || "Page"; have.group = l.group || ""; have.pin = !!l.pin; }); if(Array.isArray(d.f)) TABS.favs = d.f; saveTabs(); drawTrips();
         if(d.m){ var mine0 = myLoad(), ids = {}; d.m.forEach(function(x){ ids[x.id] = 1; }); MYL = first ? d.m.concat(mine0.filter(function(x){ return !ids[x.id]; })) : d.m; try{ localStorage.setItem(MKEY, JSON.stringify(MYL)); }catch(e){} drawMy(); } setLocalT(d.t || Date.now()); switchTo(TABS.active, true); aApplying = false; aBaseFrom(d); if(WEEKWANT) weekFromLink(true); if(GROUPWANT) groupFromLink(true); acctState("✓ Saved to your account"); if(dup) acctPush(); }
       else if(!d || lt > (d.t || 0)){ acctPush(); }
-      else { if(d && (d.t || 0) > aBaseT()) aBaseFrom(d); acctState("✓ Saved to your account"); } inboxFromSites(); }); }
+      else { if(d && (d.t || 0) > aBaseT()) aBaseFrom(d); acctState("✓ Saved to your account"); } if(WEEKWANT) weekFromLink(true); if(GROUPWANT) groupFromLink(true); inboxFromSites(); }); }
   function inboxFromSites(){ if(!AUSER || !asb) return; [["listbyaisle","ListbyAisle"],["packbybag","PackbyBag"]].forEach(function(st){
     asb.rpc("hlt_get", {p_site:st[0]}).then(function(res){ var o = res && res.data && res.data.o; if(!Array.isArray(o)) return; var got = [];
       withToday(function(T){ o.forEach(function(x){ if(x && x.i && x.n && (T.seen || []).indexOf(x.i) < 0){ T.seen = [x.i].concat(T.seen || []).slice(0, 200); var dd = x.d && x.d > iso() ? x.d : iso();
