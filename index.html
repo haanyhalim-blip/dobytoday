@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v145 -->
+<!-- DoByToday v146 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -796,6 +796,29 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
 .bwy .bwyb{padding:14px 14px 14px;position:relative}
 .bwy .bwyb .bwyh{margin:0 28px 8px 0;font-weight:800;font-size:1.05rem;color:var(--ink,#222)}
 .bwyx{position:absolute;right:8px;top:6px;border:0;background:none;font-size:1.5rem;line-height:1;cursor:pointer;color:var(--muted,#777)}
+
+/* One menu for a job (tap it, or tap ⋯): "Done?" first, then urgency as a two-way toggle and icon buttons */
+#mine .mrow.open .dconf{order:2;margin:4px 0 4px 38px}
+#mine .mrow.open .mctl{order:3}
+#mine .mrow.open .mctl .urgb,#mine .mrow.open .mctl .lowb{display:inline-flex;align-items:center;height:34px;padding:0 12px;margin:0;border:1.5px solid var(--line);background:#fff;font-size:.86rem;font-weight:700;color:var(--muted)}
+#mine .mrow.open .mctl .urgb{border-radius:999px 0 0 999px}
+#mine .mrow.open .mctl .lowb{border-radius:0 999px 999px 0;margin-left:-11px;border-left-width:0}
+#mine .mrow.open.urg .mctl .urgb{background:#fde8e6;border-color:#e8a29b;color:#b42318}
+#mine .mrow.open.low .mctl .lowb{background:#eceee9;color:var(--ink)}
+#mine .mrow.open .mctl .mvst,#mine .mrow.open .mctl .rmv{width:38px;height:34px;padding:0;justify-content:center;font-size:1.05rem}
+#mine .mrow.open .mctl .mvst .lbl,#mine .mrow.open .mctl .rmv .lbl{display:none}
+#mine .mrow.open .mctl{gap:8px 6px;padding-left:30px;padding-right:6px}
+#mine .mrow.open .dconf{margin-left:30px}
+#mine .mrow.open .mctl .urgb,#mine .mrow.open .mctl .lowb{padding:0 9px;font-size:.8rem}
+#mine .mrow.open .mctl .lowb{margin-left:-7px}
+#mine .mrow.open .mctl .mvst,#mine .mrow.open .mctl .rmv{width:34px}
+#mine .mrow.open .mctl{gap:8px 5px;padding-left:26px}
+#mine .mrow.open .dconf{margin-left:26px}
+#mine .mrow.open .mctl .urgb,#mine .mrow.open .mctl .lowb{padding:0 8px;font-size:.78rem;height:32px}
+#mine .mrow.open .mctl .mvst,#mine .mrow.open .mctl .rmv{width:32px;height:32px}
+#mine .mrow.open .mctl{padding-right:2px}
+#mine .mrow.open .mctl .mvst,#mine .mrow.open .mctl .rmv{width:30px;height:30px}
+#mine .mrow.open .mctl .urgb,#mine .mrow.open .mctl .lowb{padding:0 7px}
 </style>
 </head>
 <body>
@@ -897,7 +920,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v145</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v146</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1484,7 +1507,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     return (i > 0 ? '<span class="mvst" role="button" data-mvup="' + i + '" title="Move this step up"><span aria-hidden="true">↑</span><span class="lbl">Move up</span></span>' : "")
       + (i < S.own.length - 1 ? '<span class="mvst" role="button" data-mvdn="' + i + '" title="Move this step down"><span aria-hidden="true">↓</span><span class="lbl">Move down</span></span>' : "")
       + '<span class="mvst" role="button" data-upadd="' + i + '" title="Add an update"><span aria-hidden="true">+</span><span class="lbl">Add update</span></span><span class="mvst" role="button" data-sted="' + i + '" title="Edit this step"><span aria-hidden="true">✎</span><span class="lbl">Edit step</span></span>'; }
-  function ctl(n, ref){ var c = (S.note || {})[n] || ""; return '<div class="mctl" '+ref+'><span class="cmt'+(c ? ' has' : '')+'" role="button" title="Add a comment" aria-label="Add a comment"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span><input class="qc" type="text" maxlength="60" value="'+esc(c)+'" aria-label="Comment" placeholder="Add a comment">'+(FLAT || S.keep ? '' : MV.replace('</svg></span>', '</svg><span class="lbl">Change time</span></span>'))+(S.keep && TABS.active !== "today" ? '' : DAYB + '<span class="urgb" role="button">' + (isUrg(n) ? '❗ Remove urgent' : '❗ Urgent') + '</span><span class="lowb" role="button">' + (isLow(n) ? '↕ Back to normal' : '↓ Not urgent') + '</span>')+moveBtns(ref)+tdMoves(n)+RMV.replace('</svg></span>', '</svg><span class="lbl">Remove</span></span>')+'</div>'; }
+  function ctl(n, ref){ var c = (S.note || {})[n] || ""; return '<div class="mctl" '+ref+'><span class="cmt'+(c ? ' has' : '')+'" role="button" title="Add a comment" aria-label="Add a comment"><svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H9l-5 4z"/></svg></span><input class="qc" type="text" maxlength="60" value="'+esc(c)+'" aria-label="Comment" placeholder="Add a comment">'+(FLAT || S.keep ? '' : MV.replace('</svg></span>', '</svg><span class="lbl">Change time</span></span>'))+(S.keep && TABS.active !== "today" ? '' : (S.keep ? DAYB : '') + '<span class="urgb" role="button">' + '❗ Urgent' + '</span><span class="lowb" role="button">' + '↓ Not urgent' + '</span>')+moveBtns(ref)+tdMoves(n)+RMV.replace('</svg></span>', '</svg><span class="lbl">Remove</span></span>')+'</div>'; }
   // One tidy row per item: the tick box, the name, and a "⋯" button that opens everything else
   var MOREN = "", ONEEXP = {};   // ONEEXP: to-do rows opened to show their full text, note and link
   function moreBtn(k){ return '<button type="button" class="more" data-more="'+esc(k)+'" aria-label="More options" aria-expanded="'+(MOREN === k)+'"><svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true" fill="currentColor"><circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/></svg></button>'; }
@@ -1515,7 +1538,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     return '<a class="dlink" href="' + u + '" target="_blank" rel="noopener">' + lbl + '</a>'; }); }
   // a step on a page that ends with a question mark gets a box to write the answer in
   function isQ(o){ return !!(S.keep && TABS.active !== "today" && S.kind !== "links" && /\?\s*$/.test(o.n || "")); }
-  function moreSet(k){ MOREN = k; document.querySelectorAll("#mine .mrow").forEach(function(r){ var b = r.querySelector(".more"), on = !!b && b.dataset.more === k; r.classList.toggle("open", on); if(b) b.setAttribute("aria-expanded", String(on)); }); }
+  function moreSet(k){ MOREN = k; if(!k || !document.querySelector('#mine .mrow.asking .more[data-more="' + CSS.escape(k) + '"]')) unask(); document.querySelectorAll("#mine .mrow").forEach(function(r){ var b = r.querySelector(".more"), on = !!b && b.dataset.more === k; r.classList.toggle("open", on); if(b) b.setAttribute("aria-expanded", String(on)); }); }
   $("ltabs").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.tab){ if(PEDIT === "new" && !S.title && !nPicked()){ dropProject(); return; } BACKTOP = true; LASTPG = TABS.active; switchTo(b.dataset.tab); } });
   $("mine").addEventListener("click", function(e){ if(e.target.closest(".ansbox") || e.target.closest(".upform input, .upform textarea, .upform label, .sdetw")){ e.stopPropagation(); return; }
     var mu = e.target.closest("[data-mvup],[data-mvdn]"); if(mu){ e.stopPropagation(); var a = +(mu.dataset.mvup != null ? mu.dataset.mvup : mu.dataset.mvdn), bI = mu.dataset.mvup != null ? a - 1 : a + 1;
@@ -1536,7 +1559,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       o3.up.splice(+pr[1], 1); save(); render(); toast("Update deleted", function(){ o3.up.splice(+pr[1], 0, u); save(); render(); }); return; } }, true);
   $("mine").addEventListener("toggle", function(e){ var d = e.target; if(d.classList && d.classList.contains("sdetw")){ if(d.open){ DETOPEN[d.dataset.det] = 1; delete DETSHUT[d.dataset.det]; } else { delete DETOPEN[d.dataset.det]; DETSHUT[d.dataset.det] = 1; } } }, true);
   $("mine").addEventListener("input", function(e){ if(e.target.classList.contains("upin")) UPDDRAFT = e.target.value; });
-  $("mine").addEventListener("click", function(e){ var b = e.target.closest(".more"); if(!b) return; e.stopPropagation(); moreSet(MOREN === b.dataset.more ? "" : b.dataset.more); }, true);
+  $("mine").addEventListener("click", function(e){ var b = e.target.closest(".more"); if(!b) return; e.stopPropagation(); var k = MOREN === b.dataset.more ? "" : b.dataset.more; moreSet(k); if(k) addAsk(b.closest(".mrow")); }, true);
   document.addEventListener("click", function(e){ if(MOREN && !e.target.closest(".mrow.open")) moreSet(""); });
   function ctlKey(c){ return c.dataset.own !== undefined ? ((S.own[+c.dataset.own] || {}).n || "") : c.dataset.n; }
 
@@ -2008,15 +2031,17 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function unask(){ document.querySelectorAll("#mine .mrow.asking").forEach(function(r){ r.classList.remove("asking"); var q = r.querySelector(".dconf"); if(q) q.remove(); }); }
   $("mine").addEventListener("click", function(e){
     var y = e.target.closest("[data-dyes],[data-dno]");
-    if(y){ e.stopImmediatePropagation(); e.preventDefault(); var row = y.closest(".mrow"), bx = row && row.querySelector(".it .box"), ok = y.hasAttribute("data-dyes"); unask();
+    if(y){ e.stopImmediatePropagation(); e.preventDefault(); var row = y.closest(".mrow"), bx = row && row.querySelector(".it .box"), ok = y.hasAttribute("data-dyes"); unask(); moreSet("");
       if(ok && bx){ var ib = bx.closest(".it"), sel = ib.dataset.own !== undefined ? '.it[data-own="' + ib.dataset.own + '"]' : '.it[data-n="' + CSS.escape(ib.dataset.n || "") + '"]';
         OKTICK = true; bx.click(); OKTICK = false;
         toast("Done ✓ – it's in Done today", function(){ var b2 = document.querySelector("#mine .donel " + sel + " .box"); if(b2){ OKTICK = true; b2.click(); OKTICK = false; } }); } return; }   // Undo puts it straight back
     if(S.keep || OKTICK) return; var it = e.target.closest(".oneline .mrow .it"); if(!it || it.closest(".donel")) return; var row = it.closest(".mrow"); if(row.classList.contains("got")) return;
     var nm = it.querySelector(".nm"); if(!e.target.closest(".box") && nm && (row.classList.contains("exp") || nm.scrollWidth > nm.clientWidth + 1 || row.querySelector(".cnote, .rowlink"))) return;   // tapping the words of a long job opens it instead
     e.stopImmediatePropagation(); e.preventDefault(); var again = row.classList.contains("asking"); unask(); if(again) return;
-    row.classList.add("asking"); row.insertAdjacentHTML("beforeend", '<span class="dconf" role="group" aria-label="Is this job done?"><span>Done?</span><button type="button" class="dyes" data-dyes="1">✓ Yes, done</button><button type="button" class="dno" data-dno="1">Not yet</button></span>');
+    addAsk(row); var mb = row.querySelector(".more"); if(mb) moreSet(mb.dataset.more);
     var yb = row.querySelector(".dyes"); if(yb) yb.focus(); }, true);
+  function addAsk(row){ if(!row || row.classList.contains("asking") || row.classList.contains("got") || S.keep) return;
+    row.classList.add("asking"); row.insertAdjacentHTML("beforeend", '<span class="dconf" role="group" aria-label="Is this job done?"><span>Done?</span><button type="button" class="dyes" data-dyes="1">✓ Yes, done</button><button type="button" class="dno" data-dno="1">Not yet</button></span>'); }
   // To-do list: each job on one line; tap its words to see the rest (full text, note, link), tap the box to tick it
   $("mine").addEventListener("click", function(e){ var it = e.target.closest(".oneline .mrow .it"); if(!it || e.target.closest(".box")) return; var row = it.closest(".mrow"), nm = it.querySelector(".nm"); if(!nm || row.classList.contains("got")) return;
     var more = row.classList.contains("exp") || nm.scrollWidth > nm.clientWidth + 1 || row.querySelector(".cnote, .rowlink"); if(!more) return;
