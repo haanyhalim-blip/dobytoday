@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v148 -->
+<!-- DoByToday v149 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -820,6 +820,17 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
 #mine .mrow.open .mctl .mvst,#mine .mrow.open .mctl .rmv{width:30px;height:30px}
 #mine .mrow.open .mctl .urgb,#mine .mrow.open .mctl .lowb{padding:0 7px}
 .bwy .bwysi{font:inherit;font-weight:700;background:none;border:0;padding:0;color:inherit;text-decoration:underline;cursor:pointer}
+
+/* Ready-made list picker: change a job (✎) or add your own before adding */
+#listPick .pkrow{display:flex;align-items:center;gap:4px}
+#listPick .pkrow .it{flex:1;min-width:0}
+#listPick .pken{flex:none;width:32px;height:32px;border:0;background:none;color:var(--muted);cursor:pointer;font-size:1rem;border-radius:8px}
+#listPick .pken:hover{background:var(--second-wash,#eef0ea)}
+#listPick .pextra{margin:10px 0 4px;display:flex;flex-wrap:wrap;gap:6px}
+#listPick .pxi{display:inline-flex;align-items:center;gap:4px;border:1.5px solid var(--line);border-radius:999px;padding:3px 4px 3px 10px;font-size:.9rem;background:var(--card)}
+#listPick .pxi button{border:0;background:none;cursor:pointer;color:var(--muted);font-size:1rem}
+#listPick .pxin{display:flex;gap:6px;flex:1 1 100%}
+#listPick .pxin input{flex:1;min-width:0;font:inherit;padding:8px 10px;border:1.5px solid var(--line);border-radius:10px}
 </style>
 </head>
 <body>
@@ -926,7 +937,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v148</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v149</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1907,24 +1918,34 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   // Pick-and-choose before anything lands on the list
   var PICK = null;
   function pickGroups(rows){ var by = {}, out = [];
-    rows.forEach(function(r){ var it = byNorm[norm(r.n)], k = it ? (r.force && it.b === "hold" ? r.force : bagOf(it)) : "hold"; k = live(k); (by[k] = by[k] || []).push(r); });
+    rows.forEach(function(r){ var it = byNorm[norm(r.n)], k = it ? (r.force && it.b === "hold" ? r.force : bagOf(it)) : (r.b || "hold"); k = live(k); (by[k] = by[k] || []).push(r); });
     BAGS.forEach(function(b){ if(by[b[0]]) out.push({label:b[1], rows:by[b[0]]}); });
     return out; }
   function openPick(id){ var t = TRIPS.filter(function(x){ return x.id === id; })[0]; if(!t) return; closePick();
-    var rows = t.items.map(function(nm){ var it = byNorm[norm(nm)]; return it ? {n:it.n, force:t.force} : null; }).filter(Boolean);
-    PICK = {t:t, rows:rows, off:{}}; drawPick(); document.querySelectorAll(".trip.on").forEach(function(x){ x.classList.remove("on"); }); var card = document.querySelector('.trip[data-trip="'+id+'"]'); if(card) card.classList.add("on"); $("listPick").scrollIntoView({block:"start", behavior:"smooth"}); }
+    var rows = t.items.map(function(nm){ var it = byNorm[norm(nm)]; return it ? {n:it.n, force:t.force} : {n:nm, own:1, b:BAGOF[nm] || t.force || "any"}; });   // jobs not in the catalogue still come through, as your own
+    PICK = {t:t, rows:rows, off:{}, ren:{}, extra:[]}; drawPick(); document.querySelectorAll(".trip.on").forEach(function(x){ x.classList.remove("on"); }); var card = document.querySelector('.trip[data-trip="'+id+'"]'); if(card) card.classList.add("on"); $("listPick").scrollIntoView({block:"start", behavior:"smooth"}); }
+  function pickOwn(quiet){ var i = $("pickOwn"); if(!i || !PICK) return; var v = i.value.replace(/\s+/g, " ").trim(); if(!v) return; PICK.extra.push(v); if(!quiet){ drawPick(); var j = $("pickOwn"); if(j) j.focus(); } }
+  $("listPick").addEventListener("keydown", function(e){ if(e.target.id === "pickOwn" && e.key === "Enter"){ e.preventDefault(); pickOwn(); } });
   function closePick(){ if(!PICK) return; document.querySelectorAll(".trip.on").forEach(function(x){ x.classList.remove("on"); }); $("listPick").hidden = true; $("listPick").innerHTML = ""; PICK = null; }
   function drawPick(){ var on = PICK.rows.filter(function(r){ return !PICK.off[r.n]; }).length, box = $("listPick");
-    box.innerHTML = '<div class="phead"><span class="pk">Choose what to add from</span><b>'+esc(PICK.t.name)+'</b><small>Everything is ticked – untick what you don’t need, then press Add.</small></div><div class="grid">'
-      + pickGroups(PICK.rows).map(function(g){ return '<div class="pgrp">'+esc(g.label)+'</div>' + g.rows.map(function(r){ var k = !PICK.off[r.n]; return '<button class="it" type="button" data-pick="'+esc(r.n)+'" aria-pressed="'+k+'"><span class="box"></span><span><span class="nm">'+esc(r.n)+'</span></span></button>'; }).join(""); }).join("")
-      + '</div><div class="prow"><button class="btn primary" type="button" data-pickadd="1">Add '+on+' to my list</button><button class="link quiet" type="button" data-pickall="1">'+(on === PICK.rows.length ? 'Untick all' : 'Tick all')+'</button><button class="link quiet" type="button" data-pickclose="1">Cancel</button></div>';
+    box.innerHTML = '<div class="phead"><span class="pk">Choose what to add from</span><b>'+esc(PICK.t.name)+'</b><small>It’s a starting point – untick what you don’t need, tap ✎ to change a job, or add your own, then press Add.</small></div><div class="grid">'
+      + pickGroups(PICK.rows).map(function(g){ return '<div class="pgrp">'+esc(g.label)+'</div>' + g.rows.map(function(r){ var k = !PICK.off[r.n]; return '<div class="pkrow"><button class="it" type="button" data-pick="'+esc(r.n)+'" aria-pressed="'+k+'"><span class="box"></span><span><span class="nm">'+esc(PICK.ren[r.n] || r.n)+'</span></span></button><button type="button" class="pken" data-pickren="'+esc(r.n)+'" aria-label="Change this job">✎</button></div>'; }).join(""); }).join("")
+      + '</div><div class="pextra">' + PICK.extra.map(function(x, i){ return '<span class="pxi">' + esc(x) + '<button type="button" data-pickxx="' + i + '" aria-label="Remove">×</button></span>'; }).join("")
+      + '<div class="pxin"><input id="pickOwn" maxlength="80" placeholder="Add your own – e.g. Call the plumber" aria-label="Add your own job"><button type="button" class="btn" data-pickown="1">Add</button></div></div><div class="prow"><button class="btn primary" type="button" data-pickadd="1">Add '+on+' to my list</button><button class="link quiet" type="button" data-pickall="1">'+(on === PICK.rows.length ? 'Untick all' : 'Tick all')+'</button><button class="link quiet" type="button" data-pickclose="1">Cancel</button></div>';
     box.hidden = false; }
   $("listPick").addEventListener("click", function(e){ if(!PICK) return;
     if(e.target.closest("[data-pickclose]")){ closePick(); return; }
     if(e.target.closest("[data-pickall]")){ var all = PICK.rows.every(function(r){ return !PICK.off[r.n]; }); PICK.off = {}; if(all) PICK.rows.forEach(function(r){ PICK.off[r.n] = 1; }); drawPick(); return; }
+    var rn = e.target.closest("[data-pickren]"); if(rn){ var o = rn.dataset.pickren, v = prompt("Change this job to:", PICK.ren[o] || o); if(v != null){ v = v.replace(/\s+/g, " ").trim(); if(v && v !== o) PICK.ren[o] = v; else delete PICK.ren[o]; delete PICK.off[o]; drawPick(); } return; }
+    var xx = e.target.closest("[data-pickxx]"); if(xx){ PICK.extra.splice(+xx.dataset.pickxx, 1); drawPick(); return; }
+    if(e.target.closest("[data-pickown]")){ pickOwn(); return; }
     var b = e.target.closest("[data-pick]"); if(b){ var n = b.dataset.pick; if(PICK.off[n]) delete PICK.off[n]; else PICK.off[n] = 1; drawPick(); return; }
-    if(e.target.closest("[data-pickadd]")){ var n2 = 0, t = PICK.t;
-      PICK.rows.forEach(function(r){ if(PICK.off[r.n]) return; var it = byNorm[norm(r.n)]; if(!S.picked[it.n]) n2++; S.picked[it.n] = 1; unpark(it.n); if(t.force && it.b === "hold") S.bag[it.n] = t.force; });
+    if(e.target.closest("[data-pickadd]")){ var n2 = 0, t = PICK.t; pickOwn(true);
+      PICK.rows.forEach(function(r){ if(PICK.off[r.n]) return; var it = byNorm[norm(r.n)];
+        if(!it){ var on2 = PICK.ren[r.n] || r.n; if(!S.own.some(function(o){ return norm(o.n) === norm(on2); })){ S.own.push({n:on2, a:"other", b:r.b || "any", got:false}); n2++; } return; }
+        if(PICK.ren[r.n]){ var nn = PICK.ren[r.n]; if(!S.own.some(function(o){ return norm(o.n) === norm(nn); })){ S.own.push({n:nn, a:"other", b:(t.force && it.b === "hold") ? t.force : bagOf(it), got:false}); n2++; } return; }   // changed: it goes on as your own job, at the same time of day
+        if(!S.picked[it.n]) n2++; S.picked[it.n] = 1; unpark(it.n); if(t.force && it.b === "hold") S.bag[it.n] = t.force; });
+      PICK.extra.forEach(function(x){ var hit = find(x); if(hit){ if(!S.picked[hit.n]) n2++; S.picked[hit.n] = 1; unpark(hit.n); } else if(!S.own.some(function(o){ return norm(o.n) === norm(x); })){ S.own.push({n:x, a:"other", b:"any", got:false}); n2++; } });
       closePick(); save(); render(); openMine();
       toast(n2 ? t.name + ": " + n2 + " added" : "All of those are on your list already"); } });
   // A ready-made list opens as a page of its own (dobytoday.com/lists/…) that works as a tick-off checklist; its "Add to my list" comes back here
