@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v147 -->
+<!-- DoByToday v148 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -819,6 +819,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
 #mine .mrow.open .mctl{padding-right:2px}
 #mine .mrow.open .mctl .mvst,#mine .mrow.open .mctl .rmv{width:30px;height:30px}
 #mine .mrow.open .mctl .urgb,#mine .mrow.open .mctl .lowb{padding:0 7px}
+.bwy .bwysi{font:inherit;font-weight:700;background:none;border:0;padding:0;color:inherit;text-decoration:underline;cursor:pointer}
 </style>
 </head>
 <body>
@@ -831,12 +832,17 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   <p>They keep growing based on what you need. If there's anything that would make them more helpful, let us know. We read every message, and we usually add things quickly.</p>
   <label for="bwyText"><b>What would help you more?</b></label>
   <textarea id="bwyText" maxlength="2000" placeholder="An idea, something missing, or something that gets in the way"></textarea>
-  <div class="bwyr"><button type="button" class="bwys" id="bwySend">Send</button><small id="bwyNote">No account needed.</small></div>
+  <div class="bwyr"><button type="button" class="bwys" id="bwySend">Send</button><small id="bwyNote"></small></div>
 </div></details>
 <script>
-(function(){ var b = document.getElementById("bwySend"), t = document.getElementById("bwyText"), n = document.getElementById("bwyNote"); if(!b) return;
-  b.addEventListener("click", function(){ var v = t.value.trim(); if(!v){ n.textContent = "Write a line first."; t.focus(); return; } b.disabled = true; n.textContent = "Sending…";
-    fetch("https://formspree.io/f/meaqbeqq", {method:"POST", headers:{"Content-Type":"application/json", "Accept":"application/json"}, body: JSON.stringify({message:"[DobyToday] Building with you: " + v, page: location.href})})
+(function(){ var b = document.getElementById("bwySend"), t = document.getElementById("bwyText"), n = document.getElementById("bwyNote"), d = document.getElementById("bwy"); if(!b) return;
+  // Sending an idea needs you to be signed in, so we can reply to you
+  function who(){ try{ var j = JSON.parse(localStorage.getItem("hlt-auth") || "null"); return (j && (j.user || (j.currentSession || {}).user) || {}).email || ""; }catch(e){ return ""; } }
+  function hint(){ var em = who(); if(em) n.textContent = "We'll reply to " + em + ".";
+    else { n.innerHTML = 'Please <button type="button" class="bwysi">sign in</button> to send, so we can reply to you.'; n.querySelector(".bwysi").addEventListener("click", function(){ if(d) d.open = false; var sb = document.getElementById("acctBtn"); if(sb) sb.click(); }); } }
+  if(d) d.addEventListener("toggle", function(){ if(d.open) hint(); }); hint();
+  b.addEventListener("click", function(){ var v = t.value.trim(), em = who(); if(!em){ hint(); return; } if(!v){ n.textContent = "Write a line first."; t.focus(); return; } b.disabled = true; n.textContent = "Sending…";
+    fetch("https://formspree.io/f/meaqbeqq", {method:"POST", headers:{"Content-Type":"application/json", "Accept":"application/json"}, body: JSON.stringify({email: who(), message:"[DobyToday] Building with you: " + v, page: location.href})})
       .then(function(r){ if(!r.ok) throw 0; t.value = ""; n.textContent = "Thank you – we've got it."; })
       .catch(function(){ n.textContent = "That didn't send – check your connection and try again."; })
       .then(function(){ b.disabled = false; }); }); })();
@@ -920,7 +926,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v147</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v148</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
