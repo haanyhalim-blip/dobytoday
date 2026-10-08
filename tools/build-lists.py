@@ -125,7 +125,7 @@ def page(path, title, desc, body, crumbs):
 <footer>
 <p><a href="/"><b>DobyToday</b></a> – a to-do list for today only, sorted by when. Free, no account needed.
 <a href="/">Start your own list</a> · <a href="/lists/">All ready-made lists</a></p>
-<p>From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). {VER}</p>
+<p>From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). {VER}</p>
 </footer>
 </div>
 <script>
