@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v149 -->
+<!-- DoByToday v150 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -937,7 +937,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v149</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v150</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1742,6 +1742,15 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       toast(n ? n + " added to the top of today's list. To keep them, tap the save symbol on your list and give it a name." : "All of those are on today already"); } });
   function keepFromLink(){ var m = location.hash.match(/^#keep=([a-z0-9-]+)/); if(!m) return; history.replaceState(null, "", location.pathname + location.search);
     if(keepTrip(m[1])){ OPEN.pf = "saved"; saveOpen(); projCards(); if($("projBox").hidden) $("projBtn").click(); setTimeout(function(){ $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 50); } }
+  // dobytoday.com/#week (the Family week icon): opens today's card from your "Weekly timetable" group – Monday's card on a Monday – with the rest of the week in My saved lists
+  var WEEKWANT = false;
+  function weekFromLink(retry){ if(!retry && !/^#week$/.test(location.hash)) return; if(!retry) history.replaceState(null, "", location.pathname + location.search);
+    var day = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][new Date().getDay()],
+      wk = TABS.lists.filter(function(l){ return l.id !== "today" && groupsOf(l).some(function(g){ return /timetable/i.test(g); }); }),
+      t = wk.filter(function(l){ return (l.name || "").toLowerCase().indexOf(day.toLowerCase()) === 0; })[0];
+    if(t){ WEEKWANT = false; groupsOf(t).forEach(function(g){ OPEN["pg:g:" + g] = 1; }); saveOpen(); switchTo(t.id); window.scrollTo(0, 0); toast(day + "'s timetable"); return; }
+    if(retry) return; WEEKWANT = true; if($("projBox").hidden) $("projBtn").click();
+    setTimeout(function(){ if(WEEKWANT) toast("No weekly timetable here yet – sign in, or put your day cards in a group called Weekly timetable"); }, 4000); }
   function personOf(t){ var m = t.name.match(/^(.+?)(?:’s|'s| –| -)/); return m ? m[1] : t.name; }
   function drawTrips(){
     var card = function(t){ var on = !!kept(t.id); return '<div class="tripw"><button class="trip" type="button" data-trip="'+t.id+'"><b>'+esc(t.name)+'</b><small>'+esc(t.blurb)+'</small><span class="n">'+t.items.length+' jobs</span></button><button type="button" class="tfav'+(on ? ' on' : '')+'" data-fav="'+t.id+'" aria-pressed="'+on+'" title="'+(on ? 'Your copy is in My saved lists' : 'Save a copy to My saved lists')+'" aria-label="Save to My saved lists">'+(on ? '★' : '☆')+'</button></div>'; };
@@ -2119,8 +2128,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   $("mail").addEventListener("click", function(){ var t = asText(); if(!t) return; location.href = "mailto:?subject=" + encodeURIComponent("Today's list") + "&body=" + encodeURIComponent(t); });
 
   try{ if(/^\d{10,}$/.test(localStorage.getItem("undefined") || "")) localStorage.removeItem("undefined"); }catch(e){}   // tidy up after an old start-up mix-up
-  load(); drawTrips(); render(); dayBanner(); setTimeout(function(){ inboxFromLink(); projFromLink(); keepFromLink(); loadFromLink(); }, 0);
-  window.addEventListener("hashchange", function(){ inboxFromLink(); projFromLink(); keepFromLink(); loadFromLink(); });
+  load(); drawTrips(); render(); dayBanner(); setTimeout(function(){ inboxFromLink(); projFromLink(); keepFromLink(); loadFromLink(); weekFromLink(); }, 0);
+  window.addEventListener("hashchange", function(){ inboxFromLink(); projFromLink(); keepFromLink(); loadFromLink(); weekFromLink(); });
   document.addEventListener("visibilitychange", function(){ if(!document.hidden && S.day !== today()){ newDay(); render(); dayBanner(); } });
   (function(){
     function fold(btnId, boxId){ var b = $(btnId), x = $(boxId); b.addEventListener("click", function(){ var open = x.hidden; x.hidden = !open; b.setAttribute("aria-expanded", String(open)); }); }
@@ -2422,7 +2431,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
         aApplying = true; try{ localStorage.setItem(keyOf("today"), JSON.stringify(d.s)); }catch(e){}
         var dup = false; (d.L || []).forEach(function(l){ if(!l || !l.id) return; if(!TABS.lists.some(function(x){ return x.id === l.id; }) && sameShared(l)){ dup = true; return; } try{ localStorage.setItem(keyOf(l.id), JSON.stringify(l.s || {})); if(l.c) localStorage.setItem(ckeyOf(l.id), l.c); }catch(e){}
           var have = TABS.lists.filter(function(x){ return x.id === l.id; })[0]; if(!have){ have = {id:l.id}; TABS.lists.push(have); } have.name = l.name || have.name || "Page"; have.group = l.group || ""; have.pin = !!l.pin; }); if(Array.isArray(d.f)) TABS.favs = d.f; saveTabs(); drawTrips();
-        if(d.m){ var mine0 = myLoad(), ids = {}; d.m.forEach(function(x){ ids[x.id] = 1; }); MYL = first ? d.m.concat(mine0.filter(function(x){ return !ids[x.id]; })) : d.m; try{ localStorage.setItem(MKEY, JSON.stringify(MYL)); }catch(e){} drawMy(); } setLocalT(d.t || Date.now()); switchTo(TABS.active, true); aApplying = false; aBaseFrom(d); acctState("✓ Saved to your account"); if(dup) acctPush(); }
+        if(d.m){ var mine0 = myLoad(), ids = {}; d.m.forEach(function(x){ ids[x.id] = 1; }); MYL = first ? d.m.concat(mine0.filter(function(x){ return !ids[x.id]; })) : d.m; try{ localStorage.setItem(MKEY, JSON.stringify(MYL)); }catch(e){} drawMy(); } setLocalT(d.t || Date.now()); switchTo(TABS.active, true); aApplying = false; aBaseFrom(d); if(WEEKWANT) weekFromLink(true); acctState("✓ Saved to your account"); if(dup) acctPush(); }
       else if(!d || lt > (d.t || 0)){ acctPush(); }
       else { if(d && (d.t || 0) > aBaseT()) aBaseFrom(d); acctState("✓ Saved to your account"); } inboxFromSites(); }); }
   function inboxFromSites(){ if(!AUSER || !asb) return; [["listbyaisle","ListbyAisle"],["packbybag","PackbyBag"]].forEach(function(st){
