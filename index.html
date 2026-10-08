@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v144 -->
+<!-- DoByToday v145 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -786,6 +786,16 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
 
 .swcard .shead{padding:6px 10px 8px;margin:0 0 4px;border-bottom:1px solid var(--line,#e2e2e2);font-weight:800;font-size:.95rem;line-height:1.2}
 .swcard .shead small{display:block;font-weight:400;color:var(--muted,#777);font-size:.78rem;margin-top:2px}
+
+/* "We're building this with you" now opens from the small Ideas button at the top, as a card – no long row on the page */
+.ideasb{display:inline-flex;align-items:center;gap:5px;font:inherit;font-size:.85rem;font-weight:700;border:1.5px solid var(--line,#d9d9d9);background:var(--card,#fff);color:var(--ink,#222);border-radius:999px;padding:5px 11px;cursor:pointer;white-space:nowrap;vertical-align:middle;margin-right:6px}
+.ideasb[aria-expanded="true"]{border-color:var(--ink,#222)}
+.bwy:not([open]){display:none}
+.bwy[open]{position:fixed;z-index:80;top:max(12px,env(safe-area-inset-top,0px));right:12px;width:min(380px,calc(100vw - 24px));max-height:calc(100vh - 24px);overflow-y:auto;margin:0;box-shadow:0 12px 34px rgba(0,0,0,.25)}
+.bwy>summary{display:none!important}
+.bwy .bwyb{padding:14px 14px 14px;position:relative}
+.bwy .bwyb .bwyh{margin:0 28px 8px 0;font-weight:800;font-size:1.05rem;color:var(--ink,#222)}
+.bwyx{position:absolute;right:8px;top:6px;border:0;background:none;font-size:1.5rem;line-height:1;cursor:pointer;color:var(--muted,#777)}
 </style>
 </head>
 <body>
@@ -793,7 +803,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
 <header>
   <a class="brand" href="/">Do<span>by</span>Today</a>
   <h1 class="tagline">Today's list, sorted by when.</h1>
-<details class="bwy" id="bwy"><summary>🌱 We're building this with you…</summary><div class="bwyb">
+<details class="bwy" id="bwy"><summary>🌱 We're building this with you…</summary><div class="bwyb"><button type="button" class="bwyx" id="bwyX" aria-label="Close">×</button><p class="bwyh">We're building this with you</p>
   <p>These apps have one job: to be a handy, on-the-go helper for you and your family. That's it.</p>
   <p>They keep growing based on what you need. If there's anything that would make them more helpful, let us know. We read every message, and we usually add things quickly.</p>
   <label for="bwyText"><b>What would help you more?</b></label>
@@ -809,7 +819,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
       .then(function(){ b.disabled = false; }); }); })();
 </script>
 
-  <button class="btn keepb acctb" id="acctBtn" type="button">Sign in</button><span class="swwrap"><button class="swb" id="swBtn" type="button" aria-expanded="false" aria-controls="swCard" title="Our other handy sites" aria-label="Switch to our other sites"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><circle cx="5" cy="5" r="2.2"/><circle cx="12" cy="5" r="2.2"/><circle cx="19" cy="5" r="2.2"/><circle cx="5" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="19" cy="12" r="2.2"/><circle cx="5" cy="19" r="2.2"/><circle cx="12" cy="19" r="2.2"/><circle cx="19" cy="19" r="2.2"/></svg></button><div class="swcard" id="swCard" hidden></div></span>
+  <button class="btn keepb acctb" id="acctBtn" type="button">Sign in</button><button type="button" class="ideasb" id="ideasBtn" aria-expanded="false" aria-controls="bwy" title="Tell us what would help"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a8 8 0 0 1-11.6 7.1L4 20l1-4.6A8 8 0 1 1 21 12z"/></svg>Ideas</button><span class="swwrap"><button class="swb" id="swBtn" type="button" aria-expanded="false" aria-controls="swCard" title="Our other handy sites" aria-label="Switch to our other sites"><svg viewBox="0 0 24 24" width="18" height="18" fill="currentColor" aria-hidden="true"><circle cx="5" cy="5" r="2.2"/><circle cx="12" cy="5" r="2.2"/><circle cx="19" cy="5" r="2.2"/><circle cx="5" cy="12" r="2.2"/><circle cx="12" cy="12" r="2.2"/><circle cx="19" cy="12" r="2.2"/><circle cx="5" cy="19" r="2.2"/><circle cx="12" cy="19" r="2.2"/><circle cx="19" cy="19" r="2.2"/></svg></button><div class="swcard" id="swCard" hidden></div></span>
 </header>
 <div class="keep" id="dayBox" hidden></div>
 <div class="pick loadbox" id="loadBox" hidden></div>
@@ -887,7 +897,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v144</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v145</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -2438,6 +2448,15 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
 // "Feedback & suggestions" (and ResetbyChoice's "Send a suggestion") now open the "We're building this with you" box at the top – one place to send ideas
 (function(){ function bwyOpen(e){ var d = document.getElementById("bwy"); if(!d) return; e.preventDefault(); e.stopImmediatePropagation(); d.open = true; d.scrollIntoView({behavior:"smooth", block:"start"}); setTimeout(function(){ var t = document.getElementById("bwyText"); if(t) t.focus({preventScroll:true}); }, 350); }
   ["fbBtn", "wipBtn"].forEach(function(id){ var b = document.getElementById(id); if(b) b.addEventListener("click", bwyOpen, true); }); })();
+</script>
+<script>
+(function(){ var d = document.getElementById("bwy"), b = document.getElementById("ideasBtn"), x = document.getElementById("bwyX"); if(!d || !b) return;
+  function set(o){ d.open = o; b.setAttribute("aria-expanded", String(o)); if(o){ var t = document.getElementById("bwyText"); if(t) setTimeout(function(){ t.focus(); }, 30); } }
+  b.addEventListener("click", function(e){ e.stopPropagation(); set(!d.open); });
+  x.addEventListener("click", function(){ set(false); });
+  d.addEventListener("toggle", function(){ b.setAttribute("aria-expanded", String(d.open)); });
+  document.addEventListener("keydown", function(e){ if(e.key === "Escape" && d.open) set(false); });
+  document.addEventListener("click", function(e){ if(d.open && e.target.isConnected && !e.target.closest("#bwy") && !e.target.closest("#ideasBtn") && !e.target.closest("#fbBtn") && !e.target.closest("#wipBtn")) set(false); }); })();
 </script>
 </body>
 </html>
