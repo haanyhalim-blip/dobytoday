@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v137 -->
+<!-- DoByToday v138 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -883,7 +883,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v137</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">DueAReset</a> (a page of your own to change a habit). <span class="ver">v138</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -2428,6 +2428,11 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(has) acctLib(function(){ asb.auth.getSession().then(function(r){ AUSER = r.data && r.data.session ? r.data.session.user : null; acctUI(); acctPull(); }); }); })();
 
 })();
+</script>
+<script>
+// "Feedback & suggestions" (and DueAReset's "Send a suggestion") now open the "We're building this with you" box at the top – one place to send ideas
+(function(){ function bwyOpen(e){ var d = document.getElementById("bwy"); if(!d) return; e.preventDefault(); e.stopImmediatePropagation(); d.open = true; d.scrollIntoView({behavior:"smooth", block:"start"}); setTimeout(function(){ var t = document.getElementById("bwyText"); if(t) t.focus({preventScroll:true}); }, 350); }
+  ["fbBtn", "wipBtn"].forEach(function(id){ var b = document.getElementById(id); if(b) b.addEventListener("click", bwyOpen, true); }); })();
 </script>
 </body>
 </html>
