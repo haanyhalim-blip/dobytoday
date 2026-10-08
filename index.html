@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v150 -->
+<!-- DoByToday v151 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -576,6 +576,9 @@ h2.dsec .sub{text-transform:none;letter-spacing:0;font-weight:400}
 .porow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 0;border-top:1px solid var(--line)}
 .porow input{font:inherit;font-size:.92rem;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;flex:1 1 160px;min-width:0;background:var(--card);color:var(--ink)}
 .porow .pon{flex:1 1 140px;min-width:0;font-weight:700;font-size:.92rem}
+.gpage{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin:12px 0 2px}
+.gpage h3{margin:0;font-size:1.15rem}
+.gpage button{font:inherit;font-size:.85rem;font-weight:700;border:1.5px solid currentColor;border-radius:999px;padding:5px 13px;background:none;color:inherit;cursor:pointer}
 .plist{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:9px;margin:8px 0}
 .prow{display:flex;flex-direction:column;align-items:flex-start;justify-content:space-between;gap:8px;width:100%;min-height:92px;text-align:left;padding:12px 13px;border:1.5px solid var(--line);border-left:5px solid var(--main);border-radius:10px;background:var(--card);font:inherit;cursor:pointer}
 .prow .pn{font-weight:700;line-height:1.3;overflow-wrap:anywhere}
@@ -937,7 +940,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v150</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v151</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1183,10 +1186,11 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       h += '<div class="plist">' + newb + top.map(prow).join("") + "</div>";
       gs.forEach(function(g){ var inG = live.filter(function(p){ return groupsOf(p.l).indexOf(g) > -1; }); h += pfold("g:" + g, g, inG.length, '<div class="plist">' + inG.map(prow).join("") + "</div>"); }); }
     else { var show = f === "done" ? done : f === "saved" ? [] : live.filter(function(p){ return groupsOf(p.l).indexOf(f.slice(2)) > -1; });
+      if(f.slice(0, 2) === "g:") h += '<div class="gpage"><h3>' + esc(f.slice(2)) + '</h3><button type="button" data-glink="' + esc(f.slice(2)) + '">🔗 Link to this group</button></div>';
       h += '<div class="plist">' + (f === "done" || f === "saved" ? "" : newb) + show.map(prow).join("") + "</div>"; }
     if(f === "done" && !done.length) h += '<p class="small">Nothing finished yet.</p>';
     el.innerHTML = h; drawMy(); }
-  $("projSec").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.pf){ OPEN.pf = b.dataset.pf; saveOpen(); projCards(); return; } if(b.dataset.porg){ ORG = !ORG; projCards(); return; } if(b.dataset.newproj){ newProject(); return; } if(b.dataset.proj){ switchTo(b.dataset.proj); window.scrollTo(0, 0); return; }
+  $("projSec").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.pf){ OPEN.pf = b.dataset.pf; saveOpen(); projCards(); return; } if(b.dataset.porg){ ORG = !ORG; projCards(); return; } if(b.dataset.glink){ groupLink(b.dataset.glink); return; } if(b.dataset.newproj){ newProject(); return; } if(b.dataset.proj){ switchTo(b.dataset.proj); window.scrollTo(0, 0); return; }
     if(b.dataset.favgo){ var t = TRIPS.filter(function(x){ return x.id === b.dataset.favgo; })[0]; if(!t) return; if(t.slug){ try{ sessionStorage.setItem("dobytoday-back", t.id); }catch(x){} location.href = "/lists/" + t.slug; } else { if($("tripBox").hidden) $("tripBtn").click(); openPick(t.id); } } });
   $("projSec").addEventListener("change", function(e){ var t = e.target;
     if(t.classList.contains("pocat")){ var old = t.dataset.old, nv = t.value.replace(/,/g, " ").trim(); if(nv === old) return;
@@ -1751,6 +1755,19 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(t){ WEEKWANT = false; groupsOf(t).forEach(function(g){ OPEN["pg:g:" + g] = 1; }); saveOpen(); switchTo(t.id); window.scrollTo(0, 0); toast(day + "'s timetable"); return; }
     if(retry) return; WEEKWANT = true; if($("projBox").hidden) $("projBtn").click();
     setTimeout(function(){ if(WEEKWANT) toast("No weekly timetable here yet – sign in, or put your day cards in a group called Weekly timetable"); }, 4000); }
+  // dobytoday.com/#group=Weekly%20timetable: opens My saved lists showing just that group – its own page, to bookmark or open on any phone you're signed in on
+  var GROUPWANT = "";
+  function groupHas(g){ return TABS.lists.some(function(l){ return l.id !== "today" && groupsOf(l).indexOf(g) > -1; }); }
+  function groupFromLink(retry){ var g;
+    if(retry){ g = GROUPWANT; if(!g || !groupHas(g)) return; }
+    else { var m = location.hash.match(/^#group=(.+)$/); if(!m) return; try{ g = decodeURIComponent(m[1]).trim(); }catch(e){ return; } history.replaceState(null, "", location.pathname + location.search); if(!g) return; }
+    if(TABS.active !== "today") switchTo("today");
+    if(!groupHas(g)){ GROUPWANT = g; if($("projBox").hidden) $("projBtn").click(); setTimeout(function(){ if(GROUPWANT === g) toast("No group called " + g + " here yet – sign in to see your saved lists"); }, 4000); return; }
+    GROUPWANT = ""; OPEN.pf = "g:" + g; saveOpen(); projCards(); if($("projBox").hidden) $("projBtn").click();
+    setTimeout(function(){ $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 50); }
+  function groupLink(g){ var u = location.origin + "/#group=" + encodeURIComponent(g).replace(/%20/g, "%20");
+    if(navigator.share){ navigator.share({title:g, url:u}).catch(function(){}); return; }
+    (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(function(){ toast("Link copied – it opens " + g + " for anyone signed in to your account"); }, function(){ prompt("Copy this link", u); }); }
   function personOf(t){ var m = t.name.match(/^(.+?)(?:’s|'s| –| -)/); return m ? m[1] : t.name; }
   function drawTrips(){
     var card = function(t){ var on = !!kept(t.id); return '<div class="tripw"><button class="trip" type="button" data-trip="'+t.id+'"><b>'+esc(t.name)+'</b><small>'+esc(t.blurb)+'</small><span class="n">'+t.items.length+' jobs</span></button><button type="button" class="tfav'+(on ? ' on' : '')+'" data-fav="'+t.id+'" aria-pressed="'+on+'" title="'+(on ? 'Your copy is in My saved lists' : 'Save a copy to My saved lists')+'" aria-label="Save to My saved lists">'+(on ? '★' : '☆')+'</button></div>'; };
@@ -2128,8 +2145,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   $("mail").addEventListener("click", function(){ var t = asText(); if(!t) return; location.href = "mailto:?subject=" + encodeURIComponent("Today's list") + "&body=" + encodeURIComponent(t); });
 
   try{ if(/^\d{10,}$/.test(localStorage.getItem("undefined") || "")) localStorage.removeItem("undefined"); }catch(e){}   // tidy up after an old start-up mix-up
-  load(); drawTrips(); render(); dayBanner(); setTimeout(function(){ inboxFromLink(); projFromLink(); keepFromLink(); loadFromLink(); weekFromLink(); }, 0);
-  window.addEventListener("hashchange", function(){ inboxFromLink(); projFromLink(); keepFromLink(); loadFromLink(); weekFromLink(); });
+  load(); drawTrips(); render(); dayBanner(); setTimeout(function(){ inboxFromLink(); projFromLink(); keepFromLink(); loadFromLink(); weekFromLink(); groupFromLink(); }, 0);
+  window.addEventListener("hashchange", function(){ inboxFromLink(); projFromLink(); keepFromLink(); loadFromLink(); weekFromLink(); groupFromLink(); });
   document.addEventListener("visibilitychange", function(){ if(!document.hidden && S.day !== today()){ newDay(); render(); dayBanner(); } });
   (function(){
     function fold(btnId, boxId){ var b = $(btnId), x = $(boxId); b.addEventListener("click", function(){ var open = x.hidden; x.hidden = !open; b.setAttribute("aria-expanded", String(open)); }); }
@@ -2431,7 +2448,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
         aApplying = true; try{ localStorage.setItem(keyOf("today"), JSON.stringify(d.s)); }catch(e){}
         var dup = false; (d.L || []).forEach(function(l){ if(!l || !l.id) return; if(!TABS.lists.some(function(x){ return x.id === l.id; }) && sameShared(l)){ dup = true; return; } try{ localStorage.setItem(keyOf(l.id), JSON.stringify(l.s || {})); if(l.c) localStorage.setItem(ckeyOf(l.id), l.c); }catch(e){}
           var have = TABS.lists.filter(function(x){ return x.id === l.id; })[0]; if(!have){ have = {id:l.id}; TABS.lists.push(have); } have.name = l.name || have.name || "Page"; have.group = l.group || ""; have.pin = !!l.pin; }); if(Array.isArray(d.f)) TABS.favs = d.f; saveTabs(); drawTrips();
-        if(d.m){ var mine0 = myLoad(), ids = {}; d.m.forEach(function(x){ ids[x.id] = 1; }); MYL = first ? d.m.concat(mine0.filter(function(x){ return !ids[x.id]; })) : d.m; try{ localStorage.setItem(MKEY, JSON.stringify(MYL)); }catch(e){} drawMy(); } setLocalT(d.t || Date.now()); switchTo(TABS.active, true); aApplying = false; aBaseFrom(d); if(WEEKWANT) weekFromLink(true); acctState("✓ Saved to your account"); if(dup) acctPush(); }
+        if(d.m){ var mine0 = myLoad(), ids = {}; d.m.forEach(function(x){ ids[x.id] = 1; }); MYL = first ? d.m.concat(mine0.filter(function(x){ return !ids[x.id]; })) : d.m; try{ localStorage.setItem(MKEY, JSON.stringify(MYL)); }catch(e){} drawMy(); } setLocalT(d.t || Date.now()); switchTo(TABS.active, true); aApplying = false; aBaseFrom(d); if(WEEKWANT) weekFromLink(true); if(GROUPWANT) groupFromLink(true); acctState("✓ Saved to your account"); if(dup) acctPush(); }
       else if(!d || lt > (d.t || 0)){ acctPush(); }
       else { if(d && (d.t || 0) > aBaseT()) aBaseFrom(d); acctState("✓ Saved to your account"); } inboxFromSites(); }); }
   function inboxFromSites(){ if(!AUSER || !asb) return; [["listbyaisle","ListbyAisle"],["packbybag","PackbyBag"]].forEach(function(st){
