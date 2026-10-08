@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v146 -->
+<!-- DoByToday v147 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -869,7 +869,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
       <div class="ltwrap"><h2 class="ltitle"><button class="sect mine" id="mineBtn" type="button" aria-expanded="true" aria-controls="mineBody"><span class="c"></span>My to-do list</button></h2><span class="htally" id="htally"></span></div>
       <button class="hic hshare" id="mineShare" type="button" aria-expanded="false" aria-controls="shareBox" title="Share this list"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="2.6"/><circle cx="6" cy="12" r="2.6"/><circle cx="18" cy="19" r="2.6"/><path d="M8.3 10.8l7.4-4.3M8.3 13.2l7.4 4.3"/></svg><span class="cap"></span></button>
       <button class="hic" id="mylSaveLink" type="button" hidden title="Save to My saved lists"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h12v18l-6-4-6 4z"/></svg><span class="cap">Save</span></button>
-      <button class="hic clearic" id="clear" type="button" hidden title="Clear the whole list"><svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="3.7" y1="3.7" x2="12.3" y2="12.3" stroke="currentColor" stroke-width="1.7"/></svg><span class="cap">Clear</span></button>
+      <button class="hic clearic" id="clear" type="button" hidden title="Clear the whole list"><svg viewBox="0 0 16 16" width="20" height="20" aria-hidden="true"><circle cx="8" cy="8" r="6.4" fill="none" stroke="currentColor" stroke-width="1.7"/><line x1="3.7" y1="3.7" x2="12.3" y2="12.3" stroke="currentColor" stroke-width="1.7"/></svg><span class="cap">Clear list</span></button>
     </div>
   <div id="mineBody">
     <div id="mine"></div>
@@ -920,7 +920,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v146</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v147</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -2079,7 +2079,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function clearSearch(){ query = ""; $("q").value = ""; $("qClear").hidden = true; document.body.classList.remove("searching"); render(); }
   $("qClear").addEventListener("click", function(){ clearSearch(); $("q").focus(); });
   $("q").addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); if(splitRaw(this.value).length > 1) addTyped(this.value); else this.blur(); } });
-  function clearAll(){ if(!nPicked()) return; if(!confirm("Clear today's list?")) return; S = {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}, day:today(), later:S.later || [], past:S.past || [], seen:S.seen || [], title:"", notes:"", keep:false}; save(); render(); toast("Cleared – fresh start"); }
+  function clearAll(){ if(!nPicked()) return; if(!confirm("Clear the whole list? Every job comes off – done or not.")) return; S = {picked:{}, got:{}, own:[], bag:{}, removed:[], note:{}, day:today(), later:S.later || [], past:S.past || [], seen:S.seen || [], title:"", notes:"", keep:false}; save(); render(); toast("Cleared – fresh start"); }
   $("clear").addEventListener("click", clearAll);
   $("copy").addEventListener("click", function(){
     var t = asText(); if(!t) return;
