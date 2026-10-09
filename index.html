@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v154 -->
+<!-- DoByToday v155 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -672,6 +672,10 @@ body.pagemode .ptitle{font-size:1.6rem;margin:22px 0 10px}
 .pedit label{font-weight:800;font-size:.9rem}
 .pedit label small{font-weight:400;color:var(--muted)}
 .pedit input,.pedit textarea{font:inherit;font-size:.95rem;padding:8px 10px;border:1.5px solid var(--line);border-radius:8px;width:100%;box-sizing:border-box}
+.pedit .pcopy{margin-top:14px;padding:10px 12px;border:1.5px dashed var(--line,#ccc);border-radius:10px}
+.pedit .pcopy .r{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin-top:6px}
+.pedit .pcopy input{font:inherit;padding:6px 8px}
+.pedit .pcopy small{display:block;margin-top:6px;opacity:.75}
 .pedit .pkeep{display:flex;gap:8px;align-items:flex-start;font-weight:400;margin-top:6px}
 .pedit .pkeep input{width:auto;margin-top:4px}
 .pedit .row{display:flex;gap:14px;align-items:center;margin-top:6px}
@@ -941,7 +945,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v154</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v155</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1310,7 +1314,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       + groupField("") + '<div class="row"><button type="button" class="btn primary" data-pmake="1">Create it</button><button type="button" class="link quiet" data-pdel="1">Cancel</button></div></div>';
     if(PEDIT) return '<div class="pedit"><label for="pTitle">Title</label><input id="pTitle" maxlength="120" value="' + esc(S.title) + '" placeholder="e.g. Overdue occupancy tax"><label for="pNotes">Notes <small>– what it\'s about, who\'s who, numbers to hand. Start a line with "- " for a bullet.</small></label><textarea id="pNotes" rows="10">' + esc(S.notes) + '</textarea>' + (TABS.active !== "today" ? (S.kind === "links" ? '<label for="pItems">Links <small>– one per line: a name, then the link</small></label><textarea id="pItems" rows="6">' + esc(S.own.map(function(o){ return o.n + " – " + (o.url || ""); }).join("\n")) + "</textarea>"
         : '<label for="pItems">Steps <small>– one per line. Change, add, delete or move lines; ticks stay on steps you keep.</small></label><textarea id="pItems" rows="8">' + esc(S.own.map(function(o){ return o.n; }).join("\n")) + "</textarea>") : "")
-      + (TABS.active !== "today" ? groupField(curTab().group || "") + '<label for="pAfter">Notes after the steps <small>– optional</small></label><textarea id="pAfter" rows="5">' + esc(S.after || "") + '</textarea><label class="pkeep"><input type="checkbox" id="pPin"' + (curTab().pin ? " checked" : "") + '> Pin it to the top of My saved lists</label>' : "")
+      + (TABS.active !== "today" ? groupField(curTab().group || "") + '<label for="pAfter">Notes after the steps <small>– optional</small></label><textarea id="pAfter" rows="5">' + esc(S.after || "") + '</textarea><label class="pkeep"><input type="checkbox" id="pPin"' + (curTab().pin ? " checked" : "") + '> Pin it to the top of My saved lists</label>'
+        + '<div class="pcopy"><b>📅 Copy this card for a date</b><div class="r"><input type="date" id="pCopyD" aria-label="Date for the copy"><button type="button" class="btn" data-pcopy="1">Make the copy</button></div><small>For a day that\'s different from usual: change the copy, and this card stays as it is. Today\'s schedule opens the copy on that date.</small></div>' : "")
       + (TABS.active === "today" ? '<label class="pkeep"><input type="checkbox" id="pKeep"' + (S.keep ? " checked" : "") + '> Keep ticked jobs and the order I add them (like a saved list)</label>' : "")
       + '<div class="row"><button type="button" class="btn primary" data-psave="1">Save</button><button type="button" class="link quiet" data-px="1">Cancel</button>' + (TABS.active !== "today" ? '<button type="button" class="link danger" data-pdel="1">Delete this page</button>' : "") + '</div></div>';
     if(!has && TABS.active === "today") return "";
@@ -1747,6 +1752,19 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       toast(n ? n + " added to the top of today's list. To keep them, tap the save symbol on your list and give it a name." : "All of those are on today already"); } });
   function keepFromLink(){ var m = location.hash.match(/^#keep=([a-z0-9-]+)/); if(!m) return; history.replaceState(null, "", location.pathname + location.search);
     if(keepTrip(m[1])){ OPEN.pf = "saved"; saveOpen(); projCards(); if($("projBox").hidden) $("projBtn").click(); setTimeout(function(){ $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 50); } }
+  // A card for one date: "Fri 9 Oct – kids' timetable". Today's schedule opens it on that date instead of the usual weekday card.
+  var MONS = ["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"];
+  function cardDate(name){ var m = String(name || "").match(/^\s*(?:(?:mon|tue|wed|thu|fri|sat|sun)[a-z]*,?\s+)?(\d{1,2})(?:st|nd|rd|th)?\s+(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\.?(?:\s+(\d{4}))?\b/i); if(!m) return "";
+    var mo = MONS.indexOf(m[2].toLowerCase()), now = new Date(), y = m[3] ? +m[3] : now.getFullYear(), d = new Date(y, mo, +m[1]);
+    if(!m[3] && d < new Date(now.getFullYear(), now.getMonth() - 6, 1)) d = new Date(y + 1, mo, +m[1]);   // "9 Jan" in October means next January
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); }
+  function dayLabel(iso){ var p = iso.split("-"), d = new Date(+p[0], +p[1] - 1, +p[2]); return ["Sun","Mon","Tue","Wed","Thu","Fri","Sat"][d.getDay()] + " " + d.getDate() + " " + ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"][d.getMonth()]; }
+  function copyForDate(iso){ save(); var src = curTab(), d = JSON.parse(JSON.stringify(S)), base = (S.title || src.name || "Card").replace(/^\s*(monday|tuesday|wednesday|thursday|friday|saturday|sunday)\s*[–-]\s*/i, "");
+    if(cardDate(base)) base = base.replace(/^[^–-]*[–-]\s*/, "");
+    var name = dayLabel(iso) + " – " + base; d.title = name; d.got = {}; (d.own || []).forEach(function(o){ o.got = false; }); d.past = [];
+    var id = newTab(name), t = TABS.lists.filter(function(l){ return l.id === id; })[0]; t.group = src.group || "";
+    try{ localStorage.setItem(keyOf(id), JSON.stringify(d)); }catch(e){} saveTabs(); PEDIT = false; switchTo(id); if(typeof acctPush === "function") acctPush(); window.scrollTo(0, 0);
+    toast("Made “" + name + "” – change anything on it; the usual card stays as it is"); }
   // dobytoday.com/#week (the Family week icon): opens today's card from your "Weekly timetable" group – Monday's card on a Monday – with the rest of the week in My saved lists
   var WEEKWANT = false, WANTKEY = "dobytoday-want";
   function wantSet(v){ try{ if(v) sessionStorage.setItem(WANTKEY, JSON.stringify({v:v, t:Date.now()})); else sessionStorage.removeItem(WANTKEY); }catch(e){} }
@@ -1755,8 +1773,10 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function weekFromLink(retry){ if(!retry && !/^#week$/.test(location.hash)) return; if(!retry){ history.replaceState(null, "", location.pathname + location.search); wantSet("week"); }
     var day = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][new Date().getDay()],
       wk = TABS.lists.filter(function(l){ return l.id !== "today" && groupsOf(l).some(function(g){ return /timetable/i.test(g); }); }),
-      t = wk.filter(function(l){ return (l.name || "").toLowerCase().indexOf(day.toLowerCase()) === 0; })[0];
-    if(t){ WEEKWANT = false; wantSet(""); groupsOf(t).forEach(function(g){ OPEN["pg:g:" + g] = 1; }); saveOpen(); switchTo(t.id); window.scrollTo(0, 0); toast(day + "'s timetable"); return; }
+      today = (function(n){ return n.getFullYear() + "-" + String(n.getMonth() + 1).padStart(2, "0") + "-" + String(n.getDate()).padStart(2, "0"); })(new Date()),
+      t = wk.filter(function(l){ return cardDate(l.name) === today; })[0]   // a card made for today's date wins
+        || wk.filter(function(l){ return !cardDate(l.name) && (l.name || "").toLowerCase().indexOf(day.toLowerCase()) === 0; })[0];
+    if(t){ WEEKWANT = false; wantSet(""); groupsOf(t).forEach(function(g){ OPEN["pg:g:" + g] = 1; }); saveOpen(); switchTo(t.id); window.scrollTo(0, 0); toast(cardDate(t.name) ? "Today's card – " + t.name : day + "'s timetable"); return; }
     if(retry) return; WEEKWANT = true; wantPoll(); if($("projBox").hidden) $("projBtn").click();
     setTimeout(function(){ if(WEEKWANT) toast("No weekly timetable here yet – sign in, or put your day cards in a group called Weekly timetable"); }, 9000); }
   // dobytoday.com/#group=Weekly%20timetable: opens My saved lists showing just that group – its own page, to bookmark or open on any phone you're signed in on
@@ -2066,6 +2086,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       if(pr.links.length){ S.kind = "links"; S.own = pr.links.map(function(l){ return {n:l.n, url:l.url, a:"other", b:"any", got:false}; }); }
       else S.own = pr.steps.map(function(n){ var d = (pr.details || {})[n]; return d && d.length ? {n:n, d:d, a:"other", b:"any", got:false} : {n:n, a:"other", b:"any", got:false}; });
       PEDIT = false; ensurePage(); save(); render(); window.scrollTo(0, 0); toast(pr.links.length ? pr.links.length + (pr.links.length === 1 ? " link" : " links") + " – tap Open or Copy" : pr.steps.length ? pr.steps.length + " steps found – tick them off as you go" : "Page made – add steps below"); return; }
+    if(e.target.closest("[data-pcopy]")){ e.stopPropagation(); var cd = $("pCopyD").value; if(!cd){ toast("Pick the date first"); return; } copyForDate(cd); return; }
     if(e.target.closest("[data-psave]")){ e.stopPropagation(); var tv = $("pTitle").value.trim(), pr2 = parsePaste($("pNotes").value, true), nAdd = 0;
       S.title = tv; S.notes = pr2.notes; if($("pAfter")) S.after = $("pAfter").value.replace(/\s+$/, "");
       var pi = $("pItems"); if(pi){ var old = {}; S.own.forEach(function(o){ old[o.n] = o; });
