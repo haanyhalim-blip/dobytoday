@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v159 -->
+<!-- DoByToday v160 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -39,6 +39,30 @@
 html{-webkit-text-size-adjust:100%}
 body{margin:0;background:var(--bg);color:var(--ink);font-family:"Atkinson Hyperlegible",system-ui,-apple-system,"Segoe UI",sans-serif;font-size:16px;line-height:1.5}
 .wrap{max-width:760px;margin:0 auto;padding:0 16px 90px}
+/* Event page: a group shown as one page – its cards in date order (e.g. a weekend away) – with a way straight back */
+body.evmode .wrap > :not(#evPage){display:none!important}
+#evPage[hidden]{display:none}
+#evPage .evtop{position:sticky;top:0;z-index:5;background:var(--bg,#f6f1ea);padding:12px 0 8px;border-bottom:1px solid var(--line)}
+#evPage .evback{font:inherit;font-weight:700;border:1.5px solid var(--line);border-radius:999px;padding:7px 14px;background:var(--card);color:var(--ink);cursor:pointer}
+#evPage h2{margin:12px 0 2px;font-size:1.4rem}
+#evPage .evsub{opacity:.7;margin:0 0 8px;font-size:.9rem}
+#evPage .evbtns{display:flex;gap:6px;flex-wrap:wrap}
+#evPage .evbtns button,#evPage .evwho button{font:inherit;font-size:.85rem;font-weight:700;border:1.5px solid var(--line);border-radius:999px;padding:5px 12px;background:var(--card);color:var(--ink);cursor:pointer}
+#evPage .evwho{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-top:8px;font-size:.85rem}
+#evPage .evwho button[aria-pressed="true"]{background:var(--ink);color:var(--card);border-color:var(--ink)}
+#evPage .evday{margin:16px 0;border:1.5px solid var(--line);border-radius:14px;background:var(--card);padding:4px 14px 12px}
+#evPage .evday.today{border-color:var(--ink);border-width:2px}
+#evPage .evday > summary{cursor:pointer;list-style:none;padding:10px 0 6px;font-weight:800;font-size:1.1rem}
+#evPage .evday > summary::-webkit-details-marker{display:none}
+#evPage .evday > summary small{font-weight:600;font-size:.78rem;margin-left:8px;padding:2px 8px;border-radius:999px;background:var(--ink);color:var(--card);vertical-align:2px}
+#evPage .evday > summary small.past{background:none;color:inherit;opacity:.6;border:1px solid var(--line)}
+#evPage .evslot{margin:10px 0 2px;font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;opacity:.6}
+#evPage .evs{padding:7px 0;border-top:1px solid var(--line);font-size:.95rem}
+#evPage .evs.got{opacity:.5;text-decoration:line-through}
+#evPage .evs details summary{cursor:pointer}
+#evPage .evs details div{margin:4px 0 2px 14px;font-size:.88rem;opacity:.9}
+#evPage .evs details div p{margin:3px 0}
+#evPage .evopen{margin-top:10px;font:inherit;font-weight:700;background:none;border:0;padding:0;text-decoration:underline;cursor:pointer;color:inherit}
 header{padding:26px 0 14px;margin-bottom:6px;border-bottom:1px solid var(--line);display:flex;align-items:baseline;gap:14px;flex-wrap:wrap}
 .keep{margin:0 0 10px;padding:12px 14px;background:var(--wash);border:1.5px solid var(--main);border-radius:10px;font-size:.92rem;color:var(--ink)}
 .keep[hidden]{display:none}
@@ -858,6 +882,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
 </head>
 <body>
 <div class="wrap">
+<section id="evPage" hidden></section>
 <header>
   <a class="brand" href="/">Do<span>by</span>Today</a>
   <h1 class="tagline">Today's list, sorted by when.</h1>
@@ -960,7 +985,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v159</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v160</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1219,7 +1244,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       gs.forEach(function(g){ var inG = live.filter(function(p){ return groupsOf(p.l).indexOf(g) > -1; }); h += pfold("g:" + g, g, inG.length, '<div class="plist">' + inG.map(prow).join("") + "</div>"); }); }
     else if(f === "arch"){ h += '<p class="small">Put away – nothing here is deleted. Dated cards come here by themselves once their day has passed. To bring one back: open it → ✎ Edit → untick Archive.</p><div class="plist">' + arch.map(prow).join("") + "</div>"; }
     else { var show = f === "done" ? done : f === "saved" ? [] : live.filter(function(p){ return groupsOf(p.l).indexOf(f.slice(2)) > -1; });
-      if(f.slice(0, 2) === "g:") h += '<div class="gpage"><h3>' + esc(f.slice(2)) + '</h3><span class="gbtns"><button type="button" data-glink="' + esc(f.slice(2)) + '">🔗 My link</button><button type="button" data-gshare="' + esc(f.slice(2)) + '">👥 Share this group</button></span></div>';
+      if(f.slice(0, 2) === "g:") h += '<div class="gpage"><h3>' + esc(f.slice(2)) + '</h3><span class="gbtns"><button type="button" data-evgo="' + esc(f.slice(2)) + '">📅 Event page</button><button type="button" data-glink="' + esc(f.slice(2)) + '">🔗 My link</button><button type="button" data-gshare="' + esc(f.slice(2)) + '">👥 Share this group</button></span></div>';
       h += '<div class="plist">' + (f === "done" || f === "saved" ? "" : newb) + show.map(prow).join("") + "</div>"; }
     if(f === "done" && !done.length) h += '<p class="small">Nothing finished yet.</p>';
     el.innerHTML = h; drawMy(); }
@@ -1229,7 +1254,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(b.dataset.poadd){ var cn = $("poNew").value.replace(/,/g, " ").replace(/\s+/g, " ").trim(), ids = Array.prototype.map.call(document.querySelectorAll(".poPick:checked"), function(x){ return x.value; });
       if(!cn){ toast("Type the group name first"); $("poNew").focus(); return; } if(!ids.length){ toast("Tick at least one card"); return; }
       TABS.lists.forEach(function(l){ if(ids.indexOf(l.id) > -1 && groupsOf(l).indexOf(cn) < 0) l.group = groupsOf(l).concat([cn]).join(", "); });
-      ORG = false; GMAKE = false; OPEN.pf = "g:" + cn; saveOpen(); regroup(); toast(ids.length + (ids.length === 1 ? " card" : " cards") + " in " + cn + " – they stay in their other groups too"); return; } if(b.dataset.glink){ groupLink(b.dataset.glink); return; } if(b.dataset.gshare){ groupShare(b.dataset.gshare); return; } if(b.dataset.newproj){ NEWCH = true; projCards(); return; } if(b.dataset.newx){ NEWCH = false; projCards(); return; }
+      ORG = false; GMAKE = false; OPEN.pf = "g:" + cn; saveOpen(); regroup(); toast(ids.length + (ids.length === 1 ? " card" : " cards") + " in " + cn + " – they stay in their other groups too"); return; } if(b.dataset.glink){ groupLink(b.dataset.glink); return; } if(b.dataset.gshare){ groupShare(b.dataset.gshare); return; } if(b.dataset.evgo){ evOpen(b.dataset.evgo); return; } if(b.dataset.newproj){ NEWCH = true; projCards(); return; } if(b.dataset.newx){ NEWCH = false; projCards(); return; }
     if(b.dataset.newlist){ NEWCH = false; newProject(); return; } if(b.dataset.newgroup){ NEWCH = false; GMAKE = true; ORG = false; projCards(); return; } if(b.dataset.gcancel){ GMAKE = false; projCards(); return; } if(b.dataset.proj){ switchTo(b.dataset.proj); window.scrollTo(0, 0); return; }
     if(b.dataset.favgo){ var t = TRIPS.filter(function(x){ return x.id === b.dataset.favgo; })[0]; if(!t) return; if(t.slug){ try{ sessionStorage.setItem("dobytoday-back", t.id); }catch(x){} location.href = "/lists/" + t.slug; } else { if($("tripBox").hidden) $("tripBtn").click(); openPick(t.id); } } });
   $("projSec").addEventListener("change", function(e){ var t = e.target;
@@ -1822,8 +1847,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     else { var m = location.hash.match(/^#group=(.+)$/); if(!m) return; try{ g = decodeURIComponent(m[1]).trim(); }catch(e){ return; } history.replaceState(null, "", location.pathname + location.search); if(!g) return; wantSet("g:" + g); }
     if(TABS.active !== "today") switchTo("today");
     if(!groupHas(g)){ if(retry) return; GROUPWANT = g; wantPoll(); if($("projBox").hidden) $("projBtn").click(); setTimeout(function(){ if(GROUPWANT === g) toast("No group called " + g + " here yet – sign in to see your saved lists"); }, 9000); return; }
-    GROUPWANT = ""; wantSet(""); OPEN.pf = "g:" + g; saveOpen(); projCards(); if($("projBox").hidden) $("projBtn").click();
-    setTimeout(function(){ $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 50); }
+    GROUPWANT = ""; wantSet(""); evOpen(g); }
   function groupLink(g){ var u = location.origin + "/#group=" + encodeURIComponent(g).replace(/%20/g, "%20");
     if(navigator.share){ navigator.share({title:g, url:u}).catch(function(){}); return; }
     (navigator.clipboard ? navigator.clipboard.writeText(u) : Promise.reject()).then(function(){ toast("Link copied – it opens " + g + " for anyone signed in to your account"); }, function(){ prompt("Copy this link", u); }); }
@@ -1851,9 +1875,41 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       return rpc("get_list", {code:code}).then(function(d){ if(!d || typeof d !== "object") return; var id = "p" + lid(), j = snapOf(d);
         try{ localStorage.setItem(keyOf(id), j); localStorage.setItem(ckeyOf(id), code); localStorage.setItem("dobytoday-sync:" + code, j); }catch(e){ return; }
         TABS.lists.push({id:id, name:(d.title || "Shared card").slice(0, 80), group:g}); added++; }, function(){}); }))
-    .then(function(){ saveTabs(); if(typeof acctPush === "function") acctPush(); OPEN.pf = "g:" + g; saveOpen(); projCards(); if($("projBox").hidden) $("projBtn").click();
-      setTimeout(function(){ $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 50);
+    .then(function(){ saveTabs(); if(typeof acctPush === "function") acctPush(); if(groupHas(g)) evOpen(g);
       toast(added ? added + (added === 1 ? " card" : " cards") + " added to My saved lists – changes stay in step both ways" : groupHas(g) ? "You already have " + g : "Couldn't open that link – check your connection and try again"); }); }
+  // ---------- Event page: a whole group on one page (dobytoday.com/#group=Name opens it) ----------
+  var EVG = "", EVWHO = "";
+  function evCards(g){ return TABS.lists.filter(function(l){ return l.id !== "today" && groupsOf(l).indexOf(g) > -1; })
+    .sort(function(a, b){ var da = cardDate(a.name) || "9", db = cardDate(b.name) || "9"; return da.localeCompare(db) || String(a.name).localeCompare(String(b.name)); }); }
+  function evStepsOf(l){ var d = l.id === TABS.active ? S : readList(l.id), out = [];
+    (d.own || []).forEach(function(o, i){ out.push({n:o.n, d:o.d || [], got:!!o.got, i:i}); });
+    Object.keys(d.picked || {}).forEach(function(n, i){ out.push({n:n, d:[], got:!!(d.got || {})[n], i:1000 + i}); });
+    return out.map(function(x){ x.m = stepMins(x.n); return x; }).sort(function(a, b){ return (a.m < 0) - (b.m < 0) || a.m - b.m || a.i - b.i; }); }
+  function evShow(x){ if(!EVWHO) return true; var ns = namesOf(x.n); if(EVWHO === "*parents") return ns.some(isParent); return ns.indexOf(EVWHO) > -1; }
+  function evHTML(g){ var cs = evCards(g), today = isoToday(), people = [], dates = cs.map(function(l){ return cardDate(l.name); }).filter(Boolean);
+    cs.forEach(function(l){ evStepsOf(l).forEach(function(x){ namesOf(x.n).forEach(function(nm){ nm = nm.trim(); if(nm && !isParent(nm) && !/^(all three|everyone)$/i.test(nm) && people.indexOf(nm) < 0) people.push(nm); }); }); });
+    var chip = function(v, t){ return '<button type="button" data-evwho="' + esc(v) + '" aria-pressed="' + (EVWHO === v) + '">' + esc(t) + '</button>'; };
+    var h = '<div class="evtop"><button type="button" class="evback" data-evback="1">← Back to DobyToday</button><h2>' + esc(g) + '</h2>'
+      + '<p class="evsub">' + cs.length + (cs.length === 1 ? " card" : " cards") + (dates.length ? " · " + esc(dayLabel(dates[0])) + (dates.length > 1 ? " – " + esc(dayLabel(dates[dates.length - 1])) : "") : "") + '</p>'
+      + '<div class="evbtns"><button type="button" data-glink="' + esc(g) + '">🔗 Link</button><button type="button" data-gshare="' + esc(g) + '">👥 Share</button></div>'
+      + (people.length ? '<div class="evwho"><span>Show:</span>' + chip("", "Everyone") + people.map(function(nm){ return chip(nm, nm); }).join("") + chip("*parents", "Parents") + '</div>' : '') + '</div>';
+    if(!cs.length) return h + '<p>No cards in this group here yet – sign in to see your saved lists.</p>';
+    cs.forEach(function(l){ var dt = cardDate(l.name), past = dt && dt < today, isT = dt === today, steps = evStepsOf(l), info = [], slots = [["Morning", []], ["Afternoon", []], ["Evening", []], ["Anytime", []]];
+      steps.forEach(function(x){ if(infoStep({n:x.n, d:x.d})){ info.push(x); return; } if(!evShow(x)) return; slots[x.m < 0 ? 3 : x.m < 720 ? 0 : x.m < 1020 ? 1 : 2][1].push(x); });
+      var row = function(x){ return '<div class="evs' + (x.got ? " got" : "") + '">' + (x.d.length ? '<details><summary>' + esc(x.n) + '</summary><div>' + x.d.map(function(t){ return '<p>' + linkify(t) + '</p>'; }).join("") + '</div></details>' : esc(x.n)) + '</div>'; };
+      var title = (l.name || "").replace(/\s*[–-]\s*kids' timetable\s*$/i, "");
+      h += '<details class="evday' + (isT ? " today" : "") + '"' + (past ? "" : " open") + '><summary>' + esc(title) + (isT ? ' <small>Today</small>' : past ? ' <small class="past">Done</small>' : '') + '</summary>'
+        + slots.filter(function(sl){ return sl[1].length; }).map(function(sl){ return '<p class="evslot">' + sl[0] + '</p>' + sl[1].map(row).join(""); }).join("")
+        + (info.length && !EVWHO ? '<p class="evslot">Links and logins</p>' + info.map(row).join("") : '')
+        + '<button type="button" class="evopen" data-evopen="' + esc(l.id) + '">Open this day to tick or change it →</button></details>'; });
+    return h; }
+  function evOpen(g){ EVG = g; EVWHO = ""; OPEN.pf = "g:" + g; saveOpen(); var el = $("evPage"); el.innerHTML = evHTML(g); el.hidden = false; document.body.classList.add("evmode"); window.scrollTo(0, 0); }
+  function evClose(){ EVG = ""; $("evPage").hidden = true; $("evPage").innerHTML = ""; document.body.classList.remove("evmode"); projCards(); if($("projBox").hidden) $("projBtn").click(); setTimeout(function(){ $("projBtn").scrollIntoView({block:"start"}); window.scrollBy(0, -90); }, 30); }
+  $("evPage").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return;
+    if(b.dataset.evback){ evClose(); return; }
+    if(b.dataset.evwho !== undefined){ EVWHO = b.dataset.evwho; var y = window.scrollY; $("evPage").innerHTML = evHTML(EVG); window.scrollTo(0, y); return; }
+    if(b.dataset.evopen){ var id = b.dataset.evopen; evClose(); switchTo(id); window.scrollTo(0, 0); return; }
+    if(b.dataset.glink){ groupLink(b.dataset.glink); return; } if(b.dataset.gshare){ groupShare(b.dataset.gshare); return; } });
   function personOf(t){ var m = t.name.match(/^(.+?)(?:’s|'s| –| -)/); return m ? m[1] : t.name; }
   function drawTrips(){
     var card = function(t){ var on = !!kept(t.id); return '<div class="tripw"><button class="trip" type="button" data-trip="'+t.id+'"><b>'+esc(t.name)+'</b><small>'+esc(t.blurb)+'</small><span class="n">'+t.items.length+' jobs</span></button><button type="button" class="tfav'+(on ? ' on' : '')+'" data-fav="'+t.id+'" aria-pressed="'+on+'" title="'+(on ? 'Your copy is in My saved lists' : 'Save a copy to My saved lists')+'" aria-label="Save to My saved lists">'+(on ? '★' : '☆')+'</button></div>'; };
