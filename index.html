@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v155 -->
+<!-- DoByToday v156 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -945,7 +945,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v155</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v156</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1175,13 +1175,16 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       + ps.map(function(p){ return '<div class="porow"><span class="pon">' + esc(p.title) + '</span><input class="popage" data-id="' + esc(p.l.id) + '" value="' + esc(groupsOf(p.l).join(", ")) + '" list="poCats" maxlength="80" placeholder="No category" aria-label="Categories for ' + esc(p.title) + '"></div>'; }).join("")
       + '<datalist id="poCats">' + all.map(function(g){ return '<option value="' + esc(g) + '">'; }).join("") + '</datalist></div>'; }
   function regroup(){ saveTabs(); if(typeof acctPush === "function") acctPush(); projCards(); }
+  // Archive: a card you've put away, or a dated card ("Fri 9 Oct – …") once its day has passed. Hidden from the groups, never deleted.
+  function isoToday(){ var n = new Date(); return n.getFullYear() + "-" + String(n.getMonth() + 1).padStart(2, "0") + "-" + String(n.getDate()).padStart(2, "0"); }
+  function isArch(l){ if(!l || l.id === "today") return false; if(typeof l.arch === "boolean") return l.arch; var d = cardDate(l.name); return !!d && d < isoToday(); }
   function projCards(){ var el = $("projSec"); if(!el) return;
-    var ps = TABS.lists.filter(function(l){ return l.id !== "today"; }).map(pageInfo);
+    var all0 = TABS.lists.filter(function(l){ return l.id !== "today"; }), arch = all0.filter(isArch).map(pageInfo), ps = all0.filter(function(l){ return !isArch(l); }).map(pageInfo);
     if(LASTPG){ ps.forEach(function(p){ if(p.l.id !== LASTPG) return; var want = p.done ? "done" : groupsOf(p.l).length ? "g:" + groupsOf(p.l)[0] : "all"; if(OPEN.pf && OPEN.pf !== "all" && OPEN.pf !== want) OPEN.pf = want; }); LASTPG = ""; saveOpen(); }   // coming back from a page: you can see it
     var live = ps.filter(function(p){ return !p.done; }), done = ps.filter(function(p){ return p.done; }), gs = [];
     live.forEach(function(p){ groupsOf(p.l).forEach(function(g){ if(gs.indexOf(g) < 0) gs.push(g); }); }); gs.sort(function(a, b){ return a.localeCompare(b); });
     var saved = (MYL || []).length, f = OPEN.pf || "all";
-    var chips = [["all", "All"]].concat(gs.map(function(g){ return ["g:" + g, g]; })).concat(saved ? [["saved", "Saved days"]] : []).concat(done.length ? [["done", "✓ Done"]] : []);
+    var chips = [["all", "All"]].concat(gs.map(function(g){ return ["g:" + g, g]; })).concat(saved ? [["saved", "Saved days"]] : []).concat(done.length ? [["done", "✓ Done"]] : []).concat(arch.length ? [["arch", "🗄 Archive (" + arch.length + ")"]] : []);
     if(!chips.some(function(c){ return c[0] === f; })) f = "all"; PF = f;
     var h = '<div class="filt" role="group" aria-label="Show">' + (ORG ? "" : chips.map(function(c){ return '<button type="button" class="fchip" data-pf="' + esc(c[0]) + '" aria-pressed="' + (f === c[0]) + '">' + esc(c[1]) + "</button>"; }).join("")) + (ps.length ? '<button type="button" class="fchip porgb" data-porg="1" aria-pressed="' + ORG + '">' + (ORG ? "✓ Done organising" : "⚙ Organise") + '</button>' : '') + "</div>";
     if(ORG){ el.innerHTML = h + orgHTML(ps); drawMy(); return; }
@@ -1190,6 +1193,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       var top = live.filter(function(p){ return p.l.pin || !groupsOf(p.l).length; }).sort(function(a, b){ return (b.l.pin ? 1 : 0) - (a.l.pin ? 1 : 0); });
       h += '<div class="plist">' + newb + top.map(prow).join("") + "</div>";
       gs.forEach(function(g){ var inG = live.filter(function(p){ return groupsOf(p.l).indexOf(g) > -1; }); h += pfold("g:" + g, g, inG.length, '<div class="plist">' + inG.map(prow).join("") + "</div>"); }); }
+    else if(f === "arch"){ h += '<p class="small">Put away – nothing here is deleted. Dated cards come here by themselves once their day has passed. To bring one back: open it → ✎ Edit → untick Archive.</p><div class="plist">' + arch.map(prow).join("") + "</div>"; }
     else { var show = f === "done" ? done : f === "saved" ? [] : live.filter(function(p){ return groupsOf(p.l).indexOf(f.slice(2)) > -1; });
       if(f.slice(0, 2) === "g:") h += '<div class="gpage"><h3>' + esc(f.slice(2)) + '</h3><span class="gbtns"><button type="button" data-glink="' + esc(f.slice(2)) + '">🔗 My link</button><button type="button" data-gshare="' + esc(f.slice(2)) + '">👥 Share this group</button></span></div>';
       h += '<div class="plist">' + (f === "done" || f === "saved" ? "" : newb) + show.map(prow).join("") + "</div>"; }
@@ -1314,7 +1318,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       + groupField("") + '<div class="row"><button type="button" class="btn primary" data-pmake="1">Create it</button><button type="button" class="link quiet" data-pdel="1">Cancel</button></div></div>';
     if(PEDIT) return '<div class="pedit"><label for="pTitle">Title</label><input id="pTitle" maxlength="120" value="' + esc(S.title) + '" placeholder="e.g. Overdue occupancy tax"><label for="pNotes">Notes <small>– what it\'s about, who\'s who, numbers to hand. Start a line with "- " for a bullet.</small></label><textarea id="pNotes" rows="10">' + esc(S.notes) + '</textarea>' + (TABS.active !== "today" ? (S.kind === "links" ? '<label for="pItems">Links <small>– one per line: a name, then the link</small></label><textarea id="pItems" rows="6">' + esc(S.own.map(function(o){ return o.n + " – " + (o.url || ""); }).join("\n")) + "</textarea>"
         : '<label for="pItems">Steps <small>– one per line. Change, add, delete or move lines; ticks stay on steps you keep.</small></label><textarea id="pItems" rows="8">' + esc(S.own.map(function(o){ return o.n; }).join("\n")) + "</textarea>") : "")
-      + (TABS.active !== "today" ? groupField(curTab().group || "") + '<label for="pAfter">Notes after the steps <small>– optional</small></label><textarea id="pAfter" rows="5">' + esc(S.after || "") + '</textarea><label class="pkeep"><input type="checkbox" id="pPin"' + (curTab().pin ? " checked" : "") + '> Pin it to the top of My saved lists</label>'
+      + (TABS.active !== "today" ? groupField(curTab().group || "") + '<label for="pAfter">Notes after the steps <small>– optional</small></label><textarea id="pAfter" rows="5">' + esc(S.after || "") + '</textarea><label class="pkeep"><input type="checkbox" id="pPin"' + (curTab().pin ? " checked" : "") + '> Pin it to the top of My saved lists</label><label class="pkeep"><input type="checkbox" id="pArch"' + (isArch(curTab()) ? " checked" : "") + '> Archive it – hide it from My saved lists (kept, never deleted; find it under 🗄 Archive)</label>'
         + '<div class="pcopy"><b>📅 Copy this card for a date</b><div class="r"><input type="date" id="pCopyD" aria-label="Date for the copy"><button type="button" class="btn" data-pcopy="1">Make the copy</button></div><small>For a day that\'s different from usual: change the copy, and this card stays as it is. Today\'s schedule opens the copy on that date.</small></div>' : "")
       + (TABS.active === "today" ? '<label class="pkeep"><input type="checkbox" id="pKeep"' + (S.keep ? " checked" : "") + '> Keep ticked jobs and the order I add them (like a saved list)</label>' : "")
       + '<div class="row"><button type="button" class="btn primary" data-psave="1">Save</button><button type="button" class="link quiet" data-px="1">Cancel</button>' + (TABS.active !== "today" ? '<button type="button" class="link danger" data-pdel="1">Delete this page</button>' : "") + '</div></div>';
@@ -1772,7 +1776,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function wantPoll(){ var n = 0, iv = setInterval(function(){ n++; if(WEEKWANT) weekFromLink(true); if(GROUPWANT) groupFromLink(true); if((!WEEKWANT && !GROUPWANT) || n > 20) clearInterval(iv); }, 750); }   // your cards may still be arriving from your account
   function weekFromLink(retry){ if(!retry && !/^#week$/.test(location.hash)) return; if(!retry){ history.replaceState(null, "", location.pathname + location.search); wantSet("week"); }
     var day = ["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"][new Date().getDay()],
-      wk = TABS.lists.filter(function(l){ return l.id !== "today" && groupsOf(l).some(function(g){ return /timetable/i.test(g); }); }),
+      wk = TABS.lists.filter(function(l){ return l.id !== "today" && !(l.arch === true) && groupsOf(l).some(function(g){ return /timetable/i.test(g); }); }),
       today = (function(n){ return n.getFullYear() + "-" + String(n.getMonth() + 1).padStart(2, "0") + "-" + String(n.getDate()).padStart(2, "0"); })(new Date()),
       t = wk.filter(function(l){ return cardDate(l.name) === today; })[0]   // a card made for today's date wins
         || wk.filter(function(l){ return !cardDate(l.name) && (l.name || "").toLowerCase().indexOf(day.toLowerCase()) === 0; })[0];
@@ -1795,7 +1799,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   // Share a whole group with someone (e.g. the weekly timetable with Juhi): one link carries every card's share code.
   // dobytoday.com/#grp=Weekly%20timetable&c=code1.code2… – opening it puts all the cards in their saved lists, in the same group, kept in step with yours.
   function snapOf(d){ return JSON.stringify({picked:d.picked || {}, got:d.got || {}, own:d.own || [], bag:d.bag || {}, removed:d.removed || [], note:d.note || {}, day:d.day || "", later:d.later || [], past:d.past || [], title:d.title || "", notes:d.notes || "", after:d.after || "", keep:!!d.keep, kind:d.kind || "", urg:d.urg || {}, secs:d.secs || null, low:d.low || {}, at:d.at || {}, layout:d.layout || "", ppl:d.ppl || []}); }
-  function groupShare(g){ var ls = TABS.lists.filter(function(l){ return l.id !== "today" && groupsOf(l).indexOf(g) > -1; }); if(!ls.length) return;
+  function groupShare(g){ var ls = TABS.lists.filter(function(l){ return l.id !== "today" && !isArch(l) && groupsOf(l).indexOf(g) > -1; }); if(!ls.length) return;
     if(!confirm("Share all " + ls.length + " cards in " + g + "?\n\nAnyone you send the link to can see and change them, and their changes reach you – including anything private written on them.")) return;
     if(TABS.active !== "today" && ls.some(function(l){ return l.id === TABS.active; })) save();
     var codes = [], jobs = ls.map(function(l){ var c = ""; try{ c = localStorage.getItem(ckeyOf(l.id)) || ""; }catch(e){}
@@ -2093,7 +2097,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
         if(S.kind === "links") S.own = pi.value.split("\n").map(linkOf).filter(Boolean).map(function(l){ var was = old[l.n]; return {n:l.n, url:l.url, a:"other", b:"any", got:false}; });
         else S.own = splitSteps(pi.value).map(function(n){ var was = old[n]; return was ? was : {n:n, a:"other", b:"any", got:false}; }); }
       pr2.steps.forEach(function(n){ if(!S.own.some(function(o){ return o.n === n; })){ S.own.push({n:n, a:"other", b:"any", got:false}); nAdd++; } });
-      if(TABS.active !== "today"){ S.keep = true; curTab().group = groupsOf({group:$("pGroup").value}).join(", "); curTab().pin = !!($("pPin") && $("pPin").checked); saveTabs(); } else { var kp = $("pKeep") && $("pKeep").checked; S.keep = !!kp; }
+      if(TABS.active !== "today"){ S.keep = true; curTab().group = groupsOf({group:$("pGroup").value}).join(", "); curTab().pin = !!($("pPin") && $("pPin").checked); if($("pArch")){ var wantA = $("pArch").checked; if(wantA !== isArch(curTab())) curTab().arch = wantA; } saveTabs(); } else { var kp = $("pKeep") && $("pKeep").checked; S.keep = !!kp; }
       PEDIT = false; save(); render(); toast(nAdd ? "Saved – " + nAdd + " steps found in the notes, now below" : "Saved"); return; }
     if(e.target.closest("[data-addstep]")){ e.stopPropagation(); addStep(); return; }
     var lc = e.target.closest("[data-lcopy]"); if(lc){ e.stopPropagation(); var lo = S.own[+lc.dataset.lcopy]; if(lo){ (navigator.clipboard ? navigator.clipboard.writeText(lo.url) : Promise.reject()).then(function(){ toast("Link copied – paste it in a message"); }, function(){ prompt("Copy this link:", lo.url); }); } return; }
@@ -2486,7 +2490,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     if(added){ saveTabs(); drawTrips(); }
     if(JSON.stringify(readList(TABS.active)) !== before){ aApplying = true; switchTo(TABS.active, true); aApplying = false; } }
   function acctSend(){ var t = Date.now(); setLocalT(t);
-    var raw = readList("today"), L = TABS.lists.filter(function(l){ return l.id !== "today"; }).map(function(l){ var c = ""; try{ c = localStorage.getItem(ckeyOf(l.id)) || ""; }catch(e){} return {id:l.id, name:l.name, group:l.group || "", pin:!!l.pin, s:readList(l.id), c:c}; });
+    var raw = readList("today"), L = TABS.lists.filter(function(l){ return l.id !== "today"; }).map(function(l){ var c = ""; try{ c = localStorage.getItem(ckeyOf(l.id)) || ""; }catch(e){} return {id:l.id, name:l.name, group:l.group || "", pin:!!l.pin, arch:l.arch, s:readList(l.id), c:c}; });
     asb.rpc("hlt_save", {p_site:SITE, p_data:{s:raw, L:L, f:favs(), t:t, m:myLoad(), c:(function(){ try{ return localStorage.getItem(ckeyOf("today")) || ""; }catch(e){ return ""; } })()}}).then(function(res){
       if(!res.error) aBaseFrom({s:raw, L:L, t:t});
       acctState(res.error ? "Saved on this phone – it'll save to your account when you're connected" : "✓ Saved to your account"); }); }
@@ -2500,7 +2504,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       if(d && d.s && (first || (blank && !(S.later || []).length) || (d.t || 0) > lt)){ // just signed in: the list saved in your account wins
         aApplying = true; try{ localStorage.setItem(keyOf("today"), JSON.stringify(d.s)); }catch(e){}
         var dup = false; (d.L || []).forEach(function(l){ if(!l || !l.id) return; if(!TABS.lists.some(function(x){ return x.id === l.id; }) && sameShared(l)){ dup = true; return; } try{ localStorage.setItem(keyOf(l.id), JSON.stringify(l.s || {})); if(l.c) localStorage.setItem(ckeyOf(l.id), l.c); }catch(e){}
-          var have = TABS.lists.filter(function(x){ return x.id === l.id; })[0]; if(!have){ have = {id:l.id}; TABS.lists.push(have); } have.name = l.name || have.name || "Page"; have.group = l.group || ""; have.pin = !!l.pin; }); if(Array.isArray(d.f)) TABS.favs = d.f; saveTabs(); drawTrips();
+          var have = TABS.lists.filter(function(x){ return x.id === l.id; })[0]; if(!have){ have = {id:l.id}; TABS.lists.push(have); } have.name = l.name || have.name || "Page"; have.group = l.group || ""; have.pin = !!l.pin; if(typeof l.arch === "boolean") have.arch = l.arch; else delete have.arch; }); if(Array.isArray(d.f)) TABS.favs = d.f; saveTabs(); drawTrips();
         if(d.m){ var mine0 = myLoad(), ids = {}; d.m.forEach(function(x){ ids[x.id] = 1; }); MYL = first ? d.m.concat(mine0.filter(function(x){ return !ids[x.id]; })) : d.m; try{ localStorage.setItem(MKEY, JSON.stringify(MYL)); }catch(e){} drawMy(); } setLocalT(d.t || Date.now()); switchTo(TABS.active, true); aApplying = false; aBaseFrom(d); if(WEEKWANT) weekFromLink(true); if(GROUPWANT) groupFromLink(true); acctState("✓ Saved to your account"); if(dup) acctPush(); }
       else if(!d || lt > (d.t || 0)){ acctPush(); }
       else { if(d && (d.t || 0) > aBaseT()) aBaseFrom(d); acctState("✓ Saved to your account"); } if(WEEKWANT) weekFromLink(true); if(GROUPWANT) groupFromLink(true); inboxFromSites(); }); }
