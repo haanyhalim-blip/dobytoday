@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v156 -->
+<!-- DoByToday v157 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -573,6 +573,14 @@ h2.dsec .sub{text-transform:none;letter-spacing:0;font-weight:400}
 .porgb{margin-left:auto}
 .porg{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
 .porg h3{margin:6px 0 4px;font-size:1rem}
+.poadd{background:var(--card);border:2px solid var(--ink,#222);border-radius:12px;padding:12px;margin:8px 0 14px}
+.poadd h3{margin:0 0 6px;font-size:1.05rem}
+.poadd input[type=text]{width:100%;box-sizing:border-box;font:inherit;padding:9px 11px;border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
+.poadd .pochk{display:flex;gap:9px;align-items:center;padding:7px 0;border-top:1px solid var(--line);font-size:.93rem;cursor:pointer}
+.poadd .pochk:first-of-type{border-top:0}
+.poadd .pochk input{width:20px;height:20px;flex:none}
+.poadd .pochk small{opacity:.65;margin-left:auto;text-align:right}
+.poadd .pobtn{margin-top:10px}
 .porow{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:6px 0;border-top:1px solid var(--line)}
 .porow input{font:inherit;font-size:.92rem;padding:7px 10px;border:1.5px solid var(--line);border-radius:8px;flex:1 1 160px;min-width:0;background:var(--card);color:var(--ink)}
 .porow .pon{flex:1 1 140px;min-width:0;font-weight:700;font-size:.92rem}
@@ -945,7 +953,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v156</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v157</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1169,9 +1177,13 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   var ORG = false;
   function pfold(key, label, n, inner){ var o = !!OPEN["pg:" + key]; return '<details class="pgrp" data-pg="' + esc(key) + '"' + (o ? " open" : "") + '><summary>' + esc(label) + " <small>" + n + "</small></summary>" + inner + "</details>"; }
   function orgHTML(ps){ var all = []; ps.forEach(function(p){ groupsOf(p.l).forEach(function(g){ if(all.indexOf(g) < 0) all.push(g); }); }); all.sort(function(a, b){ return a.localeCompare(b); });
-    return '<div class="porg"><h3>Categories</h3>' + (all.length ? '<p class="small">Rename a category and every page in it follows. Clear the name to take it off its pages – the pages stay.</p>' + all.map(function(g){ var n = ps.filter(function(p){ return groupsOf(p.l).indexOf(g) > -1; }).length;
+    var add = '<div class="poadd"><h3>Add cards to a category</h3><p class="small">1. Type a new category name, or pick one you have. 2. Tick the cards. 3. Tap Add.</p>'
+      + '<input type="text" id="poNew" list="poCats" maxlength="30" placeholder="e.g. Juhi Away October Weekend" aria-label="Category name"><p class="small" style="margin:10px 0 2px">Tick the cards to put in it:</p>'
+      + ps.map(function(p){ var gs = groupsOf(p.l); return '<label class="pochk"><input type="checkbox" class="poPick" value="' + esc(p.l.id) + '"><span>' + esc(p.title) + '</span><small>' + esc(gs.join(", ")) + '</small></label>'; }).join("")
+      + '<button type="button" class="btn primary pobtn" data-poadd="1">Add to category</button></div>';
+    return add + '<div class="porg"><h3>Your categories</h3>' + (all.length ? '<p class="small">Rename a category and every page in it follows. Clear the name to take it off its pages – the pages stay.</p>' + all.map(function(g){ var n = ps.filter(function(p){ return groupsOf(p.l).indexOf(g) > -1; }).length;
         return '<div class="porow"><input class="pocat" data-old="' + esc(g) + '" value="' + esc(g) + '" maxlength="30" aria-label="Category name"><span class="small">' + n + (n === 1 ? " page" : " pages") + '</span></div>'; }).join("") : '<p class="small">No categories yet – give a page one below.</p>')
-      + '<h3>Pages</h3><p class="small">Type one or more categories for each page, with commas between – e.g. Kids, Sahara.</p>'
+      + '<h3>Each card\'s categories</h3><p class="small">Or type them here yourself – several with commas between, e.g. Kids, Sahara. A card can be in more than one.</p>'
       + ps.map(function(p){ return '<div class="porow"><span class="pon">' + esc(p.title) + '</span><input class="popage" data-id="' + esc(p.l.id) + '" value="' + esc(groupsOf(p.l).join(", ")) + '" list="poCats" maxlength="80" placeholder="No category" aria-label="Categories for ' + esc(p.title) + '"></div>'; }).join("")
       + '<datalist id="poCats">' + all.map(function(g){ return '<option value="' + esc(g) + '">'; }).join("") + '</datalist></div>'; }
   function regroup(){ saveTabs(); if(typeof acctPush === "function") acctPush(); projCards(); }
@@ -1199,7 +1211,11 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       h += '<div class="plist">' + (f === "done" || f === "saved" ? "" : newb) + show.map(prow).join("") + "</div>"; }
     if(f === "done" && !done.length) h += '<p class="small">Nothing finished yet.</p>';
     el.innerHTML = h; drawMy(); }
-  $("projSec").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.pf){ OPEN.pf = b.dataset.pf; saveOpen(); projCards(); return; } if(b.dataset.porg){ ORG = !ORG; projCards(); return; } if(b.dataset.glink){ groupLink(b.dataset.glink); return; } if(b.dataset.gshare){ groupShare(b.dataset.gshare); return; } if(b.dataset.newproj){ newProject(); return; } if(b.dataset.proj){ switchTo(b.dataset.proj); window.scrollTo(0, 0); return; }
+  $("projSec").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.pf){ OPEN.pf = b.dataset.pf; saveOpen(); projCards(); return; } if(b.dataset.porg){ ORG = !ORG; projCards(); return; }
+    if(b.dataset.poadd){ var cn = $("poNew").value.replace(/,/g, " ").replace(/\s+/g, " ").trim(), ids = Array.prototype.map.call(document.querySelectorAll(".poPick:checked"), function(x){ return x.value; });
+      if(!cn){ toast("Type the category name first"); $("poNew").focus(); return; } if(!ids.length){ toast("Tick at least one card"); return; }
+      TABS.lists.forEach(function(l){ if(ids.indexOf(l.id) > -1 && groupsOf(l).indexOf(cn) < 0) l.group = groupsOf(l).concat([cn]).join(", "); });
+      ORG = false; OPEN.pf = "g:" + cn; saveOpen(); regroup(); toast(ids.length + (ids.length === 1 ? " card" : " cards") + " added to " + cn + " – they stay in their other categories too"); return; } if(b.dataset.glink){ groupLink(b.dataset.glink); return; } if(b.dataset.gshare){ groupShare(b.dataset.gshare); return; } if(b.dataset.newproj){ newProject(); return; } if(b.dataset.proj){ switchTo(b.dataset.proj); window.scrollTo(0, 0); return; }
     if(b.dataset.favgo){ var t = TRIPS.filter(function(x){ return x.id === b.dataset.favgo; })[0]; if(!t) return; if(t.slug){ try{ sessionStorage.setItem("dobytoday-back", t.id); }catch(x){} location.href = "/lists/" + t.slug; } else { if($("tripBox").hidden) $("tripBtn").click(); openPick(t.id); } } });
   $("projSec").addEventListener("change", function(e){ var t = e.target;
     if(t.classList.contains("pocat")){ var old = t.dataset.old, nv = t.value.replace(/,/g, " ").trim(); if(nv === old) return;
