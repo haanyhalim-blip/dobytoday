@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v157 -->
+<!-- DoByToday v158 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -953,7 +953,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v157</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v158</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1211,9 +1211,11 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       h += '<div class="plist">' + (f === "done" || f === "saved" ? "" : newb) + show.map(prow).join("") + "</div>"; }
     if(f === "done" && !done.length) h += '<p class="small">Nothing finished yet.</p>';
     el.innerHTML = h; drawMy(); }
-  $("projSec").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.pf){ OPEN.pf = b.dataset.pf; saveOpen(); projCards(); return; } if(b.dataset.porg){ ORG = !ORG; projCards(); return; }
+  $("projSec").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.pf){ OPEN.pf = b.dataset.pf; saveOpen(); projCards(); return; } if(b.dataset.porg){ var pn = $("poNew"), pk = document.querySelectorAll(".poPick:checked").length;
+      if(ORG && pn && (pn.value.trim() || pk)){ b = $("projSec").querySelector("[data-poadd]"); }   // Done with a name typed or cards ticked: save them, don't lose them
+      else { ORG = !ORG; projCards(); return; } }
     if(b.dataset.poadd){ var cn = $("poNew").value.replace(/,/g, " ").replace(/\s+/g, " ").trim(), ids = Array.prototype.map.call(document.querySelectorAll(".poPick:checked"), function(x){ return x.value; });
-      if(!cn){ toast("Type the category name first"); $("poNew").focus(); return; } if(!ids.length){ toast("Tick at least one card"); return; }
+      if(!cn){ toast("Type the category name first"); $("poNew").focus(); return; } if(!ids.length){ toast("Tick at least one card, then tap Add to category"); return; }
       TABS.lists.forEach(function(l){ if(ids.indexOf(l.id) > -1 && groupsOf(l).indexOf(cn) < 0) l.group = groupsOf(l).concat([cn]).join(", "); });
       ORG = false; OPEN.pf = "g:" + cn; saveOpen(); regroup(); toast(ids.length + (ids.length === 1 ? " card" : " cards") + " added to " + cn + " – they stay in their other categories too"); return; } if(b.dataset.glink){ groupLink(b.dataset.glink); return; } if(b.dataset.gshare){ groupShare(b.dataset.gshare); return; } if(b.dataset.newproj){ newProject(); return; } if(b.dataset.proj){ switchTo(b.dataset.proj); window.scrollTo(0, 0); return; }
     if(b.dataset.favgo){ var t = TRIPS.filter(function(x){ return x.id === b.dataset.favgo; })[0]; if(!t) return; if(t.slug){ try{ sessionStorage.setItem("dobytoday-back", t.id); }catch(x){} location.href = "/lists/" + t.slug; } else { if($("tripBox").hidden) $("tripBtn").click(); openPick(t.id); } } });
