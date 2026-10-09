@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v158 -->
+<!-- DoByToday v159 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -573,6 +573,13 @@ h2.dsec .sub{text-transform:none;letter-spacing:0;font-weight:400}
 .porgb{margin-left:auto}
 .porg{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin:8px 0}
 .porg h3{margin:6px 0 4px;font-size:1rem}
+.pnewc{grid-column:1/-1;display:grid;gap:8px;align-content:start;padding:12px;border:1.5px dashed var(--line);border-radius:12px}
+.pnewc b{font-size:.95rem}
+.pnewc button{font:inherit;font-weight:700;text-align:left;padding:10px 12px;border-radius:10px;border:1.5px solid var(--line);background:var(--card);color:var(--ink);cursor:pointer}
+.pnewc button small{display:block;font-weight:400;opacity:.7;font-size:.82rem}
+.pnewc .x{border:0;background:none;padding:2px 0;font-weight:400;text-decoration:underline;opacity:.7}
+.porg details{margin-top:10px}
+.porg details summary{cursor:pointer;font-weight:700}
 .poadd{background:var(--card);border:2px solid var(--ink,#222);border-radius:12px;padding:12px;margin:8px 0 14px}
 .poadd h3{margin:0 0 6px;font-size:1.05rem}
 .poadd input[type=text]{width:100%;box-sizing:border-box;font:inherit;padding:9px 11px;border:1.5px solid var(--line);border-radius:8px;background:var(--card);color:var(--ink)}
@@ -953,7 +960,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v158</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v159</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1176,16 +1183,19 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   function groupsOf(l){ var out = []; String((l && l.group) || "").split(",").forEach(function(g){ g = g.trim(); if(g && out.indexOf(g) < 0) out.push(g); }); return out; }
   var ORG = false;
   function pfold(key, label, n, inner){ var o = !!OPEN["pg:" + key]; return '<details class="pgrp" data-pg="' + esc(key) + '"' + (o ? " open" : "") + '><summary>' + esc(label) + " <small>" + n + "</small></summary>" + inner + "</details>"; }
-  function orgHTML(ps){ var all = []; ps.forEach(function(p){ groupsOf(p.l).forEach(function(g){ if(all.indexOf(g) < 0) all.push(g); }); }); all.sort(function(a, b){ return a.localeCompare(b); });
-    var add = '<div class="poadd"><h3>Add cards to a category</h3><p class="small">1. Type a new category name, or pick one you have. 2. Tick the cards. 3. Tap Add.</p>'
-      + '<input type="text" id="poNew" list="poCats" maxlength="30" placeholder="e.g. Juhi Away October Weekend" aria-label="Category name"><p class="small" style="margin:10px 0 2px">Tick the cards to put in it:</p>'
+  function groupMaker(ps, isNew, all){ return '<div class="poadd"><h3>' + (isNew ? "📁 New group" : "Add cards to a group") + '</h3><p class="small">' + (isNew ? "Name it, tick the cards to put in it, then tap Create. A card can be in more than one group." : "Type a group name – new, or one you have – tick the cards, then tap Add.") + '</p>'
+      + '<input type="text" id="poNew" list="poCats" maxlength="30" placeholder="e.g. Juhi Away October Weekend" aria-label="Group name"><p class="small" style="margin:10px 0 2px">Tick the cards to put in it:</p>'
       + ps.map(function(p){ var gs = groupsOf(p.l); return '<label class="pochk"><input type="checkbox" class="poPick" value="' + esc(p.l.id) + '"><span>' + esc(p.title) + '</span><small>' + esc(gs.join(", ")) + '</small></label>'; }).join("")
-      + '<button type="button" class="btn primary pobtn" data-poadd="1">Add to category</button></div>';
-    return add + '<div class="porg"><h3>Your categories</h3>' + (all.length ? '<p class="small">Rename a category and every page in it follows. Clear the name to take it off its pages – the pages stay.</p>' + all.map(function(g){ var n = ps.filter(function(p){ return groupsOf(p.l).indexOf(g) > -1; }).length;
-        return '<div class="porow"><input class="pocat" data-old="' + esc(g) + '" value="' + esc(g) + '" maxlength="30" aria-label="Category name"><span class="small">' + n + (n === 1 ? " page" : " pages") + '</span></div>'; }).join("") : '<p class="small">No categories yet – give a page one below.</p>')
-      + '<h3>Each card\'s categories</h3><p class="small">Or type them here yourself – several with commas between, e.g. Kids, Sahara. A card can be in more than one.</p>'
-      + ps.map(function(p){ return '<div class="porow"><span class="pon">' + esc(p.title) + '</span><input class="popage" data-id="' + esc(p.l.id) + '" value="' + esc(groupsOf(p.l).join(", ")) + '" list="poCats" maxlength="80" placeholder="No category" aria-label="Categories for ' + esc(p.title) + '"></div>'; }).join("")
-      + '<datalist id="poCats">' + all.map(function(g){ return '<option value="' + esc(g) + '">'; }).join("") + '</datalist></div>'; }
+      + '<button type="button" class="btn primary pobtn" data-poadd="1">' + (isNew ? "Create group" : "Add to group") + '</button>' + (isNew ? ' <button type="button" class="link quiet" data-gcancel="1">Cancel</button>' : '')
+      + '<datalist id="poCats">' + (all || []).map(function(g){ return '<option value="' + esc(g) + '">'; }).join("") + '</datalist></div>'; }
+  function allGroups(ps){ var all = []; ps.forEach(function(p){ groupsOf(p.l).forEach(function(g){ if(all.indexOf(g) < 0) all.push(g); }); }); return all.sort(function(a, b){ return a.localeCompare(b); }); }
+  function orgHTML(ps){ var all = allGroups(ps);
+    return '<div class="porg"><h3>Your groups</h3>' + (all.length ? '<p class="small">Type over a name to rename the group. Clear it to remove the group – the cards stay.</p>' + all.map(function(g){ var n = ps.filter(function(p){ return groupsOf(p.l).indexOf(g) > -1; }).length;
+        return '<div class="porow"><input class="pocat" data-old="' + esc(g) + '" value="' + esc(g) + '" maxlength="30" aria-label="Group name"><span class="small">' + n + (n === 1 ? " card" : " cards") + '</span></div>'; }).join("") : '<p class="small">No groups yet – make one below.</p>') + '</div>'
+      + groupMaker(ps, false, all)
+      + '<div class="porg"><details><summary>One card at a time</summary><p class="small">Type each card\'s groups – several with commas between, e.g. Kids, Sahara.</p>'
+      + ps.map(function(p){ return '<div class="porow"><span class="pon">' + esc(p.title) + '</span><input class="popage" data-id="' + esc(p.l.id) + '" value="' + esc(groupsOf(p.l).join(", ")) + '" list="poCats" maxlength="80" placeholder="No group" aria-label="Groups for ' + esc(p.title) + '"></div>'; }).join("") + '</details></div>'; }
+  var NEWCH = false, GMAKE = false;   // Create your own → choosing a list or a group; making a group
   function regroup(){ saveTabs(); if(typeof acctPush === "function") acctPush(); projCards(); }
   // Archive: a card you've put away, or a dated card ("Fri 9 Oct – …") once its day has passed. Hidden from the groups, never deleted.
   function isoToday(){ var n = new Date(); return n.getFullYear() + "-" + String(n.getMonth() + 1).padStart(2, "0") + "-" + String(n.getDate()).padStart(2, "0"); }
@@ -1198,9 +1208,11 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
     var saved = (MYL || []).length, f = OPEN.pf || "all";
     var chips = [["all", "All"]].concat(gs.map(function(g){ return ["g:" + g, g]; })).concat(saved ? [["saved", "Saved days"]] : []).concat(done.length ? [["done", "✓ Done"]] : []).concat(arch.length ? [["arch", "🗄 Archive (" + arch.length + ")"]] : []);
     if(!chips.some(function(c){ return c[0] === f; })) f = "all"; PF = f;
-    var h = '<div class="filt" role="group" aria-label="Show">' + (ORG ? "" : chips.map(function(c){ return '<button type="button" class="fchip" data-pf="' + esc(c[0]) + '" aria-pressed="' + (f === c[0]) + '">' + esc(c[1]) + "</button>"; }).join("")) + (ps.length ? '<button type="button" class="fchip porgb" data-porg="1" aria-pressed="' + ORG + '">' + (ORG ? "✓ Done organising" : "⚙ Organise") + '</button>' : '') + "</div>";
+    var h = '<div class="filt" role="group" aria-label="Show">' + (ORG ? "" : chips.map(function(c){ return '<button type="button" class="fchip" data-pf="' + esc(c[0]) + '" aria-pressed="' + (f === c[0]) + '">' + esc(c[1]) + "</button>"; }).join("")) + (ps.length ? '<button type="button" class="fchip porgb" data-porg="1" aria-pressed="' + ORG + '">' + (ORG ? "✓ Done organising" : "⚙ Organise groups") + '</button>' : '') + "</div>";
     if(ORG){ el.innerHTML = h + orgHTML(ps); drawMy(); return; }
-    var newb = '<button type="button" class="prow pnew" data-newproj="1"><span class="pn">+ Create your own</span><span class="pc">a list, a plan or a project – paste or type it</span></button>';
+    if(GMAKE){ el.innerHTML = h + groupMaker(ps, true, allGroups(ps)); drawMy(); setTimeout(function(){ var i = $("poNew"); if(i) i.focus(); }, 30); return; }
+    var newb = NEWCH ? '<div class="pnewc"><b>Create…</b><button type="button" data-newlist="1">📝 A list<small>a list, a plan or a project – paste or type it</small></button><button type="button" data-newgroup="1">📁 A group<small>put cards together, e.g. a weekend away</small></button><button type="button" class="x" data-newx="1">Cancel</button></div>'
+      : '<button type="button" class="prow pnew" data-newproj="1"><span class="pn">+ Create your own</span><span class="pc">a list or a group</span></button>';
     if(f === "all"){   // pinned and uncategorised pages first, then one folder per category
       var top = live.filter(function(p){ return p.l.pin || !groupsOf(p.l).length; }).sort(function(a, b){ return (b.l.pin ? 1 : 0) - (a.l.pin ? 1 : 0); });
       h += '<div class="plist">' + newb + top.map(prow).join("") + "</div>";
@@ -1215,14 +1227,15 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       if(ORG && pn && (pn.value.trim() || pk)){ b = $("projSec").querySelector("[data-poadd]"); }   // Done with a name typed or cards ticked: save them, don't lose them
       else { ORG = !ORG; projCards(); return; } }
     if(b.dataset.poadd){ var cn = $("poNew").value.replace(/,/g, " ").replace(/\s+/g, " ").trim(), ids = Array.prototype.map.call(document.querySelectorAll(".poPick:checked"), function(x){ return x.value; });
-      if(!cn){ toast("Type the category name first"); $("poNew").focus(); return; } if(!ids.length){ toast("Tick at least one card, then tap Add to category"); return; }
+      if(!cn){ toast("Type the group name first"); $("poNew").focus(); return; } if(!ids.length){ toast("Tick at least one card"); return; }
       TABS.lists.forEach(function(l){ if(ids.indexOf(l.id) > -1 && groupsOf(l).indexOf(cn) < 0) l.group = groupsOf(l).concat([cn]).join(", "); });
-      ORG = false; OPEN.pf = "g:" + cn; saveOpen(); regroup(); toast(ids.length + (ids.length === 1 ? " card" : " cards") + " added to " + cn + " – they stay in their other categories too"); return; } if(b.dataset.glink){ groupLink(b.dataset.glink); return; } if(b.dataset.gshare){ groupShare(b.dataset.gshare); return; } if(b.dataset.newproj){ newProject(); return; } if(b.dataset.proj){ switchTo(b.dataset.proj); window.scrollTo(0, 0); return; }
+      ORG = false; GMAKE = false; OPEN.pf = "g:" + cn; saveOpen(); regroup(); toast(ids.length + (ids.length === 1 ? " card" : " cards") + " in " + cn + " – they stay in their other groups too"); return; } if(b.dataset.glink){ groupLink(b.dataset.glink); return; } if(b.dataset.gshare){ groupShare(b.dataset.gshare); return; } if(b.dataset.newproj){ NEWCH = true; projCards(); return; } if(b.dataset.newx){ NEWCH = false; projCards(); return; }
+    if(b.dataset.newlist){ NEWCH = false; newProject(); return; } if(b.dataset.newgroup){ NEWCH = false; GMAKE = true; ORG = false; projCards(); return; } if(b.dataset.gcancel){ GMAKE = false; projCards(); return; } if(b.dataset.proj){ switchTo(b.dataset.proj); window.scrollTo(0, 0); return; }
     if(b.dataset.favgo){ var t = TRIPS.filter(function(x){ return x.id === b.dataset.favgo; })[0]; if(!t) return; if(t.slug){ try{ sessionStorage.setItem("dobytoday-back", t.id); }catch(x){} location.href = "/lists/" + t.slug; } else { if($("tripBox").hidden) $("tripBtn").click(); openPick(t.id); } } });
   $("projSec").addEventListener("change", function(e){ var t = e.target;
     if(t.classList.contains("pocat")){ var old = t.dataset.old, nv = t.value.replace(/,/g, " ").trim(); if(nv === old) return;
       TABS.lists.forEach(function(l){ var gs = groupsOf(l), i = gs.indexOf(old); if(i < 0) return; if(nv) gs[i] = nv; else gs.splice(i, 1); l.group = groupsOf({group:gs.join(",")}).join(", "); });
-      regroup(); toast(nv ? "Renamed to " + nv : "Category taken off – the pages are still here"); return; }
+      regroup(); toast(nv ? "Renamed to " + nv : "Group removed – the cards are still here"); return; }
     if(t.classList.contains("popage")){ var l = TABS.lists.filter(function(x){ return x.id === t.dataset.id; })[0]; if(!l) return; l.group = groupsOf({group:t.value}).join(", "); regroup(); } });
   $("projBox").addEventListener("toggle", function(e){ var d = e.target; if(!d.classList || !d.classList.contains("pgrp")) return; if(d.open) OPEN["pg:" + d.dataset.pg] = 1; else delete OPEN["pg:" + d.dataset.pg]; saveOpen(); }, true);
   function deleteProject(){ var id = TABS.active; if(id === "today") return; if(!confirm("Delete “" + (S.title || "this page") + "”" + (CODE ? " from this phone? The shared link keeps working for anyone else." : "?"))) return;
@@ -1322,7 +1335,7 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   var AIPROMPT = "Turn the message below into a to-do page. Give me: a short title on the first line; then a short description (keep any figures, names, phone numbers and addresses); then a line that says Steps, followed by the steps to do, one per line, numbered, in order. Put anything useful about a step (who to ask, what to say) on the same line after a dash. Leave out anything that isn't needed.";
   function curTab(){ return TABS.lists.filter(function(l){ return l.id === TABS.active; })[0] || {}; }
   function groupField(v){ var gs = []; TABS.lists.forEach(function(l){ groupsOf(l).forEach(function(g){ if(gs.indexOf(g) < 0) gs.push(g); }); });
-    return '<label for="pGroup">Category <small>– optional; several with commas, e.g. Kids, Sahara</small></label><input id="pGroup" maxlength="80" list="pGroups" value="' + esc(v) + '" placeholder="No group"><datalist id="pGroups">' + gs.map(function(g){ return '<option value="' + esc(g) + '">'; }).join("") + "</datalist>"
+    return '<label for="pGroup">Group <small>– optional; several with commas, e.g. Kids, Sahara</small></label><input id="pGroup" maxlength="80" list="pGroups" value="' + esc(v) + '" placeholder="No group"><datalist id="pGroups">' + gs.map(function(g){ return '<option value="' + esc(g) + '">'; }).join("") + "</datalist>"
       + (gs.length ? '<div class="gchips">' + gs.map(function(g){ return '<button type="button" class="chip" data-gpick="' + esc(g) + '">' + esc(g) + "</button>"; }).join("") + "</div>" : ""); }
   function projHTML(){ var has = S.title || S.notes;
     if(PEDIT === "new") return '<div class="pedit"><b class="ph">Create your own</b>'
