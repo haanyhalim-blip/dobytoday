@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v161 -->
+<!-- DoByToday v162 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -989,7 +989,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v161</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v162</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1269,7 +1269,8 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
   $("projBox").addEventListener("toggle", function(e){ var d = e.target; if(!d.classList || !d.classList.contains("pgrp")) return; if(d.open) OPEN["pg:" + d.dataset.pg] = 1; else delete OPEN["pg:" + d.dataset.pg]; saveOpen(); }, true);
   function deleteProject(){ var id = TABS.active; if(id === "today") return; if(!confirm("Delete “" + (S.title || "this page") + "”" + (CODE ? " from this phone? The shared link keeps working for anyone else." : "?"))) return;
     try{ localStorage.removeItem(keyOf(id)); localStorage.removeItem(ckeyOf(id)); }catch(e){} TABS.lists = TABS.lists.filter(function(l){ return l.id !== id; }); saveTabs(); switchTo("today"); if(typeof acctPush === "function") acctPush(); toast("Page deleted"); }
-  function dayBanner(){ var b = $("dayBox"); if(!LEFT){ b.hidden = true; return; }
+  var DAYASK = false;   // the "New day – keep them or let them go?" message is off: unfinished jobs simply stay on today (ticked ones still clear overnight)
+  function dayBanner(){ var b = $("dayBox"); if(!DAYASK){ LEFT = 0; b.hidden = true; return; } if(!LEFT){ b.hidden = true; return; }
     b.innerHTML = '<b>New day.</b> ' + LEFT + ' job' + (LEFT === 1 ? '' : 's') + ' from yesterday ' + (LEFT === 1 ? 'was not' : 'were not') + ' done. <button class="link" id="dayKeep" type="button">Keep them on today</button> · <button class="link quiet" id="dayDrop" type="button">Let them go</button>'; b.hidden = false;
     $("dayKeep").addEventListener("click", function(){ LEFT = 0; b.hidden = true; toast("Carried over to today"); });
     $("dayDrop").addEventListener("click", function(){ CARRY.forEach(function(n){ delete S.picked[n]; delete S.got[n]; delete S.bag[n]; if(S.note) delete S.note[n]; }); S.own = S.own.filter(function(o){ return CARRY.indexOf(o.n) < 0; }); CARRY = []; LEFT = 0; save(); render(); b.hidden = true; toast("Fresh start"); }); }
