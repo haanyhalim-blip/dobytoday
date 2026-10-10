@@ -1,5 +1,5 @@
 <!doctype html>
-<!-- DoByToday v162 -->
+<!-- DoByToday v163 -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -989,7 +989,7 @@ body.habitmode .tagline,body.habitmode .sticky,body.habitmode #dayBox,body.habit
   </div>
 </section>
 
-  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v162</span></p>
+  <p class="tiny">From Handy Little Tools – also try <a href="https://listbyaisle.com/">ListbyAisle</a> (a shopping list sorted by aisle), <a href="https://packbybag.com/">PackbyBag</a> (a packing list sorted by bag) and <a href="https://dueareset.com/">ResetbyChoice</a> (a page of your own to change a habit). <span class="ver">v163</span></p>
 </div>
 </div>
 <div id="acct" hidden role="dialog" aria-modal="true" aria-labelledby="acTitle"><div class="acbox"><button class="acx" id="acX" type="button" aria-label="Close">×</button>
@@ -1248,8 +1248,11 @@ var TRIPS = [{"id":"changeover","name":"Airbnb changeover","blurb":"Guests out, 
       gs.forEach(function(g){ var inG = live.filter(function(p){ return groupsOf(p.l).indexOf(g) > -1; }); h += pfold("g:" + g, g, inG.length, '<div class="plist">' + inG.map(prow).join("") + "</div>"); }); }
     else if(f === "arch"){ h += '<p class="small">Put away – nothing here is deleted. Dated cards come here by themselves once their day has passed. To bring one back: open it → ✎ Edit → untick Archive.</p><div class="plist">' + arch.map(prow).join("") + "</div>"; }
     else { var show = f === "done" ? done : f === "saved" ? [] : live.filter(function(p){ return groupsOf(p.l).indexOf(f.slice(2)) > -1; });
+      var since = (function(){ var d = new Date(Date.now() - 14 * 864e5); return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0"); })(),
+        pastDays = f.slice(0, 2) === "g:" ? arch.filter(function(p){ var d = cardDate(p.l.name); return p.l.arch !== true && d && d >= since && groupsOf(p.l).indexOf(f.slice(2)) > -1; }).sort(function(a, b){ return cardDate(a.l.name).localeCompare(cardDate(b.l.name)); }) : [];   // an event's days that have passed stay with it for two weeks
       if(f.slice(0, 2) === "g:") h += '<div class="gpage"><h3>' + esc(f.slice(2)) + '</h3><span class="gbtns"><button type="button" data-evgo="' + esc(f.slice(2)) + '">📅 Event page</button><button type="button" data-glink="' + esc(f.slice(2)) + '">🔗 My link</button><button type="button" data-gshare="' + esc(f.slice(2)) + '">👥 Share this group</button></span></div>';
-      h += '<div class="plist">' + (f === "done" || f === "saved" ? "" : newb) + show.map(prow).join("") + "</div>"; }
+      h += '<div class="plist">' + (f === "done" || f === "saved" ? "" : newb) + show.map(prow).join("") + "</div>";
+      if(pastDays.length) h += '<p class="small" style="margin:14px 0 4px;font-weight:700">Past days</p><div class="plist" style="opacity:.75">' + pastDays.map(prow).join("") + "</div>"; }
     if(f === "done" && !done.length) h += '<p class="small">Nothing finished yet.</p>';
     el.innerHTML = h; drawMy(); }
   $("projSec").addEventListener("click", function(e){ var b = e.target.closest("button"); if(!b) return; if(b.dataset.pf){ OPEN.pf = b.dataset.pf; saveOpen(); projCards(); return; } if(b.dataset.porg){ var pn = $("poNew"), pk = document.querySelectorAll(".poPick:checked").length;
